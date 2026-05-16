@@ -218,7 +218,7 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
             <Home /> <span>Home</span>
           </div>
 
-          {isSignedIn && user?.role === "admin" && (
+          {isSignedIn && user?.role === "user" && (
             <div
               className="nav-item highlight"
               onClick={() => goTo("/post-ad")}
@@ -318,17 +318,17 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                     </div>
                   )}
 
-                  {/* {user?.role === "user" && ( */}
-                  <div
-                    onClick={() => goTo("/saved-ads")}
-                    className="dropdown-item saved-item"
-                  >
-                    <Bookmark /> My Saved Ads
-                    <span className="badge-count">{savedCount}</span>
-                  </div>
-                  {/* )} */}
+                  {user?.role === "user" && (
+                    <div
+                      onClick={() => goTo("/saved-ads")}
+                      className="dropdown-item saved-item"
+                    >
+                      <Bookmark /> My Saved Ads
+                      <span className="badge-count">{savedCount}</span>
+                    </div>
+                  )}
 
-                  {user?.role === "admin" && (
+                  {user?.role === "user" && (
                     <div
                       className="dropdown-item"
                       onClick={() => goTo("/my-ads")}
@@ -406,20 +406,20 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                 </div>
               )}
 
-              {user?.role === "admin" && (
+              {user?.role === "user" && (
                 <div onClick={() => goTo("/post-ad")}>
                   <AddCircle /> Post Ad
                 </div>
               )}
 
-              {/* {user?.role === "user" && ( */}
-              <div onClick={() => goTo("/saved-ads")} className="saved-item">
-                <Bookmark /> My Saved Ads
-                <span className="badge-count">{savedCount}</span>
-              </div>
-              {/* )} */}
+              {user?.role === "user" && (
+                <div onClick={() => goTo("/saved-ads")} className="saved-item">
+                  <Bookmark /> My Saved Ads
+                  <span className="badge-count">{savedCount}</span>
+                </div>
+              )}
 
-              {user?.role === "admin" && (
+              {user?.role === "user" && (
                 <div onClick={() => goTo("/my-ads")}>
                   <BorderColor /> My Ads
                 </div>

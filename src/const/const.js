@@ -1,10 +1,12 @@
-export const API_BASE_URL = "http://localhost:3200/api";
-export const PROFILE_PLACEHOLDER_IMAGE = "http://localhost:3200/";
-export const ADS_PLACEHOLDER_IMAGE = "http://localhost:3200/";
+// export const API_BASE_URL = "http://localhost:3200/api";
+// export const PROFILE_PLACEHOLDER_IMAGE = "http://localhost:3200/";
+// export const ADS_PLACEHOLDER_IMAGE = "http://localhost:3200/";
 
-// export const API_BASE_URL = "https://8306-112-213-178-240.ngrok-free.app/api";
-// export const PROFILE_PLACEHOLDER_IMAGE =
-//   "https://8306-112-213-178-240.ngrok-free.app/";
+export const API_BASE_URL = "https://marketplace-backend-chec.onrender.com/api";
+export const PROFILE_PLACEHOLDER_IMAGE =
+  "https://marketplace-backend-chec.onrender.com/";
+export const ADS_PLACEHOLDER_IMAGE =
+  "https://marketplace-backend-chec.onrender.com/";
 
 export const FRONTEND_BASE_URL = "http://localhost:4200";
 
