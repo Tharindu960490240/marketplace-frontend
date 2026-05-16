@@ -52,7 +52,7 @@ const MainBodyWrapper = ({ children, isSignedIn }) => {
 
   return (
     <div
-      className={isSignedIn && !isAuthPage ? "mainBody signedIn" : "mainBody"}
+      className={isSignedIn && !isAuthPage ? "mainBody signedIn" : "mainBody signedIn"}
     >
       {children}
     </div>

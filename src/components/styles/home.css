@@ -4,7 +4,7 @@
   background: var(--main-bg-color);
   /* min-height: 100vh; */
   color: var(--text-color);
-  width: auto%;
+  width: auto;
 }
 
 /* ================= HERO ================= */
