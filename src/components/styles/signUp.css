@@ -7,10 +7,10 @@
   justify-content: center;
   align-items: center;
 
-  width: 100%;
+  width: auto;
   max-width: 700px;
 
-  margin: 30px auto 30px auto;
+  margin: 30px auto;
 
   padding: 30px;
 
@@ -66,14 +66,14 @@
 
 @media screen and (max-width: 480px) {
   .signup-container {
-    margin: 25px;
+    margin: 25px auto;
     padding: 20px;
   }
 }
 
 @media screen and (max-width: 768px) {
   .signup-container {
-    margin: 15px;
+    margin: 15px auto;
     padding: 20px;
   }
 
