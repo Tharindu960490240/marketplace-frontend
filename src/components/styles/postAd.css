@@ -1,0 +1,156 @@
+/* ===============================
+   POST AD CONTAINER
+=============================== */
+.ads-container {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  margin: 30px auto 30px auto;
+
+  background: var(--card-color);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px var(--border-color);
+
+  padding: 30px;
+  box-sizing: border-box;
+
+  color: var(--text-color);
+}
+
+/* Title */
+.ads-box h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+/* ===============================
+   UPLOAD BOX
+=============================== */
+.upload-row {
+  margin-top: 10px;
+}
+
+.upload-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  padding: 12px;
+
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+
+  cursor: pointer;
+  color: var(--muted-color);
+  transition: all 0.3s ease;
+}
+
+.upload-box:hover {
+  border-color: var(--link-color);
+  color: var(--link-color);
+  transform: translateY(-2px);
+}
+
+.required{
+  border-color: #ff6b6b;
+}
+/* ===============================
+   IMAGE PREVIEW
+=============================== */
+.image-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  padding: 15px;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.image-box {
+  position: relative;
+  width: 110px;
+  height: 110px;
+}
+
+.image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+/* DELETE BUTTON */
+.image-box button {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+
+  width: 24px;
+  height: 24px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #ff4d4d;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.image-box button:hover {
+  transform: scale(1.1);
+}
+
+.image-box svg{
+  font-size: 1rem;
+}
+
+/* ===============================
+   RESPONSIVE DESIGN
+=============================== */
+
+/* MOBILE (IMPORTANT PART FOR YOUR REQUIREMENT) */
+@media (max-width: 768px) {
+  .ads-container {
+    padding: 20px;
+  }
+
+  .ads-box h2 {
+    font-size: 22px;
+  }
+
+  .image-box {
+    width: 90px;
+    height: 90px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 20px !important;
+  }
+}
+
+/* SMALL MOBILE */
+@media (max-width: 480px) {
+  .ads-container {
+    padding: 15px;
+  }
+
+  .upload-box {
+    flex-direction: column;
+    text-align: center;
+    padding: 14px;
+  }
+}

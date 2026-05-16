@@ -1,0 +1,279 @@
+/* ===============================
+   ALL USERS PAGE WRAPPER
+=============================== */
+
+.allCategories-container {
+  position: relative;
+  margin: 30px 30px 30px 30px;
+
+  background: var(--card-color);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px var(--border-color);
+
+  padding: 50px !important;
+  box-sizing: border-box;
+
+  color: var(--text-color);
+}
+
+/* Title */
+.allCategories-container h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text-color);
+}
+
+/* ===============================
+   TABS SECTION
+=============================== */
+
+.allCategories-container .MuiTabs-root {
+  margin-top: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.allCategories-container .MuiTab-root {
+  color: var(--muted-color) !important;
+  text-transform: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.allCategories-container .MuiTab-root:hover {
+  color: var(--link-color) !important;
+}
+
+.allCategories-container .Mui-selected {
+  color: var(--link-color) !important;
+  font-weight: 600;
+}
+
+.allCategories-container .MuiTabs-indicator {
+  background-color: var(--link-color);
+}
+
+/* ===============================
+   SEARCH + ACTION BAR
+=============================== */
+
+.allCategories-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Search field */
+.allCategories-actions .MuiTextField-root {
+  background: var(--card-color);
+  border-radius: 8px;
+}
+
+/* ===============================
+   BUTTONS
+=============================== */
+
+.allCategories-container .MuiButton-contained {
+  background: var(--button-success-bg);
+  color: var(--button-text);
+  text-transform: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  box-shadow: 0 4px 12px var(--border-color);
+}
+
+.allCategories-container .MuiButton-contained:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* ===============================
+   TABLE CONTAINER
+=============================== */
+
+.allCategories-container .MuiPaper-root {
+  background: var(--card-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px var(--border-color);
+  overflow: hidden;
+  margin-top: 15px;
+}
+
+/* ===============================
+   TABLE STYLING
+=============================== */
+
+.allCategories-container .MuiTableCell-root {
+  color: var(--text-color) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  font-size: 14px;
+}
+
+/* Header */
+.allCategories-container .MuiTableHead-root {
+  background: var(--main-bg-color);
+}
+
+.allCategories-container .MuiTableHead-root .MuiTableCell-root {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+/* Row hover */
+.allCategories-container .MuiTableRow-root:hover {
+  background: var(--side-nav-hover-bg);
+  transition: 0.2s ease;
+}
+
+/* ===============================
+   SORT ICON
+=============================== */
+
+.allCategories-container .MuiTableCell-root svg {
+  font-size: 18px;
+  vertical-align: middle;
+}
+
+/* ===============================
+   AVATAR
+=============================== */
+
+.allCategories-container .MuiAvatar-root {
+  width: 38px;
+  height: 38px;
+  border: 2px solid var(--border-color);
+}
+
+/* ===============================
+   ACTION ICON BUTTONS
+=============================== */
+
+.allCategories-container .MuiIconButton-root {
+  color: var(--text-color) !important;
+  transition: all 0.2s ease;
+}
+
+.allCategories-container .MuiInputBase-root svg {
+  color: var(--text-color) !important;
+}
+
+.allCategories-container .MuiIconButton-root:hover {
+  color: var(--link-color);
+  transform: scale(1.1);
+}
+
+/* ===============================
+   STATUS CHIPS
+=============================== */
+
+.MuiChip-root {
+  font-weight: 500 !important;
+  font-size: 12px !important;
+}
+
+/* success */
+.MuiChip-colorSuccess {
+  background: rgba(76, 175, 80, 0.15) !important;
+  color: #4caf50 !important;
+}
+
+/* warning */
+.MuiChip-colorWarning {
+  background: rgba(255, 152, 0, 0.15) !important;
+  color: #ff9800 !important;
+}
+
+/* error */
+.MuiChip-colorError {
+  background: rgba(244, 67, 54, 0.15) !important;
+  color: #f44336 !important;
+}
+
+/* ===============================
+   PAGINATION
+=============================== */
+
+.allCategories-container .MuiTablePagination-root {
+  color: var(--text-color);
+  border-top: 1px solid var(--border-color);
+}
+
+.allCategories-container .MuiSelect-select {
+  color: var(--text-color);
+}
+
+/* ===============================
+   DIALOG / MODAL
+=============================== */
+
+.allCategories-container .MuiDialog-paper {
+  background: var(--card-color);
+  color: var(--text-color);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  min-width: 400px;
+}
+
+/* Dialog title */
+.allCategories-container .MuiDialogTitle-root {
+  background: var(--main-bg-color);
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+/* ===============================
+   EMPTY STATE ROW
+=============================== */
+
+.allCategories-container .MuiTableBody-root td {
+  padding: 20px;
+  color: var(--muted-color);
+}
+
+.allCategories-container .button-success {
+  display: flex;
+  align-items: center;
+  max-width: 200px;
+}
+/* ===============================
+   RESPONSIVE
+=============================== */
+
+@media (max-width: 768px) {
+  .allCategories-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .allCategories-actions .MuiTextField-root {
+    width: 100%;
+  }
+
+  .allCategories-container .MuiPaper-root {
+    overflow-x: auto;
+  }
+  .allCategories-container {
+    margin: auto;
+    padding: 30px !important;
+  }
+}
+
+/* ===============================
+   DARK THEME ENHANCEMENTS
+=============================== */
+
+[data-theme="dark"] .allCategories-container .MuiPaper-root {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .allCategories-container .MuiTableRow-root:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .allCategories-container .MuiDialog-paper {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}

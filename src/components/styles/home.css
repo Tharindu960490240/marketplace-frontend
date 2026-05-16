@@ -1,0 +1,379 @@
+/* ================= GLOBAL ================= */
+.marketplace {
+  /* padding: 28px; */
+  background: var(--main-bg-color);
+  /* min-height: 100vh; */
+  color: var(--text-color);
+  /* width: 100%; */
+}
+
+/* ================= HERO ================= */
+.hero-search {
+  padding: 60px 20px;
+  background: var(--hero-background-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.hero-content {
+  max-width: 1000px;
+}
+
+.hero-content h1 {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.hero-content p {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ================= SEARCH BOX ================= */
+.search-box {
+  margin-top: 30px;
+  width: 100%;
+  max-width: 1200px;
+
+  padding: 30px;
+  background: var(--card-color);
+  border-radius: 14px;
+
+  box-shadow: 0 10px 30px var(--border-color);
+
+  display: grid;
+  grid-template-columns: 2fr 2fr 2fr;
+  gap: 20px;
+
+  box-sizing: border-box;
+}
+
+.search-button {
+  height: 40px;
+  border-radius: 8px;
+  border: none;
+
+  background: var(--button-success-bg);
+  color: #fff;
+
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.search-button:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+/* ================= SECTION TITLE ================= */
+.section-title {
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+
+  margin: 0 auto 20px;
+  padding: 20px 0 10px;
+
+  max-width: 1200px;
+  color: var(--text-color);
+}
+
+/* ================= LISTING GRID ================= */
+.listing-grid {
+  display: grid;
+  gap: 22px;
+
+  /* max-width: 1200px; */
+  margin: auto;
+  padding: 10px 20px 50px;
+  box-sizing: border-box;
+
+  /* default = xs (mobile first) */
+  grid-template-columns: 1fr;
+}
+
+/* ================= CARD ================= */
+.listing-card.modern {
+  background: var(--card-color);
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+
+  display: flex;
+  flex-direction: column;
+
+  transition: all 0.35s ease;
+}
+
+.listing-card.modern:hover {
+  transform: translateY(-10px) scale(1.01);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+}
+
+/* ================= IMAGE ================= */
+.listing-card.modern .img {
+  width: 100%;
+  height: 190px;
+
+  position: relative;
+  overflow: hidden;
+
+  background: #f0f0f0;
+}
+
+.listing-card.modern .img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  transition: transform 0.4s ease;
+}
+
+.listing-card.modern:hover .img img {
+  transform: scale(1.05);
+}
+
+/* image gradient overlay */
+.listing-card.modern .img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.4), transparent 60%);
+}
+
+/* badge */
+.marketplace .badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: white;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+/* ================= INFO ================= */
+.info {
+  padding: 16px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-header h3 {
+  font-size: 15px;
+  font-weight: 600;
+
+  margin: 0;
+
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.location-tag {
+  font-size: 10px;
+
+  background: rgba(33, 150, 243, 0.15);
+  color: var(--link-color);
+
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+/* ================= PRICE ================= */
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 10px;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--link-color);
+}
+
+/* negotiable */
+.per {
+  font-size: 10px;
+
+  background: rgba(255, 152, 0, 0.15);
+  color: #e91e63;
+
+  padding: 5px 10px;
+  border-radius: 20px;
+
+  display: flex;
+  align-items: center;
+}
+
+/* ================= RATING ================= */
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 8px;
+}
+
+.review-count {
+  color: var(--muted-color);
+}
+
+/* wishlist */
+.wishlist-btn {
+  width: 100%;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  padding: 12px;
+
+  border: 1px solid var(--border-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted-color);
+  max-height: 42.4px;
+}
+
+.wishlist-btn:hover {
+  background: rgba(33, 150, 243, 0.08);
+  color: #2196f3;
+  opacity: 0.95;
+  transform: translateY(-2px);
+}
+
+.wishlist-btn.active {
+  background: rgba(33, 150, 243, 0.12);
+  border-color: #2196f3;
+  color: #2196f3;
+  transform: translateY(-1px);
+}
+
+/* icon color inside active button */
+.wishlist-btn.active svg {
+  color: #2196f3;
+}
+
+/* ================= EMPTY STATE ================= */
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: var(--muted-color);
+}
+
+/* ================= TABLE OVERRIDES ================= */
+.marketplace .MuiTablePagination-root {
+  color: var(--text-color);
+  border-top: 1px solid var(--border-color);
+}
+
+.marketplace .MuiSelect-select {
+  color: var(--text-color);
+}
+
+.marketplace .MuiSelect-icon {
+  color: var(--text-color) !important;
+}
+
+.listing-card .saved-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  font-size: 30px;
+}
+
+.marketplace .stats-container {
+  padding: 20px;
+}
+
+/* ================= RESPONSIVE BASE ================= */
+@media (max-width: 1200px) {
+  .marketplace {
+    padding: 20px;
+  }
+}
+
+/* ================= TABLET & BELOW ================= */
+@media (max-width: 1024px) {
+  .search-box {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 600px) {
+  .marketplace {
+    padding: 0px;
+  }
+
+  .search-box {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .listing-grid {
+    padding: 10px 0px 10px 0px;
+  }
+  .marketplace .stats-container {
+    padding: 0px;
+  }
+}
+
+/* ================= LISTING GRID (MOBILE FIRST) ================= */
+/* default (xs) */
+.listing-grid {
+  grid-template-columns: 1fr;
+}
+
+/* sm ≥ 600px → 2 columns */
+@media (min-width: 600px) {
+  .listing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* md ≥ 900px → 3 columns */
+@media (min-width: 900px) {
+  .listing-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* lg ≥ 1200px → 4 columns */
+@media (min-width: 1200px) {
+  .listing-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

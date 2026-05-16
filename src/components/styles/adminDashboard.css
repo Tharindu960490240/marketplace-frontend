@@ -1,0 +1,259 @@
+/* ================= BASE ================= */
+.admin-dashboard {
+  padding: 28px;
+  background: var(--main-bg-color);
+  min-height: 100vh;
+  color: var(--text-color);
+}
+
+/* ================= STATS ================= */
+.stats-grid {
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--card-color);
+  border-radius: 18px;
+  padding: 22px 30px;
+
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  border: 1px solid var(--border-color);
+
+  box-shadow:
+    0 6px 20px var(--border-color),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle glow line */
+.stat-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  opacity: 0.7;
+}
+
+/* hover effect */
+.stat-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow:
+    0 15px 40px var(--border-color),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* icon container */
+.stat-card svg {
+  padding: 10px !important;
+  font-size: 36px !important;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* numbers */
+.stat-card h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* label */
+.stat-card p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted-color);
+}
+
+/* COLORS + bottom gradient bar */
+.stat-card.green svg {
+  color: #4caf50;
+}
+.stat-card.green::after {
+  background: linear-gradient(90deg, #4caf50, #81c784);
+}
+
+.stat-card.orange svg {
+  color: #ff9800;
+}
+.stat-card.orange::after {
+  background: linear-gradient(90deg, #ff9800, #ffb74d);
+}
+
+.stat-card.blue svg {
+  color: #2196f3;
+}
+.stat-card.blue::after {
+  background: linear-gradient(90deg, #2196f3, #64b5f6);
+}
+
+.stat-card.purple svg {
+  color: #9c27b0;
+}
+.stat-card.purple::after {
+  background: linear-gradient(90deg, #9c27b0, #ce93d8);
+}
+
+.stat-card.teal svg {
+  color: #00bcd4;
+}
+.stat-card.teal::after {
+  background: linear-gradient(90deg, #00bcd4, #4dd0e1);
+}
+
+.stat-card.indigo svg {
+  color: #3f51b5;
+}
+.stat-card.indigo::after {
+  background: linear-gradient(90deg, #3f51b5, #7986cb);
+}
+
+/* ================= SECTION ================= */
+.section {
+  margin-top: 25px !important;
+}
+
+/* ================= CARD BOX ================= */
+.card-box {
+  background: var(--card-color);
+  border-radius: 18px;
+  padding: 20px;
+
+  border: 1px solid var(--border-color);
+
+  box-shadow:
+    0 8px 25px var(--border-color),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  transition: 0.3s;
+}
+
+.card-box:hover {
+  transform: translateY(-3px);
+}
+
+/* title */
+.card-box h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* optional subtitle */
+.card-box p {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--muted-color);
+}
+
+/* ================= LIST ================= */
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color);
+
+  font-size: 14px;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+/* ================= ACTIVITY ================= */
+.activity {
+  padding: 8px 0;
+  /* font-size: 13px; */
+  color: var(--muted-color);
+
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.activity:last-child {
+  border-bottom: none;
+}
+
+/* ================= BADGE ================= */
+.badge {
+  /* background: linear-gradient(135deg, #2196f3, #64b5f6); */
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ================= CHART ================= */
+.chart-placeholder {
+  height: 220px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(33, 150, 243, 0.05),
+    rgba(33, 150, 243, 0.02)
+  );
+
+  border: 1px dashed var(--border-color);
+
+  color: var(--muted-color);
+  font-size: 14px;
+}
+
+/* ================= HEADER (OPTIONAL ADD) ================= */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.admin-header h2 {
+  margin: 0;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1200px) {
+  .admin-dashboard {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 900px) {
+  .actions {
+    flex-direction: column;
+  }
+
+  .stat-card {
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-dashboard {
+    padding: 15px;
+  }
+
+  .stat-card {
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .stat-card h2 {
+    font-size: 20px;
+  }
+}

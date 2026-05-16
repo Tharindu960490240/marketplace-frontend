@@ -1,0 +1,92 @@
+/* ===============================
+   Modal Container (Theme Based)
+=============================== */
+
+.reset-password-modal,
+.add-customer-modal,
+.add-admin-modal,
+.reject-modal,
+.add-category-modal,
+.reject-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--card-color);
+  color: var(--text-color);
+  padding: 30px 50px 50px 50px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 25px var(--border-color);
+  width: 100%;
+  text-align: center;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Modal Size Variants */
+.reset-password-modal,
+.add-category-modal {
+  max-width: 300px;
+}
+
+.add-admin-modal,
+.add-customer-modal,
+.reject-modal {
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Modal Title */
+.modal-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: var(--text-color);
+}
+
+.modal-raw {
+  margin-bottom: 0px !important;
+}
+
+/* Desktop default: 2 columns */
+.form-row-modal {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .form-row-modal {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===============================
+   Responsive
+=============================== */
+@media (max-width: 768px) {
+  .reset-password-modal,
+  .add-category-modal,
+  .add-customer-modal,
+  .reject-modal,
+  .add-admin-modal {
+    width: 90%;
+    padding: 25px 30px;
+  }
+
+  .modal-title {
+    font-size: 20px;
+  }
+
+  .form-row-modal {
+    grid-template-columns: 1fr !important;
+    gap: 0px;
+    margin-bottom: 0px;
+  }
+}
