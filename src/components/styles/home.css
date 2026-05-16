@@ -317,7 +317,7 @@
 /* ================= RESPONSIVE BASE ================= */
 @media (max-width: 1200px) {
   .marketplace {
-    padding: 20px;
+    padding: 0px;
   }
 }
 
@@ -331,7 +331,7 @@
 /* ================= MOBILE ================= */
 @media (max-width: 600px) {
   .marketplace {
-    padding: 10px;
+    padding: 0px;
   }
 
   .search-box {
