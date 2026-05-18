@@ -33,7 +33,7 @@ import { getAds, incrementAdView } from "../../services/adsService";
 import { saveAd, removeSavedAd } from "../../services/savedAdService";
 import { getDashboardStats } from "../../services/dashboardService";
 
-import { get_token } from "../../services/authService";
+import { get_token, getMyData } from "../../services/authService";
 
 import LoadingSpinner from "./LoadingSpinner";
 import CustomSnackbar from "./CustomSnackbar";
@@ -53,6 +53,8 @@ const Home = () => {
 
   const [savedMap, setSavedMap] = useState({});
 
+  const [user, setUser] = useState(null);
+
   const [stats, setStats] = useState({
     activeCount: 0,
     sellerCount: 0,
@@ -67,6 +69,12 @@ const Home = () => {
   const fetchCategories = useCallback(async () => {
     try {
       setLoading(true);
+      const myData = await getMyData();
+
+      if (myData) {
+        setUser(myData);
+      }
+
       const res = await getAllCategories();
       if (res?.success) {
         setCategoryList(res.data || []);
@@ -447,28 +455,30 @@ const Home = () => {
                       View Details
                     </button>
 
-                    <Tooltip
-                      title={
-                        savedMap[item.id] ? "Remove from saved" : "Save ad"
-                      }
-                    >
-                      <button
-                        className={`wishlist-btn ${savedMap[item.id] ? "active" : ""}`}
-                        onClick={() => handleToggleSave(item.id)}
+                    {user?.role === "user" && (
+                      <Tooltip
+                        title={
+                          savedMap[item.id] ? "Remove from saved" : "Save ad"
+                        }
                       >
-                        {savedMap[item.id] ? (
-                          <>
-                            <Bookmark style={{ marginRight: 5 }} />
-                            Saved
-                          </>
-                        ) : (
-                          <>
-                            <BookmarkAdd style={{ marginRight: 5 }} />
-                            Save
-                          </>
-                        )}
-                      </button>
-                    </Tooltip>
+                        <button
+                          className={`wishlist-btn ${savedMap[item.id] ? "active" : ""}`}
+                          onClick={() => handleToggleSave(item.id)}
+                        >
+                          {savedMap[item.id] ? (
+                            <>
+                              <Bookmark style={{ marginRight: 5 }} />
+                              Saved
+                            </>
+                          ) : (
+                            <>
+                              <BookmarkAdd style={{ marginRight: 5 }} />
+                              Save
+                            </>
+                          )}
+                        </button>
+                      </Tooltip>
+                    )}
                   </div>
                 </div>
               </div>

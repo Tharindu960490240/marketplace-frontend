@@ -358,25 +358,27 @@ const AdDetails = () => {
 
           {/* SAVE */}
 
-          <div className="button-group">
-            <Tooltip title={isSaved ? "Remove from saved" : "Save ad"}>
-              <button
-                className={`wishlist-btn ${isSaved ? "active" : ""}`}
-                onClick={handleToggleSave}
-              >
-                {isSaved ? (
-                  <>
-                    <Bookmark style={{ marginRight: 5 }} /> Saved
-                  </>
-                ) : (
-                  <>
-                    <BookmarkAdd style={{ marginRight: 5 }} />
-                    Save
-                  </>
-                )}
-              </button>
-            </Tooltip>
-          </div>
+          {user?.role === "user" && (
+            <div className="button-group">
+              <Tooltip title={isSaved ? "Remove from saved" : "Save ad"}>
+                <button
+                  className={`wishlist-btn ${isSaved ? "active" : ""}`}
+                  onClick={handleToggleSave}
+                >
+                  {isSaved ? (
+                    <>
+                      <Bookmark style={{ marginRight: 5 }} /> Saved
+                    </>
+                  ) : (
+                    <>
+                      <BookmarkAdd style={{ marginRight: 5 }} />
+                      Save
+                    </>
+                  )}
+                </button>
+              </Tooltip>
+            </div>
+          )}
 
           {/* SELLER */}
           <div className="seller-card">
