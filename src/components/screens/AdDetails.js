@@ -394,56 +394,61 @@ const AdDetails = () => {
       </div>
 
       {/* ================= ADD REVIEW ================= */}
-      <div className="review-box">
-        <h3>Add Review</h3>
+      {user?.role === "admin" && (
+        <div className="review-box">
+          <h3>Add Review</h3>
 
-        <Box sx={{ mb: 2, width: 250, display: "flex", alignItems: "center" }}>
-          <Rating
-            name="hover-feedback"
-            value={rating}
-            precision={0.5}
-            getLabelText={getLabelText}
-            onChange={(e, newValue) => setRating(newValue)}
-            onChangeActive={(e, newHover) => setHover(newHover)}
-            emptyIcon={<Star style={{ opacity: 0.55 }} fontSize="inherit" />}
-          />
+          <Box
+            sx={{ mb: 2, width: 250, display: "flex", alignItems: "center" }}
+          >
+            <Rating
+              name="hover-feedback"
+              value={rating}
+              precision={0.5}
+              getLabelText={getLabelText}
+              onChange={(e, newValue) => setRating(newValue)}
+              onChangeActive={(e, newHover) => setHover(newHover)}
+              emptyIcon={<Star style={{ opacity: 0.55 }} fontSize="inherit" />}
+            />
 
-          <Box sx={{ ml: 2, fontSize: "inherit" }}>
-            {AppConst.RATING_LABLES[(hover !== -1 ? hover : rating) || 0]}
+            <Box sx={{ ml: 2, fontSize: "inherit" }}>
+              {AppConst.RATING_LABLES[(hover !== -1 ? hover : rating) || 0]}
+            </Box>
           </Box>
-        </Box>
-        <div className="form-row full">
-          {/* DESCRIPTION */}
-          <TextField
-            className="custom-textfield"
-            label="Review note"
-            multiline
-            rows={4}
-            required
-            value={comment}
-            error={clickSubmit && !comment.trim()}
-            helperText={
-              clickSubmit && !comment
-                ? "Reason is required"
-                : "e.g. Good seller, fast response"
-            }
-            onChange={(e) => setComment(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Description />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </div>
+          <div className="form-row full">
+            {/* DESCRIPTION */}
+            <TextField
+              className="custom-textfield"
+              label="Review note"
+              multiline
+              rows={4}
+              required
+              value={comment}
+              error={clickSubmit && !comment.trim()}
+              helperText={
+                clickSubmit && !comment
+                  ? "Reason is required"
+                  : "e.g. Good seller, fast response"
+              }
+              onChange={(e) => setComment(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Description />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </div>
 
-        <button className="button-success" onClick={handleSubmitReview}>
-          Submit Review
-        </button>
-      </div>
+          <button className="button-success" onClick={handleSubmitReview}>
+            Submit Review
+          </button>
+        </div>
+      )}
 
       {/* ================= REVIEWS ================= */}
+
       <div className="reviews-section">
         <div className="reviews-header">
           <h3>Reviews</h3>
