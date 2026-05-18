@@ -86,7 +86,7 @@ const AdminDashboard = () => {
     navigate(path);
   };
 
-  if (!data) return <LoadingSpinner open={loading} />;
+  if (!data) return <LoadingSpinner open={!data} />;
 
   /* ================= FIX DATA ================= */
   const growthData = data.growth.map((g) => ({

@@ -42,7 +42,7 @@
   --button-success-bg: linear-gradient(135deg, #2196f3 0%, #4dabf5 100%);
   --button-text: #ffffff;
   --button-error-bg: linear-gradient(135deg, #e91e63 0%, #ed4b82 100%);
- --button-warning-bg: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+  --button-warning-bg: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
   --button-disable-bg: linear-gradient(135deg, #bdbdbd 0%, #e0e0e0 100%);
 }
 
@@ -83,7 +83,7 @@
   --button-success-bg: linear-gradient(135deg, #2196f3 0%, #4dabf5 100%);
   --button-text: #ffffff;
   --button-error-bg: linear-gradient(135deg, #e91e63 0%, #ed4b82 100%);
- --button-warning-bg: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+  --button-warning-bg: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
   --button-disable-bg: linear-gradient(135deg, #bdbdbd 0%, #e0e0e0 100%);
 }
 
@@ -271,6 +271,40 @@
   color: #ffd700 !important;
 }
 
+.MuiPaper-root-MuiDialog-paper,
+.MuiDialogContent-root,
+.MuiDialogContentText-root,
+.MuiDialogTitle-root,
+.MuiDialogActions-root {
+  background: var(--card-color);
+  color: var(--muted-color) !important;
+}
+
+.MuiIconButton-root {
+  color: var(--muted-color) !important;
+}
+
+.MuiPaper-root-MuiDialog-paper {
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 15px var(--border-color);
+}
+
+.MuiDialogContent-root {
+  border-top: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+/* Target MUI input */
+.MuiInputBase-input:-webkit-autofill,
+.MuiInputBase-input:-webkit-autofill:hover,
+.MuiInputBase-input:-webkit-autofill:focus,
+.MuiInputBase-input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--text-color) !important;
+  caret-color: transparent !important;
+  border-radius: inherit;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .button-success {
   background: var(--button-success-bg);
 }
@@ -328,29 +362,6 @@
   box-shadow: 0 4px 15px var(--border-color);
   padding: 1.5rem;
   transition: all 0.3s ease;
-}
-
-.MuiPaper-root-MuiDialog-paper,
-.MuiDialogContent-root,
-.MuiDialogContentText-root,
-.MuiDialogTitle-root,
-.MuiDialogActions-root {
-  background: var(--card-color);
-  color: var(--muted-color) !important;
-}
-
-.MuiIconButton-root {
-  color: var(--muted-color) !important;
-}
-
-.MuiPaper-root-MuiDialog-paper {
-  border: 1px solid var(--border-color);
-  box-shadow: 0 4px 15px var(--border-color);
-}
-
-.MuiDialogContent-root {
-  border-top: 1px solid var(--border-color) !important;
-  border-bottom: 1px solid var(--border-color) !important;
 }
 
 /* ===============================

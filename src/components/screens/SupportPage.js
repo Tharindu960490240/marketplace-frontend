@@ -230,8 +230,8 @@ const SupportPage = () => {
 
   // ================= EFFECTS =================
   useEffect(() => {
-    loadUser();
     loadTickets();
+    loadUser();
   }, [loadUser, loadTickets]);
 
   useEffect(() => {
@@ -357,28 +357,13 @@ const SupportPage = () => {
     }
   };
 
+  if (!user) return <LoadingSpinner open={!user} />;
+
   return (
     <div className="support-container">
       {/* LEFT */}
       <div className={`support-left ${isMobileChatOpen ? "hide-mobile" : ""}`}>
         <h3>Support</h3>
-
-        {/* FILTER DROPDOWN */}
-        <div className="ticket-filter">
-          <FormControl fullWidth size="small" className="custom-textfield">
-            <InputLabel>Filter Tickets</InputLabel>
-            <Select
-              value={ticketFilter}
-              label="Filter Tickets"
-              onChange={(e) => setTicketFilter(e.target.value)}
-            >
-              <MenuItem value="all">All Tickets</MenuItem>
-              <MenuItem value="open">Open</MenuItem>
-              <MenuItem value="closed">Closed</MenuItem>
-            </Select>
-          </FormControl>
-        </div>
-
         {user?.role !== "admin" && (
           <div className="new-ticket">
             <TextField
@@ -430,6 +415,22 @@ const SupportPage = () => {
             </button>
           </div>
         )}
+
+        {/* FILTER DROPDOWN */}
+        <div className="ticket-filter">
+          <FormControl fullWidth size="small" className="custom-textfield">
+            <InputLabel>Filter Tickets</InputLabel>
+            <Select
+              value={ticketFilter}
+              label="Filter Tickets"
+              onChange={(e) => setTicketFilter(e.target.value)}
+            >
+              <MenuItem value="all">All Tickets</MenuItem>
+              <MenuItem value="open">Open</MenuItem>
+              <MenuItem value="closed">Closed</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
 
         <div className="ticket-list">
           {filteredTickets.map((t) => (

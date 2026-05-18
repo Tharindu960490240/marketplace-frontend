@@ -286,12 +286,7 @@ const AdDetails = () => {
     return AppConst.RATING_LABLES[rounded] || "No rating";
   };
 
-  if (!ad)
-    return (
-      <div className="ad-details-page">
-        <LoadingSpinner open={loading} />
-      </div>
-    );
+  if (!ad) return <LoadingSpinner open={loading} />;
 
   return (
     <div className="ad-details-page">

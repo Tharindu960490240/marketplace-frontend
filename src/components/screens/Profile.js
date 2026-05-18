@@ -386,9 +386,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
 
   if (!user)
     return (
-      <div className="ad-details-page">
-        <LoadingSpinner open={loading} />
-      </div>
+        <LoadingSpinner open={!user} />
     );
 
   return (
