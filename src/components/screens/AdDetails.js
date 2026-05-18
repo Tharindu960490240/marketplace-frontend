@@ -394,7 +394,7 @@ const AdDetails = () => {
       </div>
 
       {/* ================= ADD REVIEW ================= */}
-      {user?.role === "admin" && (
+      {user?.role === "user" && (
         <div className="review-box">
           <h3>Add Review</h3>
 
