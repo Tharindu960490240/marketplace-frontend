@@ -157,7 +157,7 @@
   top: 12px;
   left: 12px;
 
-  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  /* background: linear-gradient(135deg, #4caf50, #2e7d32); */
   color: white;
 
   font-size: 10px;
@@ -218,9 +218,6 @@
 /* negotiable */
 .per {
   font-size: 10px;
-
-  background: rgba(255, 152, 0, 0.15);
-  color: #e91e63;
 
   padding: 5px 10px;
   border-radius: 20px;

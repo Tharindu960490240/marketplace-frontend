@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { pink } from "@mui/material/colors";
-import { TablePagination, Rating, Box, Tooltip } from "@mui/material";
+import { TablePagination, Rating, Box, Tooltip, Chip } from "@mui/material";
 
 import { Bookmark, Star } from "@mui/icons-material";
 
@@ -124,9 +124,22 @@ const SavedAds = () => {
     return AppConst.RATING_LABLES[rounded] || "No rating";
   };
 
+  const statusChip = (status) => {
+    const map = {
+      active: "success",
+      pending: "warning",
+      sold: "error",
+      rejected: "error",
+      deleted: "error",
+      Negotiable: "warning",
+      Fixed: "warning",
+    };
+
+    return <Chip label={status} color={map[status]} size="small" />;
+  };
+
   return (
     <div className="marketplace">
-
       {/* ================= LIST ================= */}
       <section className="listings-container">
         <div className="listing-grid">
@@ -146,7 +159,7 @@ const SavedAds = () => {
                     }
                     alt={item.title}
                   />
-                  <span className="badge">{item.status || "Available"}</span>
+                  <span className="badge">{statusChip(item.status)}</span>
                   <Bookmark className="saved-badge" sx={{ color: pink[500] }} />
                 </div>
 
@@ -165,7 +178,7 @@ const SavedAds = () => {
                   <div className="price-row">
                     <span className="price">Rs. {item.price}</span>
                     <span className="per">
-                      {item.negotiable ? "Negotiable" : "Fixed"}
+                      {statusChip(item.negotiable ? "Negotiable" : "Fixed")}
                     </span>
                   </div>
 

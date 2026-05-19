@@ -11,6 +11,7 @@ import {
   Box,
   Tooltip,
   Grid,
+  Chip,
 } from "@mui/material";
 
 import {
@@ -242,6 +243,20 @@ const Home = () => {
     return AppConst.RATING_LABLES[rounded] || "No rating";
   };
 
+  const statusChip = (status) => {
+    const map = {
+      active: "success",
+      pending: "warning",
+      sold: "error",
+      rejected: "error",
+      deleted: "error",
+      Negotiable: "warning",
+      Fixed: "warning",
+    };
+
+    return <Chip label={status} color={map[status]} size="small" />;
+  };
+
   return (
     <div className="marketplace">
       {/* ================= HERO ================= */}
@@ -391,7 +406,8 @@ const Home = () => {
                     }
                     alt={item.title}
                   />
-                  <span className="badge">{"Available"}</span>
+
+                  <span className="badge">{statusChip(item.status)}</span>
                   {savedMap[item.id] && (
                     <Bookmark
                       className="saved-badge"
@@ -415,7 +431,7 @@ const Home = () => {
                   <div className="price-row">
                     <span className="price">Rs. {item.price}</span>
                     <span className="per">
-                      {item.negotiable ? "Negotiable" : "Fixed"}
+                      {statusChip(item.negotiable ? "Negotiable" : "Fixed")}
                     </span>
                   </div>
 

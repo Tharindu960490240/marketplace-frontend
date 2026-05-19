@@ -11,6 +11,7 @@ import {
   IconButton,
   Avatar,
   Collapse,
+  Chip,
 } from "@mui/material";
 import {
   Star,
@@ -286,6 +287,20 @@ const AdDetails = () => {
     return AppConst.RATING_LABLES[rounded] || "No rating";
   };
 
+  const statusChip = (status) => {
+    const map = {
+      active: "success",
+      pending: "warning",
+      sold: "error",
+      rejected: "error",
+      deleted: "error",
+      Negotiable: "warning",
+      Fixed: "warning",
+    };
+
+    return <Chip label={status} color={map[status]} size="small" />;
+  };
+
   if (!ad) return <LoadingSpinner open={loading} />;
 
   return (
@@ -294,6 +309,7 @@ const AdDetails = () => {
       <div className="ad-container">
         {/* LEFT */}
         <div className="ad-left">
+          <span className="badge">{statusChip(ad?.status)}</span>
           <div
             className="slider"
             onMouseEnter={() => setPaused(true)}
@@ -333,7 +349,12 @@ const AdDetails = () => {
           )}
           <h2>{ad.title}</h2>
 
-          <p className="price">Rs. {ad.price}</p>
+          <p className="price">
+            Rs. {ad.price}{" "}
+            <span className="ad-pre">
+              {statusChip(ad.negotiable ? "Negotiable" : "Fixed")}
+            </span>
+          </p>
 
           <div className="meta">
             <span>{ad.city}</span>
@@ -358,7 +379,7 @@ const AdDetails = () => {
 
           {/* SAVE */}
 
-          {(user?.role !== "admin" && user?.id !== ad?.user_id) && (
+          {user?.role !== "admin" && user?.id !== ad?.user_id && (
             <div className="button-group">
               <Tooltip title={isSaved ? "Remove from saved" : "Save ad"}>
                 <button
@@ -396,7 +417,7 @@ const AdDetails = () => {
       </div>
 
       {/* ================= ADD REVIEW ================= */}
-      {(user?.role !== "admin" && user?.id !== ad?.user_id) && (
+      {user?.role !== "admin" && user?.id !== ad?.user_id && (
         <div className="review-box">
           <h3>Add Review</h3>
 
