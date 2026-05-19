@@ -483,7 +483,12 @@ const AllUsers = () => {
         <div className="add-admin-modal">
           <IconButton
             onClick={() => setShowAddAdminModal(false)}
-            style={{ position: "absolute", right: 10, top: 10 }}
+            style={{
+              position: "absolute",
+              right: 10,
+              top: 10,
+              color: "var(--muted-color)",
+            }}
           >
             <Close />
           </IconButton>
@@ -511,7 +516,7 @@ const AllUsers = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Person color="var(--muted-color)" />
+                      <Person />
                     </InputAdornment>
                   ),
                 }}
@@ -538,7 +543,7 @@ const AllUsers = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Person color="var(--muted-color)" />
+                      <Person />
                     </InputAdornment>
                   ),
                 }}
@@ -567,7 +572,7 @@ const AllUsers = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Email color="var(--muted-color)" />
+                      <Email />
                     </InputAdornment>
                   ),
                   // endAdornment: adminData.isValidEmail ? (
@@ -599,7 +604,7 @@ const AllUsers = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Phone color="var(--muted-color)" />
+                      <Phone />
                     </InputAdornment>
                   ),
                 }}
@@ -629,7 +634,7 @@ const AllUsers = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Lock color="var(--muted-color)" />
+                      <Lock />
                     </InputAdornment>
                   ),
                   endAdornment: (
@@ -643,9 +648,9 @@ const AllUsers = () => {
                         }
                       >
                         {adminData.showPassword ? (
-                          <Visibility color="var(--muted-color)" />
+                          <Visibility />
                         ) : (
-                          <VisibilityOff color="var(--muted-color)" />
+                          <VisibilityOff />
                         )}
                       </IconButton>
                     </InputAdornment>
@@ -674,7 +679,7 @@ const AllUsers = () => {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Lock color="var(--muted-color)" />
+                      <Lock />
                     </InputAdornment>
                   ),
                 }}

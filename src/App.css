@@ -388,6 +388,15 @@
   color: #ffffff;
 }
 
+.MuiAlert-action {
+  padding: 0 !important;
+  align-items: center !important;
+}
+
+.MuiAlert-action .MuiIconButton-root {
+color: white !important;
+}
+
 /* ===============================
    Responsive
 =============================== */

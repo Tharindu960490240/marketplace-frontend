@@ -165,7 +165,7 @@ const SignIn = ({ onSignIn }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Email color="var(--muted-color)" />
+                  <Email  />
                 </InputAdornment>
               ),
               endAdornment: data.check_email_Change && (
@@ -194,16 +194,16 @@ const SignIn = ({ onSignIn }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Lock color="var(--muted-color)" />
+                  <Lock  />
                 </InputAdornment>
               ),
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={togglePasswordVisibility}>
                     {data.secureTextEntry ? (
-                      <VisibilityOff color="var(--muted-color)" />
+                      <VisibilityOff  />
                     ) : (
-                      <Visibility color="var(--muted-color)" />
+                      <Visibility  />
                     )}
                   </IconButton>
                 </InputAdornment>

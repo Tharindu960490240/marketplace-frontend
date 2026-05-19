@@ -384,10 +384,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
     }
   };
 
-  if (!user)
-    return (
-        <LoadingSpinner open={!user} />
-    );
+  if (!user) return <LoadingSpinner open={!user} />;
 
   return (
     <div className="profile-container">
@@ -508,6 +505,17 @@ const Profile = ({ onSignOut, isSignedIn }) => {
       {/* Password Reset Modal */}
       <Modal open={showPasswordModal}>
         <div className="reset-password-modal">
+          <IconButton
+            onClick={() => setShowPasswordModal(false)}
+            style={{
+              position: "absolute",
+              right: 10,
+              top: 10,
+              color: "var(--muted-color)",
+            }}
+          >
+            <Close />
+          </IconButton>
           <h2 className="modal-title">Reset Password</h2>
 
           <div className="input-container">
@@ -531,16 +539,16 @@ const Profile = ({ onSignOut, isSignedIn }) => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Lock color="var(--muted-color)" />
+                    <Lock />
                   </InputAdornment>
                 ),
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton onClick={toggleShowPassword}>
                       {resetData.showPassword ? (
-                        <Visibility color="var(--muted-color)" />
+                        <Visibility />
                       ) : (
-                        <VisibilityOff color="var(--muted-color)" />
+                        <VisibilityOff />
                       )}
                     </IconButton>
                   </InputAdornment>
@@ -570,16 +578,16 @@ const Profile = ({ onSignOut, isSignedIn }) => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Lock color="var(--muted-color)" />
+                    <Lock />
                   </InputAdornment>
                 ),
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton onClick={toggleShowPassword}>
                       {resetData.showPassword ? (
-                        <Visibility color="var(--muted-color)" />
+                        <Visibility />
                       ) : (
-                        <VisibilityOff color="var(--muted-color)" />
+                        <VisibilityOff />
                       )}
                     </IconButton>
                   </InputAdornment>
@@ -607,7 +615,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Lock color="var(--muted-color)" />
+                    <Lock />
                   </InputAdornment>
                 ),
               }}

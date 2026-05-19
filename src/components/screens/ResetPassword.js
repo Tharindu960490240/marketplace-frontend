@@ -244,7 +244,7 @@ const ResetPassword = ({ onSignOut }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Email color="var(--muted-color)" />
+                  <Email  />
                 </InputAdornment>
               ),
               endAdornment: data.check_email_Change ? (
@@ -278,13 +278,13 @@ const ResetPassword = ({ onSignOut }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Lock color="var(--muted-color)"/>
+                  <Lock />
                 </InputAdornment>
               ),
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={togglePasswordVisibility}>
-                    {data.showPassword ? <Visibility color="var(--muted-color)" /> : <VisibilityOff color="var(--muted-color)" />}
+                    {data.showPassword ? <Visibility  /> : <VisibilityOff  />}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -310,7 +310,7 @@ const ResetPassword = ({ onSignOut }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Lock color="var(--muted-color)" />
+                  <Lock  />
                 </InputAdornment>
               ),
             }}

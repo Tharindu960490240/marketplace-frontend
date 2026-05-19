@@ -453,7 +453,12 @@ const AllCategories = () => {
         <div className="add-category-modal">
           <IconButton
             onClick={() => setShowModal(false)}
-            style={{ position: "absolute", right: 10, top: 10 }}
+            style={{
+              position: "absolute",
+              right: 10,
+              top: 10,
+              color: "var(--muted-color)",
+            }}
           >
             <Close />
           </IconButton>
@@ -471,7 +476,9 @@ const AllCategories = () => {
             required
             error={!categoryData.isValidCategory}
             helperText={
-              !categoryData.isValidCategory ? "Category name is required and must contain only letters" : ""
+              !categoryData.isValidCategory
+                ? "Category name is required and must contain only letters"
+                : ""
             }
             value={categoryData.category}
             InputProps={{
@@ -517,7 +524,7 @@ const AllCategories = () => {
               position: "absolute",
               right: 8,
               top: 8,
-              color: (theme) => theme.palette.grey[500],
+              color: "var(--muted-color)",
             }}
           >
             <Close />

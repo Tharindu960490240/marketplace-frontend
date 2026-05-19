@@ -206,7 +206,7 @@ const SignUp = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Person color="var(--muted-color)" />
+                  <Person  />
                 </InputAdornment>
               ),
             }}
@@ -228,7 +228,7 @@ const SignUp = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Person color="var(--muted-color)" />
+                  <Person  />
                 </InputAdornment>
               ),
             }}
@@ -253,7 +253,7 @@ const SignUp = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Email color="var(--muted-color)" />
+                  <Email  />
                 </InputAdornment>
               ),
             }}
@@ -279,7 +279,7 @@ const SignUp = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Phone color="var(--muted-color)" />
+                  <Phone  />
                 </InputAdornment>
               ),
             }}
@@ -305,16 +305,16 @@ const SignUp = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Lock color="var(--muted-color)" />
+                  <Lock  />
                 </InputAdornment>
               ),
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={togglePasswordVisibility}>
                     {userData.showPassword ? (
-                      <Visibility color="var(--muted-color)" />
+                      <Visibility  />
                     ) : (
-                      <VisibilityOff color="var(--muted-color)" />
+                      <VisibilityOff  />
                     )}
                   </IconButton>
                 </InputAdornment>
@@ -337,7 +337,7 @@ const SignUp = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Lock color="var(--muted-color)" />
+                  <Lock  />
                 </InputAdornment>
               ),
             }}

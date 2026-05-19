@@ -121,7 +121,7 @@ const ForgotPassword = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Email color="var(--muted-color)" />
+                  <Email  />
                 </InputAdornment>
               ),
               endAdornment: data.check_email_Change ? (

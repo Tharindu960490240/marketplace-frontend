@@ -578,7 +578,12 @@ const AllAds = () => {
                 isValid: true,
               }))
             }
-            style={{ position: "absolute", right: 10, top: 10 }}
+            style={{
+              position: "absolute",
+              right: 10,
+              top: 10,
+              color: "var(--muted-color)",
+            }}
           >
             <Close />
           </IconButton>
