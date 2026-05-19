@@ -91,18 +91,16 @@ const Home = () => {
   }, []);
 
   const fetchStats = useCallback(async () => {
-    const res = await getDashboardStats();
+    // const res = await getDashboardStats();
 
-    if (res?.success) {
-      setStats(
-        res.data || {
-          activeCount: 0,
-          sellerCount: 0,
-          totalViews: 0,
-          categoryCount: 0,
-        },
-      );
-    }
+    // if (res?.success) {
+    setStats({
+      activeCount: 0,
+      sellerCount: 0,
+      totalViews: 0,
+      categoryCount: 0,
+    });
+    // }
   }, []);
 
   const fetchAds = useCallback(async () => {
@@ -455,7 +453,7 @@ const Home = () => {
                       View Details
                     </button>
 
-                    {user?.role === "user" && (
+                    {user?.role !== "admin" && user?.id !== item.user_id && (
                       <Tooltip
                         title={
                           savedMap[item.id] ? "Remove from saved" : "Save ad"

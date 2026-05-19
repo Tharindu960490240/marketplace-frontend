@@ -358,7 +358,7 @@ const AdDetails = () => {
 
           {/* SAVE */}
 
-          {user?.role === "user" && (
+          {(user?.role !== "admin" && user?.id !== ad?.user_id) && (
             <div className="button-group">
               <Tooltip title={isSaved ? "Remove from saved" : "Save ad"}>
                 <button
@@ -396,7 +396,7 @@ const AdDetails = () => {
       </div>
 
       {/* ================= ADD REVIEW ================= */}
-      {user?.role === "user" && (
+      {(user?.role !== "admin" && user?.id !== ad?.user_id) && (
         <div className="review-box">
           <h3>Add Review</h3>
 
