@@ -103,7 +103,6 @@ const SupportPage = () => {
 
       const enriched = res.data.map((t) => ({
         ...t,
-        lastMessage: t.last_message || "No messages yet",
         unreadCount: t.unread_count || 0,
       }));
 
@@ -469,12 +468,11 @@ const SupportPage = () => {
               </div>
 
               <div className="last-message-row">
-                <span className="last-message">{t.lastMessage}</span>
+                <span className="status">{t.status}</span>
                 <span className="ticket-time">
                   {formatTicketPreviewTime(t.updated_at)}
                 </span>
               </div>
-              <span className="status">{t.status}</span>
             </div>
           ))}
         </div>

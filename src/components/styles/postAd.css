@@ -8,8 +8,8 @@
   margin: 30px auto 30px auto;
 
   background: var(--card-color);
-  border-radius: 14px;
-  box-shadow: 0 10px 30px var(--border-color);
+  border-radius: 15px;
+  box-shadow: 0 10px 25px var(--border-color);
 
   padding: 30px;
   box-sizing: border-box;
@@ -55,7 +55,7 @@
   transform: translateY(-2px);
 }
 
-.required{
+.required {
   border-color: #ff6b6b;
 }
 /* ===============================
@@ -113,7 +113,7 @@
   transform: scale(1.1);
 }
 
-.image-box svg{
+.image-box svg {
   font-size: 1rem;
 }
 

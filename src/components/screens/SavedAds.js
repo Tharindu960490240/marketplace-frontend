@@ -126,8 +126,6 @@ const SavedAds = () => {
 
   return (
     <div className="marketplace">
-      {/* ================= TITLE ================= */}
-      <p className="section-title"></p>
 
       {/* ================= LIST ================= */}
       <section className="listings-container">

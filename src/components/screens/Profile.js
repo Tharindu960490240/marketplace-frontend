@@ -458,7 +458,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
         <div className="profile-sections">
           {/* PERSONAL INFO */}
           <div className="section-card">
-            <h3 className="section-title">Personal Info</h3>
+            <h3 className="profile-sections-title ">Personal Info</h3>
 
             <div className="info-row">
               <span className="info-label">Phone</span>

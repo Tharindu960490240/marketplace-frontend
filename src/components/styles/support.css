@@ -10,6 +10,7 @@
   overflow: hidden;
   gap: 15px;
   padding: 20px;
+  border-radius: 15px;
 }
 
 .support-container .button-warning {
@@ -114,23 +115,32 @@
    LAST MESSAGE
 =============================== */
 
-.last-message {
+.last-message-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.status {
+  width: 40px;
   font-size: 12px;
   color: var(--muted-color);
   margin-top: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
 }
 
-/* ===============================
-   STATUS TEXT
-=============================== */
-
-.status {
+.ticket-time {
   font-size: 11px;
   color: var(--muted-color);
   margin-top: 4px;
+  white-space: nowrap;
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ===============================
@@ -285,20 +295,6 @@
   position: absolute;
   bottom: 4px;
   right: 10px;
-}
-
-.last-message-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-}
-
-.ticket-time {
-  font-size: 11px;
-  color: var(--muted-color);
-  white-space: nowrap;
-  opacity: 0.8;
 }
 
 .date-separator {
