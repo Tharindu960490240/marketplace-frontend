@@ -10,20 +10,16 @@ import {
   Rating,
   Box,
   Tooltip,
-  Grid,
   Chip,
 } from "@mui/material";
 
 import {
   Search,
   Category,
-  Storefront,
-  TrendingUp,
   LocationOn,
   Bookmark,
   Star,
   BookmarkAdd,
-  Visibility,
 } from "@mui/icons-material";
 
 import * as AppConst from "../../const/const";
@@ -32,7 +28,6 @@ import "../styles/home.css";
 import { getAllCategories } from "../../services/categoryService";
 import { getAds, incrementAdView } from "../../services/adsService";
 import { saveAd, removeSavedAd } from "../../services/savedAdService";
-import { getDashboardStats } from "../../services/dashboardService";
 
 import { get_token, getMyData } from "../../services/authService";
 
@@ -55,13 +50,6 @@ const Home = () => {
   const [savedMap, setSavedMap] = useState({});
 
   const [user, setUser] = useState(null);
-
-  const [stats, setStats] = useState({
-    activeCount: 0,
-    sellerCount: 0,
-    totalViews: 0,
-    categoryCount: 0,
-  });
 
   // ================= DISTRICTS =================
   const districts = AppConst.DISTRICTS;
@@ -91,18 +79,7 @@ const Home = () => {
     }
   }, []);
 
-  const fetchStats = useCallback(async () => {
-    // const res = await getDashboardStats();
 
-    // if (res?.success) {
-    setStats({
-      activeCount: 0,
-      sellerCount: 0,
-      totalViews: 0,
-      categoryCount: 0,
-    });
-    // }
-  }, []);
 
   const fetchAds = useCallback(async () => {
     try {
@@ -153,8 +130,7 @@ const Home = () => {
   useEffect(() => {
     fetchCategories();
     fetchAds();
-    fetchStats();
-  }, [fetchCategories, fetchAds, fetchStats]);
+  }, [fetchCategories, fetchAds]);
 
   const handleClose = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
@@ -341,49 +317,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-      <div className="stats-container" style={{ display: "none" }}>
-        <Grid container spacing={2} className="stats-grid">
-          <Grid item xs={12} sm={6} md={3}>
-            <div className="stat-card green">
-              <TrendingUp />
-              <div>
-                <h2>{stats.activeCount}</h2>
-                <p>Active Listings</p>
-              </div>
-            </div>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <div className="stat-card orange">
-              <Storefront />
-              <div>
-                <h2>{stats.sellerCount}</h2>
-                <p>Verified Sellers</p>
-              </div>
-            </div>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <div className="stat-card purple">
-              <Visibility />
-              <div>
-                <h2>{stats.totalViews}</h2>
-                <p>Total Ad Views</p>
-              </div>
-            </div>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            <div className="stat-card indigo">
-              <Category />
-              <div>
-                <h2>{stats.categoryCount}</h2>
-                <p>Categories</p>
-              </div>
-            </div>
-          </Grid>
-        </Grid>
-      </div>
 
       {/* ================= LISTINGS ================= */}
       <section className="listings-container">
