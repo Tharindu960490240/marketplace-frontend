@@ -333,9 +333,8 @@ const Home = () => {
                   <img
                     src={
                       item.primary_image
-                        ? AppConst.ADS_PLACEHOLDER_IMAGE + item.primary_image
-                        : AppConst.ADS_PLACEHOLDER_IMAGE +
-                          "uploads/profile_pic/user.png"
+                        ? item.primary_image
+                        : AppConst.ADS_PLACEHOLDER_IMAGE 
                     }
                     alt={item.title}
                   />

@@ -304,10 +304,9 @@ const MyAds = () => {
                         <img
                           src={
                             ad.primary_image
-                              ? AppConst.ADS_PLACEHOLDER_IMAGE +
+                              ?
                                 ad.primary_image
-                              : AppConst.ADS_PLACEHOLDER_IMAGE +
-                                "uploads/profile_pic/user.png"
+                              : AppConst.ADS_PLACEHOLDER_IMAGE 
                           }
                           alt=""
                           style={{

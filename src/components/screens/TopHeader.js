@@ -286,9 +286,8 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
               <Avatar
                 src={
                   user && user.profile_image
-                    ? AppConst.PROFILE_PLACEHOLDER_IMAGE + user.profile_image
-                    : AppConst.PROFILE_PLACEHOLDER_IMAGE +
-                      "uploads/profile_pic/user.png"
+                    ? user.profile_image
+                    : AppConst.PROFILE_PLACEHOLDER_IMAGE 
                 }
                 className="profile-avatar"
               />

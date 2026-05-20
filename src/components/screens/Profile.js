@@ -395,9 +395,8 @@ const Profile = ({ onSignOut, isSignedIn }) => {
             <img
               src={
                 user.profile_image
-                  ? AppConst.PROFILE_PLACEHOLDER_IMAGE + user.profile_image
-                  : AppConst.PROFILE_PLACEHOLDER_IMAGE +
-                    "uploads/profile_pic/user.png"
+                  ? user.profile_image
+                  : AppConst.PROFILE_PLACEHOLDER_IMAGE 
               }
               alt="profile"
             />

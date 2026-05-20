@@ -1,12 +1,11 @@
 // export const API_BASE_URL = "http://localhost:3200/api";
-// export const PROFILE_PLACEHOLDER_IMAGE = "http://localhost:3200/";
-// export const ADS_PLACEHOLDER_IMAGE = "http://localhost:3200/";
 
 export const API_BASE_URL = "https://marketplace-backend-chec.onrender.com/api";
 export const PROFILE_PLACEHOLDER_IMAGE =
-  "https://marketplace-backend-chec.onrender.com/";
+  "https://sathwa-sewana-marketplace-uploads.s3.ap-southeast-1.amazonaws.com/default/user.png";
+
 export const ADS_PLACEHOLDER_IMAGE =
-  "https://marketplace-backend-chec.onrender.com/";
+  "https://sathwa-sewana-marketplace-uploads.s3.ap-southeast-1.amazonaws.com/default/ad.png";
 
 export const FRONTEND_BASE_URL = "http://localhost:4200";
 

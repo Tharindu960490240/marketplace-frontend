@@ -109,8 +109,8 @@ const AdDetails = () => {
 
   const images = useMemo(() => {
     return ad?.images?.length > 0
-      ? ad.images.map((img) => ADS_PLACEHOLDER_IMAGE + img.image_url)
-      : [ADS_PLACEHOLDER_IMAGE + "uploads/profile_pic/user.png"];
+      ? ad.images.map((img) => img.image_url)
+      : [ADS_PLACEHOLDER_IMAGE];
   }, [ad]);
 
   const imageCount = images.length;
@@ -500,9 +500,8 @@ const AdDetails = () => {
                     <Avatar
                       src={
                         rev.user?.url
-                          ? AppConst.PROFILE_PLACEHOLDER_IMAGE + rev.user.url
-                          : AppConst.PROFILE_PLACEHOLDER_IMAGE +
-                            "uploads/profile_pic/user.png"
+                          ? rev.user.url
+                          : AppConst.PROFILE_PLACEHOLDER_IMAGE 
                       }
                     />
 

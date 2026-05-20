@@ -445,9 +445,8 @@ const SupportPage = () => {
                   <Avatar
                     src={
                       t.profile_image
-                        ? AppConst.PROFILE_PLACEHOLDER_IMAGE + t.profile_image
-                        : AppConst.PROFILE_PLACEHOLDER_IMAGE +
-                          "uploads/profile_pic/user.png"
+                        ? t.profile_image
+                        : AppConst.PROFILE_PLACEHOLDER_IMAGE 
                     }
                   />
 

@@ -406,10 +406,9 @@ const AllUsers = () => {
                         <Avatar
                           src={
                             u.profile_image
-                              ? AppConst.PROFILE_PLACEHOLDER_IMAGE +
+                              ?
                                 u.profile_image
-                              : AppConst.PROFILE_PLACEHOLDER_IMAGE +
-                                "uploads/profile_pic/user.png"
+                              : AppConst.PROFILE_PLACEHOLDER_IMAGE 
                           }
                         />
                       </TableCell>
