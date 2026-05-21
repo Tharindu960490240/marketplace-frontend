@@ -150,7 +150,7 @@
   color: var(--dropdown-text);
 
   border-radius: 12px;
-  box-shadow: 0 10px 25px var(--dropdown-box-shadow);
+  box-shadow: 0 4px 12px var(--dropdown-box-shadow);
 
   overflow: hidden;
   animation: fadeIn 0.2s ease-in-out;

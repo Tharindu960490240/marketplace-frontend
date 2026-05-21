@@ -8,7 +8,7 @@
 
   background: var(--card-color);
   border-radius: 15px;
-  
+  box-shadow: 0 4px 12px var(--border-color);
 
   padding: 50px !important;
   box-sizing: border-box;

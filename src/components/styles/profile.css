@@ -19,7 +19,7 @@
   border-radius: 15px;
   overflow: hidden;
   background: var(--card-color);
-  
+  box-shadow: 0 4px 12px var(--border-color);
 }
 
 /* ===============================

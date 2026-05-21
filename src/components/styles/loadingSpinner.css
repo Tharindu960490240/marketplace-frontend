@@ -25,7 +25,7 @@
   background: var(--card-color);
   backdrop-filter: blur(10px);
 
-  
+  box-shadow: 0 4px 12px var(--border-color);
 
   outline: none;
 }
