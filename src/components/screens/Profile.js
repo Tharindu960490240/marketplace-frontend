@@ -33,6 +33,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Avatar,
 } from "@mui/material";
 
 const Profile = ({ onSignOut, isSignedIn }) => {
@@ -44,6 +45,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
   const [phone, setPhone] = useState(null);
   const [isValidContactNo, setIsValidContactNo] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const fileInputRef = useRef(null);
 
@@ -67,7 +69,6 @@ const Profile = ({ onSignOut, isSignedIn }) => {
   };
 
   // ================= FETCH USER =================
-
   const fetchUser = useCallback(async () => {
     try {
       const token = await get_token();
@@ -100,6 +101,14 @@ const Profile = ({ onSignOut, isSignedIn }) => {
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   // ================= UPDATE PROFILE =================
   const handleUpdateProfile = async () => {
@@ -145,6 +154,10 @@ const Profile = ({ onSignOut, isSignedIn }) => {
     }
 
     setImage(file);
+
+    //  create preview URL
+    const previewUrl = URL.createObjectURL(file);
+    setImagePreview(previewUrl);
   };
 
   // ================= UPLOAD IMAGE =================
@@ -392,11 +405,14 @@ const Profile = ({ onSignOut, isSignedIn }) => {
         {/* ================= COVER ================= */}
         <div className="profile-header">
           <div className="profile-image-box" onClick={openFilePicker}>
-            <img
+            <Avatar
+              className="profile_img"
               src={
-                user.profile_image
-                  ? user.profile_image
-                  : AppConst.PROFILE_PLACEHOLDER_IMAGE 
+                imagePreview
+                  ? imagePreview
+                  : user.profile_image
+                    ? user.profile_image
+                    : AppConst.PROFILE_PLACEHOLDER_IMAGE
               }
               alt="profile"
             />

@@ -45,7 +45,7 @@
   cursor: pointer;
 }
 
-.profile-image-box img {
+.profile-image-box .profile_img {
   width: 100%;
   height: 100%;
   border-radius: 50%;
@@ -55,7 +55,7 @@
   transition: 0.3s ease;
 }
 
-.profile-image-box:hover img {
+.profile-image-box:hover .profile_img {
   transform: scale(1.05);
 }
 
