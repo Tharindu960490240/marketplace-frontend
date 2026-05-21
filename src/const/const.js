@@ -1,6 +1,9 @@
 // export const API_BASE_URL = "http://localhost:3200/api";
 
-export const API_BASE_URL = "https://marketplace-backend-chec.onrender.com/api";
+// export const API_BASE_URL = "https://marketplace-backend-chec.onrender.com/api";
+
+export const API_BASE_URL = "http://52.221.196.150:3200/api";
+
 export const PROFILE_PLACEHOLDER_IMAGE =
   "https://sathwa-sewana-marketplace-uploads.s3.ap-southeast-1.amazonaws.com/default/user.png";
 
