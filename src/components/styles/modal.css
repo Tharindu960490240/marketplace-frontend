@@ -17,7 +17,7 @@
   padding: 30px;
   border-radius: 15px;
   border: 1px solid var(--border-color);
-  box-shadow: 0 10px 25px var(--border-color);
+  
   width: 100%;
   text-align: center;
   transition:

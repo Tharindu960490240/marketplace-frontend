@@ -44,7 +44,7 @@
   background: var(--card-color);
   border-radius: 14px;
 
-  box-shadow: 0 10px 25px var(--border-color);
+  
 
   display: grid;
   grid-template-columns: 2fr 2fr 2fr;

@@ -5,7 +5,7 @@
   margin: 30px auto;
   border-radius: 15px;
   padding: clamp(12px, 2vw, 25px);
-  box-shadow: 0 10px 25px var(--border-color);
+  
   box-sizing: border-box;
 }
 
