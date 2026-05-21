@@ -8,7 +8,7 @@ export const saveAd = async (token, adId) => {
     const res = await fetch(API_ENDPOINTS.SAVED.CREATE, {
       method: "POST",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
@@ -41,7 +41,7 @@ export const removeSavedAd = async (token, adId) => {
     const res = await fetch(API_ENDPOINTS.SAVED.DELETE(adId), {
       method: "DELETE",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -81,7 +81,7 @@ export const getSavedAds = async (token, params = {}) => {
     const res = await fetch(`${API_ENDPOINTS.SAVED.BASE}?${query.toString()}`, {
       method: "GET",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },

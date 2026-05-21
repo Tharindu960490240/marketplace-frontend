@@ -8,7 +8,7 @@ export const createSupportTicket = async (token, ticketData) => {
     const res = await fetch(API_ENDPOINTS.SUPPORT.CREATE_TICKET, {
       method: "POST",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -41,7 +41,7 @@ export const sendSupportMessage = async (token, messageData) => {
     const res = await fetch(API_ENDPOINTS.SUPPORT.SEND_MESSAGE, {
       method: "POST",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -74,7 +74,7 @@ export const getSupportTickets = async (token) => {
     const res = await fetch(API_ENDPOINTS.SUPPORT.GET_TICKETS, {
       method: "GET",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -108,7 +108,7 @@ export const getSupportMessages = async (token, ticketId) => {
       {
         method: "GET",
         headers: {
-          "ngrok-skip-browser-warning": "true",
+          
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
@@ -143,7 +143,7 @@ export const closeSupportTicket = async (token, ticketId) => {
       {
         method: "PATCH",
         headers: {
-          "ngrok-skip-browser-warning": "true",
+          
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },

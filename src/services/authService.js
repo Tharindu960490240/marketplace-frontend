@@ -101,7 +101,7 @@ export const getProfile = async (token) => {
     const res = await fetch(API_ENDPOINTS.AUTH.ME, {
       method: "GET",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -127,7 +127,7 @@ export const updateProfile = async (token, userData) => {
     const res = await fetch(API_ENDPOINTS.AUTH.UPDATE_PROFILE, {
       method: "PUT",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -157,7 +157,7 @@ export const updateProfileImage = async (token, imageFile) => {
     const res = await fetch(API_ENDPOINTS.AUTH.ME_IMAGE, {
       method: "PUT",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
       },
       body: formData,
@@ -183,7 +183,7 @@ export const changePassword = async (token, passwordData) => {
     const res = await fetch(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, {
       method: "PUT",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -235,7 +235,7 @@ export const updateUserStatus = async (token, userId, email, status) => {
     const res = await fetch(API_ENDPOINTS.AUTH.UPDATE_STATUS(userId), {
       method: "PATCH",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -334,7 +334,7 @@ export const getAllUsers = async (token, params = {}) => {
     const res = await fetch(`${API_ENDPOINTS.AUTH.BASE}?${query.toString()}`, {
       method: "GET",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -380,7 +380,7 @@ export const deleteProfile = async (token) => {
     const res = await fetch(API_ENDPOINTS.AUTH.DELETE_PROFILE, {
       method: "DELETE",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },

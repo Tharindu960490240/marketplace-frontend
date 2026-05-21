@@ -8,7 +8,7 @@ export const createReview = async (token, reviewData) => {
     const res = await fetch(API_ENDPOINTS.REVIEWS.CREATE, {
       method: "POST",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -41,7 +41,7 @@ export const getReviewsByAd = async (adId) => {
     const res = await fetch(API_ENDPOINTS.REVIEWS.BY_AD(adId), {
       method: "GET",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         "Content-Type": "application/json",
       },
     });
@@ -72,7 +72,7 @@ export const deleteReview = async (token, id) => {
     const res = await fetch(API_ENDPOINTS.REVIEWS.DELETE(id), {
       method: "DELETE",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },

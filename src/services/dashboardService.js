@@ -8,7 +8,7 @@ export const getDashboardStats = async () => {
     const res = await fetch(API_ENDPOINTS.DASHBOARD.HOME, {
       method: "GET",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         "Content-Type": "application/json",
       },
     });
@@ -39,7 +39,7 @@ export const getAdminDashboardStats = async (token) => {
     const res = await fetch(API_ENDPOINTS.DASHBOARD.ADMIN, {
       method: "GET",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },

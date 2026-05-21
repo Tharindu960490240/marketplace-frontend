@@ -8,7 +8,7 @@ export const getActiveCategories = async (token) => {
     const res = await fetch(API_ENDPOINTS.CATEGORIES.GET_ACTIVE, {
       method: "GET",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
@@ -40,7 +40,7 @@ export const getAllCategories = async () => {
     const res = await fetch(API_ENDPOINTS.CATEGORIES.GET_ALL, {
       method: "GET",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         "Content-Type": "application/json",
       },
     });
@@ -82,7 +82,7 @@ export const getAllCategoriesAdmin = async (token, params = {}) => {
       {
         method: "GET",
         headers: {
-          "ngrok-skip-browser-warning": "true",
+          
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
@@ -118,7 +118,7 @@ export const createCategory = async (token, categoryData) => {
     const res = await fetch(API_ENDPOINTS.CATEGORIES.CREATE, {
       method: "POST",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -151,7 +151,7 @@ export const updateCategoryStatus = async (token, id, status) => {
     const res = await fetch(API_ENDPOINTS.CATEGORIES.UPDATE_STATUS(id), {
       method: "PATCH",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -184,7 +184,7 @@ export const deleteCategory = async (token, id) => {
     const res = await fetch(API_ENDPOINTS.CATEGORIES.DELETE(id), {
       method: "DELETE",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },

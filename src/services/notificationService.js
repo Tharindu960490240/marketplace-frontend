@@ -8,7 +8,7 @@ export const getNotifications = async (token) => {
     const res = await fetch(API_ENDPOINTS.NOTIFICATIONS.GET_ALL, {
       method: "GET",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -37,7 +37,7 @@ export const getNotificationsCount = async (token) => {
     const res = await fetch(API_ENDPOINTS.NOTIFICATIONS.COUNT, {
       method: "GET",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -71,7 +71,7 @@ export const markNotificationAsRead = async (token, id) => {
       {
         method: "PATCH",
         headers: {
-          "ngrok-skip-browser-warning": "true",
+          
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
@@ -106,7 +106,7 @@ export const markAllNotificationsAsRead = async (token) => {
       {
         method: "PATCH",
         headers: {
-          "ngrok-skip-browser-warning": "true",
+          
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },

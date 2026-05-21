@@ -9,7 +9,7 @@ export const createAd = async (token, adData) => {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        "ngrok-skip-browser-warning": "true",
+        
         "Content-Type": "application/json",
       },
       body: JSON.stringify(adData),
@@ -42,7 +42,7 @@ export const getAds = async (params = {}, token = null) => {
     if (params.status) query.append("status", params.status);
 
     const headers = {
-      "ngrok-skip-browser-warning": "true",
+      
     };
 
     if (token) {
@@ -76,7 +76,7 @@ export const getAds = async (params = {}, token = null) => {
 export const getAdById = async (id, token = null) => {
   try {
     const headers = {
-      "ngrok-skip-browser-warning": "true",
+      
     };
 
     if (token) {
@@ -113,7 +113,7 @@ export const getMyAds = async (params = {}, token = null) => {
     if (params.status) query.append("status", params.status);
 
     const headers = {
-      "ngrok-skip-browser-warning": "true",
+      
     };
 
     if (token) {
@@ -151,7 +151,7 @@ export const updateAd = async (token, adId, adData) => {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-        "ngrok-skip-browser-warning": "true",
+        
       },
       body: JSON.stringify(adData),
     });
@@ -177,7 +177,7 @@ export const deleteAd = async (token, adId) => {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
-        "ngrok-skip-browser-warning": "true",
+        
       },
     });
 
@@ -201,7 +201,7 @@ export const updateAdStatus = async (token, adId, status, reason) => {
     const res = await fetch(API_ENDPOINTS.ADS.UPDATE_STATUS(adId), {
       method: "PATCH",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
@@ -228,7 +228,7 @@ export const incrementAdView = async (adId) => {
     const res = await fetch(API_ENDPOINTS.ADS.INCREMENT_VIEW(adId), {
       method: "PATCH",
       headers: {
-        "ngrok-skip-browser-warning": "true",
+        
       },
     });
 
@@ -259,7 +259,7 @@ export const uploadAdImages = async (token, adId, images) => {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        "ngrok-skip-browser-warning": "true",
+        
       },
       body: formData,
     });
