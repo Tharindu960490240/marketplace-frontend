@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  Lock,
-  Visibility,
-  VisibilityOff,
-  Email
-} from "@mui/icons-material";
+import { Lock, Visibility, VisibilityOff, Email } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
@@ -45,19 +40,12 @@ const SignIn = ({ onSignIn }) => {
   };
 
   const handlePasswordChange = (val) => {
-    if (val.trim().length >= 8) {
-      setData({
-        ...data,
-        password: val,
-        isValidPassword: true,
-      });
-    } else {
-      setData({
-        ...data,
-        password: val,
-        isValidPassword: false,
-      });
-    }
+    const isPasswordValid = val.trim().length >= 8;
+    setData({
+      ...data,
+      password: val,
+      isValidPassword: isPasswordValid,
+    });
   };
 
   const togglePasswordVisibility = () => {
@@ -69,9 +57,7 @@ const SignIn = ({ onSignIn }) => {
 
   const handleSignIn = async () => {
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
-    const isPasswordValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        data.password
-      );;
+    const isPasswordValid = data.password.trim().length >= 8;
 
     // Update validation state
     setData({
@@ -93,7 +79,10 @@ const SignIn = ({ onSignIn }) => {
     // Proceed to login if both email and password are valid
 
     try {
-      const loginResponse = await loginUser({ email: data.email, password: data.password });
+      const loginResponse = await loginUser({
+        email: data.email,
+        password: data.password,
+      });
       if (loginResponse.success) {
         const currentTime = new Date().getTime();
 
@@ -167,7 +156,7 @@ const SignIn = ({ onSignIn }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Email  />
+                  <Email />
                 </InputAdornment>
               ),
               endAdornment: data.check_email_Change && (
@@ -196,17 +185,13 @@ const SignIn = ({ onSignIn }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Lock  />
+                  <Lock />
                 </InputAdornment>
               ),
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={togglePasswordVisibility}>
-                    {data.secureTextEntry ? (
-                      <VisibilityOff  />
-                    ) : (
-                      <Visibility  />
-                    )}
+                    {data.secureTextEntry ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
