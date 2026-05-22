@@ -91,8 +91,12 @@ const SignUp = () => {
   };
 
   const handlePasswordChange = (val) => {
-    const isValidPassword = val.length >= 6;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    const isValidPassword = passwordRegex.test(val);
     const passwordMatch = val === userData.confirmPassword;
+
     setUserData({
       ...userData,
       password: val,
@@ -100,7 +104,6 @@ const SignUp = () => {
       passwordMatch,
     });
   };
-
   const handleConfirmPasswordChange = (val) => {
     const passwordMatch = val === userData.password;
     setUserData({ ...userData, confirmPassword: val, passwordMatch });
@@ -121,7 +124,11 @@ const SignUp = () => {
       /^[a-zA-Z]+$/.test(userData.last_name) && userData.last_name.length > 0;
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.email);
     const isContactNoValid = /^\d{10}$/.test(userData.phone);
-    const isPasswordValid = userData.password.length >= 6;
+
+    const isPasswordValid =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        userData.password
+      );
     const matchPassword = userData.password === userData.confirmPassword;
 
     // Update the state with validation results
@@ -206,7 +213,7 @@ const SignUp = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Person  />
+                  <Person />
                 </InputAdornment>
               ),
             }}
@@ -228,7 +235,7 @@ const SignUp = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Person  />
+                  <Person />
                 </InputAdornment>
               ),
             }}
@@ -248,12 +255,12 @@ const SignUp = () => {
             helperText={
               !userData.isValidEmail
                 ? "Invalid email format."
-                : "example@abcd.com"
+                : "eg: example@abcd.com"
             }
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Email  />
+                  <Email />
                 </InputAdornment>
               ),
             }}
@@ -274,12 +281,12 @@ const SignUp = () => {
             helperText={
               !userData.isValidPhone
                 ? "Contact number must be 10 digits."
-                : "0123456789"
+                : "eg: 0712345678"
             }
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Phone  />
+                  <Phone />
                 </InputAdornment>
               ),
             }}
@@ -299,23 +306,19 @@ const SignUp = () => {
             error={!userData.isValidPassword}
             helperText={
               !userData.isValidPassword
-                ? "Password must be at least 6 characters long."
-                : ""
+                ? "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character."
+                : "eg: MyPass2025!"
             }
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Lock  />
+                  <Lock />
                 </InputAdornment>
               ),
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={togglePasswordVisibility}>
-                    {userData.showPassword ? (
-                      <Visibility  />
-                    ) : (
-                      <VisibilityOff  />
-                    )}
+                    {userData.showPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -337,7 +340,7 @@ const SignUp = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Lock  />
+                  <Lock />
                 </InputAdornment>
               ),
             }}

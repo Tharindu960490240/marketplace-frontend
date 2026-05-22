@@ -45,7 +45,7 @@ const SignIn = ({ onSignIn }) => {
   };
 
   const handlePasswordChange = (val) => {
-    if (val.trim().length >= 6) {
+    if (val.trim().length >= 8) {
       setData({
         ...data,
         password: val,
@@ -69,7 +69,9 @@ const SignIn = ({ onSignIn }) => {
 
   const handleSignIn = async () => {
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
-    const isPasswordValid = data.password.length >= 6;
+    const isPasswordValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        data.password
+      );;
 
     // Update validation state
     setData({

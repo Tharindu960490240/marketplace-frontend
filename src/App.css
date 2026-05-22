@@ -394,8 +394,15 @@
 }
 
 .MuiAlert-action .MuiIconButton-root {
-color: white !important;
+  color: white !important;
 }
+
+.recharts-default-tooltip {
+  background: var(--card-color) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 4px 15px var(--border-color) !important;
+}
+
 
 /* ===============================
    Responsive

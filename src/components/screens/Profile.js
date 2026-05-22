@@ -234,10 +234,14 @@ const Profile = ({ onSignOut, isSignedIn }) => {
   };
 
   const handleOldPasswordChange = (event) => {
+    const oldPassword = event.target.value;
     setResetData({
       ...resetData,
-      oldPassword: event.target.value,
-      isValidOldPassword: event.target.value.length >= 6,
+      oldPassword,
+      isValidOldPassword:
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+          oldPassword,
+        ),
     });
   };
 
@@ -246,7 +250,10 @@ const Profile = ({ onSignOut, isSignedIn }) => {
     setResetData({
       ...resetData,
       newPassword,
-      isValidPassword: newPassword.length >= 6,
+      isValidPassword:
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+          newPassword,
+        ),
       passwordMatch: newPassword === resetData.confirmPassword,
     });
   };
@@ -272,8 +279,14 @@ const Profile = ({ onSignOut, isSignedIn }) => {
       return;
     }
 
-    const isOldPasswordValid = resetData.oldPassword.length >= 6;
-    const isPasswordValid = resetData.newPassword.length >= 6;
+    const isOldPasswordValid =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        resetData.oldPassword
+      );
+    const isPasswordValid =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        resetData.newPassword
+      );
     const matchPassword = resetData.newPassword === resetData.confirmPassword;
 
     // Update the state with the latest validation results
@@ -294,45 +307,43 @@ const Profile = ({ onSignOut, isSignedIn }) => {
     }
 
     setLoading(true);
-    // Proceed with password reset if validation passes
-    if (isPasswordValid && matchPassword) {
-      try {
-        const result = await changePassword(token, {
-          newPassword: resetData.newPassword,
-          oldPassword: resetData.oldPassword,
+
+    try {
+      const result = await changePassword(token, {
+        newPassword: resetData.newPassword,
+        oldPassword: resetData.oldPassword,
+      });
+      if (result.success) {
+        setSnackbar({
+          open: true,
+          message: "Password successfully reset!",
+          severity: "success",
         });
-        if (result.success) {
-          setSnackbar({
-            open: true,
-            message: "Password successfully reset!",
-            severity: "success",
-          });
-          // Log out the user after password reset
-          setTimeout(() => {
-            setShowPasswordModal(false);
-            setLoading(false);
-            handleLogout();
-          }, 2500);
-        } else {
+        // Log out the user after password reset
+        setTimeout(() => {
+          setShowPasswordModal(false);
           setLoading(false);
-          setSnackbar({
-            open: true,
-            message:
-              result.message || "Failed to reset password. Please try again.",
-            severity: "error",
-          });
-        }
-      } catch (error) {
-        // Handle any errors during the password reset process
+          handleLogout();
+        }, 2500);
+      } else {
         setLoading(false);
         setSnackbar({
           open: true,
           message:
-            "An error occurred during password reset. Please try again later.",
+            result.message || "Failed to reset password. Please try again.",
           severity: "error",
         });
-        console.error("Password reset error:", error);
       }
+    } catch (error) {
+      // Handle any errors during the password reset process
+      setLoading(false);
+      setSnackbar({
+        open: true,
+        message:
+          "An error occurred during password reset. Please try again later.",
+        severity: "error",
+      });
+      console.error("Password reset error:", error);
     }
   };
 

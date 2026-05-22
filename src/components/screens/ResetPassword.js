@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  Lock,
-  Visibility,
-  VisibilityOff,
-  Email
-} from "@mui/icons-material";
+import { Lock, Visibility, VisibilityOff, Email } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
@@ -100,7 +95,10 @@ const ResetPassword = ({ onSignOut }) => {
 
   // Handle New Password Input Change
   const handleNewPasswordChange = (val) => {
-    const isPasswordValid = val.length >= 6;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    const isPasswordValid = passwordRegex.test(val);
     setData({
       ...data,
       password: val,
@@ -128,29 +126,23 @@ const ResetPassword = ({ onSignOut }) => {
 
   // Handle Password Reset
   const handlePasswordReset = async () => {
-    // 1. Validation checks
-    if (!data.password || !data.confirmPassword) {
-      setSnackbar({
-        open: true,
-        message: "Please fill all fields",
-        severity: "error",
-      });
-      return;
-    }
+    const isPasswordValid =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        data.password
+      );
+    const matchPassword = data.password === data.confirmPassword;
 
-    if (!data.isPasswordValid) {
-      setSnackbar({
-        open: true,
-        message: "Password must be at least 6 characters",
-        severity: "error",
-      });
-      return;
-    }
+    // Update the state with validation results
+    setData({
+      ...data,
+      isPasswordValid: isPasswordValid,
+      passwordMatch: matchPassword,
+    });
 
-    if (!data.passwordMatch) {
+    if (!isPasswordValid || !matchPassword) {
       setSnackbar({
         open: true,
-        message: "Passwords do not match",
+        message: "Please fill in all the fields with valid information.",
         severity: "error",
       });
       return;
@@ -244,7 +236,7 @@ const ResetPassword = ({ onSignOut }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Email  />
+                  <Email />
                 </InputAdornment>
               ),
               endAdornment: data.check_email_Change ? (
@@ -272,8 +264,8 @@ const ResetPassword = ({ onSignOut }) => {
             required
             helperText={
               !data.isPasswordValid
-                ? "Password must be at least 6 characters long."
-                : ""
+                ? "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character."
+                : "eg: MyPass2025!"
             }
             InputProps={{
               startAdornment: (
@@ -284,7 +276,7 @@ const ResetPassword = ({ onSignOut }) => {
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton onClick={togglePasswordVisibility}>
-                    {data.showPassword ? <Visibility  /> : <VisibilityOff  />}
+                    {data.showPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -310,7 +302,7 @@ const ResetPassword = ({ onSignOut }) => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Lock  />
+                  <Lock />
                 </InputAdornment>
               ),
             }}

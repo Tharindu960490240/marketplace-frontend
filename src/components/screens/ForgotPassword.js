@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import {
-Email
-} from "@mui/icons-material";
+import { Email } from "@mui/icons-material";
 
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -10,9 +8,7 @@ import "../styles/frogotPassword.css";
 import LoadingSpinner from "./LoadingSpinner";
 import CustomSnackbar from "./CustomSnackbar";
 
-import {
-  sendPasswordResetLink
-} from "../../services/authService";
+import { sendPasswordResetLink } from "../../services/authService";
 
 const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
@@ -44,7 +40,15 @@ const ForgotPassword = () => {
   // Handle Password Reset (Only sending email for reset link)
   const handlePasswordReset = async () => {
     // 1. Basic validation
-    if (!data.email || !data.isValidUser) {
+
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
+    setData({
+      ...data,
+      isValidUser: isValidEmail,
+      check_email_Change: isValidEmail,
+    });
+
+    if (!isValidEmail) {
       setSnackbar({
         open: true,
         message: "Please enter a valid email address",
@@ -121,7 +125,7 @@ const ForgotPassword = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Email  />
+                  <Email />
                 </InputAdornment>
               ),
               endAdornment: data.check_email_Change ? (
