@@ -181,7 +181,7 @@ const SignIn = ({ onSignIn }) => {
             variant="outlined"
             className="custom-textfield"
             error={!data.isValidPassword}
-            helperText={!data.isValidPassword ? "Invalid password must be at least 8 characters long." : ""}
+            helperText={!data.isValidPassword ? "Invalid password, must be at least 8 characters long." : ""}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
