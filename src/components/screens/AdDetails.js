@@ -435,7 +435,7 @@ const AdDetails = () => {
                   ) : (
                     <>
                       <BookmarkAdd style={{ marginRight: 5 }} />
-                      {t("ad_details_page.save")}
+                      {t("ad_details_page.save_ad")}
                     </>
                   )}
                 </button>

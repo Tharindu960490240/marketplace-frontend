@@ -97,8 +97,15 @@
   overflow: hidden;
 }
 
+body.en {
+  font-family: "Inter", sans-serif;
+}
+
+body.si {
+  font-family: "Noto Sans Sinhala", "Iskoola Pota", sans-serif;
+}
+
 .mainBody {
-  font-family: "Roboto", sans-serif;
   background: var(--bg-color);
   margin: 0;
   padding: 0;

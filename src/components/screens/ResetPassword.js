@@ -220,7 +220,7 @@ const ResetPassword = ({ onSignOut }) => {
   return (
     <div className="forgot-password-container">
       <div className="forgot-password-box">
-        <h2>{t("reset_password_page.resetPassword")}</h2>
+        <h2>{t("reset_password_page.title")}</h2>
 
         {/* Email Input */}
         <div className="input-container">
