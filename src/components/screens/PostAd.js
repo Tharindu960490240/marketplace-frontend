@@ -28,6 +28,8 @@ import { get_token } from "../../services/authService";
 import LoadingSpinner from "./LoadingSpinner";
 import CustomSnackbar from "./CustomSnackbar";
 
+import { v4 as uuidv4 } from "uuid";
+
 import { useTranslation } from "react-i18next";
 
 /* ================= VALIDATION ================= */
@@ -147,7 +149,7 @@ const PostAd = () => {
     const valid = files.filter((f) => ALLOWED_TYPES.includes(f.type));
 
     const newImages = valid.map((file) => ({
-      id: crypto.randomUUID(), // unique id
+      id: uuidv4(),
       file,
       url: URL.createObjectURL(file),
     }));
@@ -219,7 +221,7 @@ const PostAd = () => {
         district: adData.district,
         city: adData.city,
       };
-      
+
       const res = await createAd(token, payload);
 
       if (!res.success) return showMessage(t("post_ad.ad_error"), "error");
