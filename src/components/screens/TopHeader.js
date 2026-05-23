@@ -234,7 +234,7 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
         {/* CENTER NAV */}
         <div className="header-center">
           <div className="nav-item" onClick={() => goTo("/")}>
-            <Home /> <span>{t("header.home")}</span>
+            <Home /> {t("header.home")}
           </div>
 
           {isSignedIn && user?.role === "user" && (
@@ -316,7 +316,9 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                 }
                 className="profile-avatar"
               />
-              <span className="header-name">{t("header.welcome")}, {user?.first_name}</span>
+              <span className="header-name">
+                {t("header.welcome")}, {user?.first_name}
+              </span>
 
               {openMenu && (
                 <div className="dropdown-menu">
@@ -386,7 +388,9 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                     onClick={() => goTo("/support")}
                   >
                     <ChatBubble />
-                    {user?.role === "user" ? t("header.contactUs") : t("header.giveSupport")}
+                    {user?.role === "user"
+                      ? t("header.contactUs")
+                      : t("header.giveSupport")}
                     <span className="badge-count">{notificationCount}</span>
                   </div>
 
@@ -465,7 +469,9 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
 
               <div onClick={() => goTo("/support")} className="saved-item">
                 <ChatBubble />
-                {user?.role === "user" ? t("header.contactUs") : t("header.giveSupport")}
+                {user?.role === "user"
+                  ? t("header.contactUs")
+                  : t("header.giveSupport")}
                 <span className="badge-count">{notificationCount}</span>
               </div>
 
@@ -499,7 +505,7 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
 
           <div onClick={toggleLanguage}>
             <Language />
-            {language === "en" ? "සිංහල" : "English"}
+            <span>{language === "en" ? "සිංහල" : "English"}</span>
           </div>
         </div>
       </div>
