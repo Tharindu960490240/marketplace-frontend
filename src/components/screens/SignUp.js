@@ -28,8 +28,11 @@ import CustomSnackbar from "./CustomSnackbar";
 
 import { registerUser } from "../../services/authService";
 
+import { useTranslation } from "react-i18next";
+
 const SignUp = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const initialUserData = {
     first_name: "",
@@ -76,12 +79,12 @@ const SignUp = () => {
   };
 
   const handleFirstNameChange = (val) => {
-    const isValidFirstName = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(val);
+    const isValidFirstName = /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(val);
     setUserData({ ...userData, first_name: val, isValidFirstName });
   };
 
   const handleLastNameChange = (val) => {
-    const isValidLastName = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(val);
+    const isValidLastName = /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(val);
     setUserData({ ...userData, last_name: val, isValidLastName });
   };
 
@@ -119,15 +122,18 @@ const SignUp = () => {
 
   const handleUserFormSubmit = async () => {
     const isFirstNameValid =
-      /^[a-zA-Z]+$/.test(userData.first_name) && userData.first_name.length > 0;
+      /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(userData.first_name) &&
+      userData.first_name.length > 0;
     const isLastNameValid =
-      /^[a-zA-Z]+$/.test(userData.last_name) && userData.last_name.length > 0;
+      /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(userData.last_name) &&
+      userData.last_name.length > 0;
+
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.email);
     const isContactNoValid = /^\d{10}$/.test(userData.phone);
 
     const isPasswordValid =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        userData.password
+        userData.password,
       );
     const matchPassword = userData.password === userData.confirmPassword;
 
@@ -152,7 +158,7 @@ const SignUp = () => {
     ) {
       setSnackbar({
         open: true,
-        message: "Please fill in all the fields with valid information.",
+        message: t("signup_page.fillValidFields"),
         severity: "error",
       });
       return;
@@ -166,7 +172,7 @@ const SignUp = () => {
       if (result.success) {
         setSnackbar({
           open: true,
-          message: "User account created successfully! Verify email to login.",
+          message: t("signup_page.accountCreatedSuccess"),
           severity: "success",
         });
         setDialogOpen(true);
@@ -174,9 +180,7 @@ const SignUp = () => {
         setLoading(false);
         setSnackbar({
           open: true,
-          message:
-            result.message ||
-            "Failed to create user account. Please try again.",
+          message: t("signup_page.accountCreateFailed"),
           severity: "error",
         });
       }
@@ -184,7 +188,7 @@ const SignUp = () => {
       setLoading(false);
       setSnackbar({
         open: true,
-        message: "An error occurred while adding the user. Please try again.",
+        message: t("signup_page.accountError"),
         severity: "error",
       });
     }
@@ -193,22 +197,22 @@ const SignUp = () => {
   return (
     <div className="signup-container">
       <div className="signup-box">
-        <h2>Sign Up</h2>
+        <h2>{t("signup_page.signUpTitle")}</h2>
 
         {/* Name */}
         <div className="form-row desktop-two mobile-full">
           <TextField
             className="custom-textfield"
             size="small"
-            label="First Name"
+            label={t("signup_page.firstName")}
             value={userData.first_name}
             onChange={(e) => handleFirstNameChange(e.target.value)}
             required
             error={!userData.isValidFirstName}
             helperText={
               !userData.isValidFirstName
-                ? "Name must contain only letters."
-                : "eg: Tharindu"
+                ? t("signup_page.firstNameError")
+                : t("signup_page.firstNameHint")
             }
             InputProps={{
               startAdornment: (
@@ -222,15 +226,15 @@ const SignUp = () => {
           <TextField
             className="custom-textfield"
             size="small"
-            label="Last Name"
+            label={t("signup_page.lastName")}
             value={userData.last_name}
             onChange={(e) => handleLastNameChange(e.target.value)}
             required
             error={!userData.isValidLastName}
             helperText={
               !userData.isValidLastName
-                ? "Name must contain only letters."
-                : "eg: Madusanka"
+                ? t("signup_page.lastNameError")
+                : t("signup_page.lastNameHint")
             }
             InputProps={{
               startAdornment: (
@@ -247,15 +251,15 @@ const SignUp = () => {
           <TextField
             className="custom-textfield"
             size="small"
-            label="Email"
+            label={t("signup_page.email")}
             value={userData.email}
             onChange={(e) => handleEmailChange(e.target.value)}
             required
             error={!userData.isValidEmail}
             helperText={
               !userData.isValidEmail
-                ? "Invalid email format."
-                : "eg: example@abcd.com"
+                ? t("signup_page.emailError")
+                : t("signup_page.emailHint")
             }
             InputProps={{
               startAdornment: (
@@ -269,7 +273,7 @@ const SignUp = () => {
           <TextField
             className="custom-textfield"
             size="small"
-            label="Contact No."
+            label={t("signup_page.contactNo")}
             value={userData.phone}
             onChange={(e) => {
               if (/^\d*$/.test(e.target.value)) {
@@ -280,8 +284,8 @@ const SignUp = () => {
             error={!userData.isValidPhone}
             helperText={
               !userData.isValidPhone
-                ? "Contact number must be 10 digits."
-                : "eg: 0712345678"
+                ? t("signup_page.contactError")
+                : t("signup_page.contactHint")
             }
             InputProps={{
               startAdornment: (
@@ -298,7 +302,7 @@ const SignUp = () => {
           <TextField
             className="custom-textfield"
             size="small"
-            label="New Password"
+            label={t("signup_page.newPassword")}
             type={userData.showPassword ? "text" : "password"}
             value={userData.password}
             onChange={(e) => handlePasswordChange(e.target.value)}
@@ -306,8 +310,8 @@ const SignUp = () => {
             error={!userData.isValidPassword}
             helperText={
               !userData.isValidPassword
-                ? "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character."
-                : "eg: MyPass2025!"
+                ? t("signup_page.invalidPasswordStrength")
+                : t("signup_page.passwordHintSignup")
             }
             InputProps={{
               startAdornment: (
@@ -328,14 +332,14 @@ const SignUp = () => {
           <TextField
             className="custom-textfield"
             size="small"
-            label="Confirm Password"
+            label={t("signup_page.confirmPassword")}
             type={userData.showPassword ? "text" : "password"}
             value={userData.confirmPassword}
             onChange={(e) => handleConfirmPasswordChange(e.target.value)}
             required
             error={!userData.passwordMatch}
             helperText={
-              !userData.passwordMatch ? "Passwords do not match." : ""
+              !userData.passwordMatch ? t("signup_page.passwordMismatch") : ""
             }
             InputProps={{
               startAdornment: (
@@ -350,16 +354,17 @@ const SignUp = () => {
         {/* Buttons */}
         <div className="button-group">
           <button onClick={handleUserFormSubmit} className="button-success">
-            Create User Account
+            {t("signup_page.createAccount")}
           </button>
 
           <button onClick={clearData} className="button-error">
-            Cancel
+            {t("signup_page.cancel")}
           </button>
         </div>
 
         <p className="signin-link">
-          Already have an account? <Link to="/signin">Sign In</Link>
+          {t("signup_page.alreadyHaveAccount")}{" "}
+          <Link to="/signin">{t("signup_page.signInLink")}</Link>
         </p>
       </div>
 
@@ -373,7 +378,7 @@ const SignUp = () => {
         maxWidth="xs"
       >
         <DialogTitle>
-          Verify Your Email Address
+          {t("signup_page.verifyEmailTitle")}
           <IconButton
             onClick={handleDialogClose}
             sx={{
@@ -388,16 +393,13 @@ const SignUp = () => {
 
         <DialogContent dividers>
           <DialogContentText>
-            Your account has been created successfully
+            {t("signup_page.verifyEmailText1")}
             <br />
             <br />
-            We’ve sent a verification link to your email address. Please check
-            your <b>Inbox</b> or <b>Spam/Junk folder</b> and click the link to
-            activate your account.
+            {t("signup_page.verifyEmailText2")}
             <br />
             <br />
-            If you don’t receive the email within a few minutes, please contact
-            support team.
+            {t("signup_page.verifyEmailText3")}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}></DialogActions>

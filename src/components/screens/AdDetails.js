@@ -36,11 +36,10 @@ import CustomSnackbar from "./CustomSnackbar";
 
 import * as AppConst from "../../const/const";
 
-const getLabelText = (value) => {
-  return `${value} Star${value !== 1 ? "s" : ""}, ${AppConst.RATING_LABLES[value]}`;
-};
+import { useTranslation } from "react-i18next";
 
 const AdDetails = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
 
   const [ad, setAd] = useState(null);
@@ -59,6 +58,12 @@ const AdDetails = () => {
 
   const [showReviews, setShowReviews] = useState(false);
 
+  const getLabelText = (value) => {
+    return `${value} ${
+      value !== 1 ? t("ad_details_page.stars") : t("ad_details_page.star")
+    }, ${AppConst.RATING_LABLES[value]}`;
+  };
+
   const handleClose = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
@@ -71,6 +76,10 @@ const AdDetails = () => {
 
   const fetchAd = useCallback(async () => {
     try {
+      setRating(0);
+      setHover(-1);
+      setComment("");
+      setClickSubmit(false);
       setLoading(true);
       setCurrentIndex(0);
 
@@ -80,6 +89,7 @@ const AdDetails = () => {
       if (myData) {
         setUser(myData);
       }
+
       const res = await getAdById(id, token);
 
       if (res.success) {
@@ -88,20 +98,20 @@ const AdDetails = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Failed to load ad",
+          message: t("ad_details_page.failed_load_ad"),
           severity: "error",
         });
       }
     } catch (error) {
       setSnackbar({
         open: true,
-        message: "Server error while loading ad",
+        message: t("ad_details_page.server_error_load_ad"),
         severity: "error",
       });
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   useEffect(() => {
     fetchAd();
@@ -135,20 +145,23 @@ const AdDetails = () => {
 
   const handleSubmitReview = async () => {
     const token = await get_token();
+
     if (!token)
       return setSnackbar({
         open: true,
-        message: "Session expired. Please login again.",
+        message: t("ad_details_page.session_expired"),
         severity: "error",
       });
 
     setClickSubmit(true);
+
     if (!rating || !comment.trim()) {
       setSnackbar({
         open: true,
-        message: "Rating and comment are required",
+        message: t("ad_details_page.rating_comment_required"),
         severity: "error",
       });
+
       return;
     }
 
@@ -164,27 +177,27 @@ const AdDetails = () => {
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Review added successfully",
+          message: t("ad_details_page.review_added_success"),
           severity: "success",
         });
 
-        // RESET FORM
         setRating(0);
         setHover(-1);
         setComment("");
         setClickSubmit(false);
+
         fetchAd();
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Failed to add review",
+          message: t("ad_details_page.failed_add_review"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Server error while submitting review",
+        message: t("ad_details_page.server_error_submit_review"),
         severity: "error",
       });
     } finally {
@@ -194,10 +207,11 @@ const AdDetails = () => {
 
   const handleDeleteReview = async (reviewId) => {
     const token = await get_token();
+
     if (!token)
       return setSnackbar({
         open: true,
-        message: "Session expired. Please login again.",
+        message: t("ad_details_page.session_expired"),
         severity: "error",
       });
 
@@ -209,22 +223,22 @@ const AdDetails = () => {
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Review deleted successfully",
+          message: t("ad_details_page.review_deleted_success"),
           severity: "success",
         });
 
-        fetchAd(); // refresh reviews
+        fetchAd();
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Failed to delete review",
+          message: res.message || t("ad_details_page.failed_delete_review"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error deleting review",
+        message: t("ad_details_page.error_delete_review"),
         severity: "error",
       });
     } finally {
@@ -238,7 +252,7 @@ const AdDetails = () => {
     if (!token) {
       return setSnackbar({
         open: true,
-        message: "Session expired. Please login again.",
+        message: t("ad_details_page.session_expired"),
         severity: "error",
       });
     }
@@ -256,23 +270,27 @@ const AdDetails = () => {
 
       if (res.success) {
         setIsSaved((prev) => !prev);
+
         window.dispatchEvent(new Event("savedChanged"));
+
         setSnackbar({
           open: true,
-          message: isSaved ? "Removed from saved" : "Ad saved",
+          message: isSaved
+            ? t("ad_details_page.removed_from_saved")
+            : t("ad_details_page.ad_saved"),
           severity: "success",
         });
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Failed to update saved state",
+          message: t("ad_details_page.failed_update_saved"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Server error",
+        message: t("ad_details_page.server_error"),
         severity: "error",
       });
     } finally {
@@ -281,10 +299,11 @@ const AdDetails = () => {
   };
 
   const getRatingLabel = (rating) => {
-    if (!rating) return "No rating";
+    if (!rating) return t("ad_details_page.no_rating");
 
     const rounded = Math.round(rating * 2) / 2;
-    return AppConst.RATING_LABLES[rounded] || "No rating";
+
+    return AppConst.RATING_LABLES[rounded] || t("ad_details_page.no_rating");
   };
 
   const statusChip = (status) => {
@@ -298,7 +317,23 @@ const AdDetails = () => {
       Fixed: "warning",
     };
 
-    return <Chip label={status} color={map[status]} size="small" />;
+    const labelMap = {
+      active: t("ad_details_page.active"),
+      pending: t("ad_details_page.pending"),
+      sold: t("ad_details_page.sold"),
+      rejected: t("ad_details_page.rejected"),
+      deleted: t("ad_details_page.deleted"),
+      Negotiable: t("ad_details_page.negotiable"),
+      Fixed: t("ad_details_page.fixed"),
+    };
+
+    return (
+      <Chip
+        label={labelMap[status] || status}
+        color={map[status]}
+        size="small"
+      />
+    );
   };
 
   if (!ad) return <LoadingSpinner open={loading} />;
@@ -381,19 +416,26 @@ const AdDetails = () => {
 
           {user?.role !== "admin" && user?.id !== ad?.user_id && (
             <div className="button-group">
-              <Tooltip title={isSaved ? "Remove from saved" : "Save ad"}>
+              <Tooltip
+                title={
+                  isSaved
+                    ? t("ad_details_page.remove_from_saved")
+                    : t("ad_details_page.save_ad")
+                }
+              >
                 <button
                   className={`wishlist-btn ${isSaved ? "active" : ""}`}
                   onClick={handleToggleSave}
                 >
                   {isSaved ? (
                     <>
-                      <Bookmark style={{ marginRight: 5 }} /> Saved
+                      <Bookmark style={{ marginRight: 5 }} />
+                      {t("ad_details_page.saved")}
                     </>
                   ) : (
                     <>
                       <BookmarkAdd style={{ marginRight: 5 }} />
-                      Save
+                      {t("ad_details_page.save")}
                     </>
                   )}
                 </button>
@@ -403,7 +445,7 @@ const AdDetails = () => {
 
           {/* SELLER */}
           <div className="seller-card">
-            <h4>Seller Information</h4>
+            <h4>{t("ad_details_page.seller_information")}</h4>
             <p>{ad.user?.name}</p>
             <p>{ad.user?.phone}</p>
           </div>
@@ -412,14 +454,14 @@ const AdDetails = () => {
 
       {/* ================= DESCRIPTION ================= */}
       <div className="description">
-        <h3>Description</h3>
+        <h3>{t("ad_details_page.description")}</h3>
         <p>{ad.description}</p>
       </div>
 
       {/* ================= ADD REVIEW ================= */}
       {user?.role !== "admin" && user?.id !== ad?.user_id && (
         <div className="review-box">
-          <h3>Add Review</h3>
+          <h3>{t("ad_details_page.add_review")}</h3>
 
           <Box
             sx={{ mb: 2, width: 250, display: "flex", alignItems: "center" }}
@@ -442,7 +484,7 @@ const AdDetails = () => {
             {/* DESCRIPTION */}
             <TextField
               className="custom-textfield"
-              label="Review note"
+              label={t("ad_details_page.review_note")}
               multiline
               rows={4}
               required
@@ -450,8 +492,8 @@ const AdDetails = () => {
               error={clickSubmit && !comment.trim()}
               helperText={
                 clickSubmit && !comment
-                  ? "Reason is required"
-                  : "e.g. Good seller, fast response"
+                  ? t("ad_details_page.reason_required")
+                  : t("ad_details_page.review_placeholder")
               }
               onChange={(e) => setComment(e.target.value)}
               InputProps={{
@@ -465,7 +507,7 @@ const AdDetails = () => {
           </div>
 
           <button className="button-success" onClick={handleSubmitReview}>
-            Submit Review
+            {t("ad_details_page.submit_review")}
           </button>
         </div>
       )}
@@ -474,8 +516,14 @@ const AdDetails = () => {
 
       <div className="reviews-section">
         <div className="reviews-header">
-          <h3>Reviews</h3>
-          <Tooltip title={showReviews ? "Hide Reviews" : "Show Reviews"}>
+          <h3>{t("ad_details_page.reviews")}</h3>
+          <Tooltip
+            title={
+              showReviews
+                ? t("ad_details_page.hide_reviews")
+                : t("ad_details_page.show_reviews")
+            }
+          >
             <IconButton
               color="primary"
               onClick={() => setShowReviews((prev) => !prev)}
@@ -491,7 +539,7 @@ const AdDetails = () => {
 
         <Collapse in={showReviews} timeout="auto" unmountOnExit>
           {ad.reviews?.length === 0 ? (
-            <p className="no-reviews">No reviews yet</p>
+            <p className="no-reviews">{t("ad_details_page.no_reviews")}</p>
           ) : (
             ad.reviews?.map((rev) => (
               <div key={rev.id} className="review-card">
@@ -501,7 +549,7 @@ const AdDetails = () => {
                       src={
                         rev.user?.url
                           ? rev.user.url
-                          : AppConst.PROFILE_PLACEHOLDER_IMAGE 
+                          : AppConst.PROFILE_PLACEHOLDER_IMAGE
                       }
                     />
 
@@ -527,7 +575,7 @@ const AdDetails = () => {
                   </div>
 
                   {(user?.role === "admin" || rev.user?.id === user?.id) && (
-                    <Tooltip title="Delete Review">
+                    <Tooltip title={t("ad_details_page.delete_review")}>
                       <IconButton onClick={() => handleDeleteReview(rev.id)}>
                         <Delete color="error" />
                       </IconButton>

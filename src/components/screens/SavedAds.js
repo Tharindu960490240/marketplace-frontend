@@ -15,7 +15,10 @@ import { get_token } from "../../services/authService";
 import LoadingSpinner from "./LoadingSpinner";
 import CustomSnackbar from "./CustomSnackbar";
 
+import { useTranslation } from "react-i18next";
+
 const SavedAds = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [ads, setAds] = useState([]);
@@ -52,20 +55,20 @@ const SavedAds = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Failed to load saved ads",
+          message: res.message || t("saved_ads_page.failed_load_saved_ads"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Server error while loading saved ads",
+        message: t("saved_ads_page.server_error_loading_saved_ads"),
         severity: "error",
       });
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage]);
+  }, [page, rowsPerPage, t]);
 
   useEffect(() => {
     fetchSavedAds();
@@ -78,7 +81,7 @@ const SavedAds = () => {
     if (!token) {
       return setSnackbar({
         open: true,
-        message: "Login required",
+        message: t("saved_ads_page.session_expired"),
         severity: "error",
       });
     }
@@ -92,20 +95,20 @@ const SavedAds = () => {
         window.dispatchEvent(new Event("savedChanged"));
         setSnackbar({
           open: true,
-          message: "Removed from saved",
+          message: t("saved_ads_page.removed_saved"),
           severity: "success",
         });
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Failed to remove",
+          message: t("saved_ads_page.failed_remove"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Server error",
+        message: t("saved_ads_page.server_error"),
         severity: "error",
       });
     }
@@ -118,10 +121,10 @@ const SavedAds = () => {
   };
 
   const getRatingLabel = (rating) => {
-    if (!rating) return "No rating";
+    if (!rating) return t("saved_ads_page.no_rating");
 
     const rounded = Math.round(rating * 2) / 2;
-    return AppConst.RATING_LABLES[rounded] || "No rating";
+    return AppConst.RATING_LABLES[rounded] || t("saved_ads_page.no_rating");
   };
 
   const statusChip = (status) => {
@@ -135,7 +138,23 @@ const SavedAds = () => {
       Fixed: "warning",
     };
 
-    return <Chip label={status} color={map[status]} size="small" />;
+    const labelMap = {
+      active: t("saved_ads_page.active"),
+      pending: t("saved_ads_page.pending"),
+      sold: t("saved_ads_page.sold"),
+      rejected: t("saved_ads_page.rejected"),
+      deleted: t("saved_ads_page.deleted"),
+      Negotiable: t("saved_ads_page.negotiable"),
+      Fixed: t("saved_ads_page.fixed"),
+    };
+
+    return (
+      <Chip
+        label={labelMap[status] || status}
+        color={map[status]}
+        size="small"
+      />
+    );
   };
 
   return (
@@ -144,7 +163,7 @@ const SavedAds = () => {
       <section className="listings-container">
         <div className="listing-grid">
           {ads.length === 0 ? (
-            <p className="no-data">No saved ads</p>
+            <p className="no-data">{t("saved_ads_page.no_saved_ads")}</p>
           ) : (
             ads.map((item) => (
               <div className="listing-card modern" key={item.id}>
@@ -154,7 +173,7 @@ const SavedAds = () => {
                     src={
                       item.primary_image
                         ? item.primary_image
-                        : AppConst.ADS_PLACEHOLDER_IMAGE 
+                        : AppConst.ADS_PLACEHOLDER_IMAGE
                     }
                     alt={item.title}
                   />
@@ -206,17 +225,17 @@ const SavedAds = () => {
                         navigate(`/ad/${item.id}`);
                       }}
                     >
-                      View Details
+                      {t("saved_ads_page.view_details")}
                     </button>
 
                     {/* 🔥 ALWAYS UNSAVE */}
-                    <Tooltip title="Remove from saved">
+                    <Tooltip title={t("saved_ads_page.remove_saved")}>
                       <button
                         className="wishlist-btn active"
                         onClick={() => handleUnsave(item.id)}
                       >
                         <Bookmark style={{ marginRight: 5 }} />
-                        Saved
+                        {t("saved_ads_page.saved")}
                       </button>
                     </Tooltip>
                   </div>

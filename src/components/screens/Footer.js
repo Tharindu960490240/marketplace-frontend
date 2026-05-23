@@ -8,11 +8,13 @@ import {
   Language,
 } from "@mui/icons-material";
 
+import { useTranslation } from "react-i18next";
+
 const Footer = () => {
+  const { t } = useTranslation();
   return (
     <footer className="footer">
       <div className="footer-container">
-
         {/* ================= COMPANY ================= */}
         <div className="footer-col">
           <div className="footer-brand">
@@ -21,21 +23,25 @@ const Footer = () => {
               alt="Agri Link Services"
               className="footer-logo"
             />
-            <h3>Agri Link Services</h3>
+            <h3>{t("footer.companyName")}</h3>
           </div>
 
           <p className="desc">
-            Trusted agricultural & livestock service provider in Sri Lanka.
+            {t("footer.companyDesc")}
           </p>
 
-          <a href="https://agrilinkservices.com/" target="_blank" rel="noreferrer">
-            <Language /> agrilinkservices.com
+          <a
+            href="https://agrilinkservices.com/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Language /> {t("footer.website")}
           </a>
         </div>
 
         {/* ================= CONTACT ================= */}
         <div className="footer-col">
-          <h3>Contact</h3>
+          <h3>{t("footer.contact")}</h3>
 
           <a href="tel:+94773782149">
             <Phone /> +94 77 378 2149
@@ -52,25 +58,36 @@ const Footer = () => {
 
         {/* ================= SOCIAL ================= */}
         <div className="footer-col">
-          <h3>Follow Us</h3>
+          <h3>{t("footer.followUs")}</h3>
 
-          <a href="https://www.youtube.com/@Agri_Link" target="_blank" rel="noreferrer">
-            <YouTube /> YouTube
+          <a
+            href="https://www.youtube.com/@Agri_Link"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <YouTube /> {t("footer.youtube")}
           </a>
 
-          <a href="https://www.facebook.com/profile.php?id=100085256541352" target="_blank" rel="noreferrer">
-            <Facebook /> Facebook
+          <a
+            href="https://www.facebook.com/profile.php?id=100085256541352"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Facebook /> {t("footer.facebook")}
           </a>
 
-          <a href="https://www.linkedin.com/company/agri-link-services/" target="_blank" rel="noreferrer">
-            <LinkedIn /> LinkedIn
+          <a
+            href="https://www.linkedin.com/company/agri-link-services/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <LinkedIn /> {t("footer.linkedin")}
           </a>
         </div>
-
       </div>
 
       <div className="footer-bottom">
-        © 2026 T&S Private Limited. All rights reserved.
+        {t("footer.copyright")}
       </div>
     </footer>
   );

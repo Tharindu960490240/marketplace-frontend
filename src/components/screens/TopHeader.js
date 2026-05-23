@@ -20,6 +20,7 @@ import {
   Bookmark,
   Notifications,
   ChatBubble,
+  Language,
 } from "@mui/icons-material";
 
 import "../styles/topHeader.css";
@@ -34,7 +35,11 @@ import { get_token, getProfile } from "../../services/authService";
 import { getSavedAds } from "../../services/savedAdService";
 import { getNotificationsCount } from "../../services/notificationService";
 
+import { useTranslation } from "react-i18next";
+
 const TopHeader = ({ onSignOut, isSignedIn }) => {
+  const { t, i18n } = useTranslation();
+
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -58,6 +63,10 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
     document.documentElement.getAttribute("data-theme") === "dark",
   );
 
+  const [language, setLanguage] = useState(
+    document.documentElement.getAttribute("language") || "en",
+  );
+
   const toggleDarkMode = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);
@@ -66,6 +75,16 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
       newMode ? "dark" : "light",
     );
   };
+
+  const toggleLanguage = () => {
+    const newLang = language === "en" ? "si" : "en";
+    setLanguage(newLang);
+    document.documentElement.setAttribute("language", newLang);
+  };
+
+  useEffect(() => {
+    i18n.changeLanguage(language);
+  }, [language, i18n]);
 
   const goTo = (path) => {
     navigate(path);
@@ -83,7 +102,7 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
     setLoading(true);
     setSnackbar({
       open: true,
-      message: "You have successfully logged out.",
+      message: t("header.logoutSuccess"),
       severity: "success",
     });
 
@@ -215,7 +234,7 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
         {/* CENTER NAV */}
         <div className="header-center">
           <div className="nav-item" onClick={() => goTo("/")}>
-            <Home /> <span>Home</span>
+            <Home /> <span>{t("header.home")}</span>
           </div>
 
           {isSignedIn && user?.role === "user" && (
@@ -223,7 +242,8 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
               className="nav-item highlight"
               onClick={() => goTo("/post-ad")}
             >
-              <AddCircle /> <span style={{ marginBottom: "2px" }}>Post Ad</span>
+              <AddCircle />{" "}
+              <span style={{ marginBottom: "2px" }}>{t("header.postAd")}</span>
             </div>
           )}
         </div>
@@ -254,14 +274,14 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                 className="hide-in-mobile"
                 onClick={() => goTo("/signin")}
               >
-                <Login /> <span>Sign In</span>
+                <Login /> <span>{t("header.signIn")}</span>
               </button>
 
               <button
                 className="primary hide-in-mobile"
                 onClick={() => goTo("/signup")}
               >
-                <PersonAdd /> <span>Sign Up</span>
+                <PersonAdd /> <span>{t("header.signUp")}</span>
               </button>
             </>
           )}
@@ -276,6 +296,11 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
             <DarkMode />
           </div>
 
+          <div className="nav-item hide-in-mobile" onClick={toggleLanguage}>
+            <Language />
+            {language === "en" ? "සිංහල" : "English"}
+          </div>
+
           {/* PROFILE DROPDOWN */}
           {isSignedIn && (
             <div
@@ -287,11 +312,11 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                 src={
                   user && user.profile_image
                     ? user.profile_image
-                    : AppConst.PROFILE_PLACEHOLDER_IMAGE 
+                    : AppConst.PROFILE_PLACEHOLDER_IMAGE
                 }
                 className="profile-avatar"
               />
-              <span className="header-name">Hi {user?.first_name}</span>
+              <span className="header-name">{t("header.welcome")}, {user?.first_name}</span>
 
               {openMenu && (
                 <div className="dropdown-menu">
@@ -299,7 +324,7 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                     className="dropdown-item"
                     onClick={() => goTo("/profile")}
                   >
-                    <AccountCircle /> Profile
+                    <AccountCircle /> {t("header.profile")}
                   </div>
 
                   {user?.role === "admin" && (
@@ -307,13 +332,13 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                       className="dropdown-item"
                       onClick={() => goTo("/dashboard")}
                     >
-                      <Dashboard /> Dashboard
+                      <Dashboard /> {t("header.dashboard")}
                     </div>
                   )}
 
                   {user?.role === "admin" && (
                     <div className="dropdown-item" onClick={() => goTo("/ads")}>
-                      <BorderColor /> Manage Ads
+                      <BorderColor /> {t("header.manageAds")}
                     </div>
                   )}
 
@@ -322,7 +347,7 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                       onClick={() => goTo("/saved-ads")}
                       className="dropdown-item saved-item"
                     >
-                      <Bookmark /> My Saved Ads
+                      <Bookmark /> {t("header.mySavedAds")}
                       <span className="badge-count">{savedCount}</span>
                     </div>
                   )}
@@ -332,7 +357,7 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                       className="dropdown-item"
                       onClick={() => goTo("/my-ads")}
                     >
-                      <BorderColor /> My Ads
+                      <BorderColor /> {t("header.myAds")}
                     </div>
                   )}
 
@@ -342,7 +367,7 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                       onClick={() => goTo("/users")}
                     >
                       <People />
-                      Manage Users
+                      {t("header.manageUsers")}
                     </div>
                   )}
 
@@ -352,7 +377,7 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                       onClick={() => goTo("/categories")}
                     >
                       <Category />
-                      Manage Categories
+                      {t("header.manageCategories")}
                     </div>
                   )}
 
@@ -361,12 +386,12 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
                     onClick={() => goTo("/support")}
                   >
                     <ChatBubble />
-                    {user?.role === "user" ? "Contact Us" : "Give Support"}
+                    {user?.role === "user" ? t("header.contactUs") : t("header.giveSupport")}
                     <span className="badge-count">{notificationCount}</span>
                   </div>
 
                   <div className="dropdown-item" onClick={handleLogout}>
-                    <Logout /> Logout
+                    <Logout /> {t("header.logout")}
                   </div>
                 </div>
               )}
@@ -378,74 +403,74 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
       {/* ================= MOBILE DRAWER ================= */}
       <div className={`mobile-drawer ${mobileMenu ? "open" : ""}`}>
         <div className="drawer-header">
-          <span>Menu</span>
+          <span>{t("header.menu")}</span>
           <Close onClick={() => setMobileMenu(false)} />
         </div>
 
         <div className="drawer-content">
           <div onClick={() => goTo("/")}>
-            <Home /> Home
+            <Home /> {t("header.home")}
           </div>
 
           {isSignedIn && (
             <>
               <div onClick={() => goTo("/profile")}>
-                <AccountCircle /> Profile
+                <AccountCircle /> {t("header.profile")}
               </div>
 
               {user?.role === "admin" && (
                 <div onClick={() => goTo("/dashboard")}>
-                  <Dashboard /> Dashboard
+                  <Dashboard /> {t("header.dashboard")}
                 </div>
               )}
 
               {user?.role === "admin" && (
                 <div onClick={() => goTo("/ads")}>
-                  <BorderColor /> Manage Ads
+                  <BorderColor /> {t("header.manageAds")}
                 </div>
               )}
 
               {user?.role === "user" && (
                 <div onClick={() => goTo("/post-ad")}>
-                  <AddCircle /> Post Ad
+                  <AddCircle /> {t("header.postAd")}
                 </div>
               )}
 
               {user?.role === "user" && (
                 <div onClick={() => goTo("/saved-ads")} className="saved-item">
-                  <Bookmark /> My Saved Ads
+                  <Bookmark /> {t("header.mySavedAds")}
                   <span className="badge-count">{savedCount}</span>
                 </div>
               )}
 
               {user?.role === "user" && (
                 <div onClick={() => goTo("/my-ads")}>
-                  <BorderColor /> My Ads
+                  <BorderColor /> {t("header.myAds")}
                 </div>
               )}
 
               {user?.role === "admin" && (
                 <div onClick={() => goTo("/users")}>
                   <People />
-                  Manage Users
+                  {t("header.manageUsers")}
                 </div>
               )}
 
               {user?.role === "admin" && (
                 <div onClick={() => goTo("/categories")}>
                   <Category />
-                  Manage Categories
+                  {t("header.manageCategories")}
                 </div>
               )}
 
               <div onClick={() => goTo("/support")} className="saved-item">
                 <ChatBubble />
-                {user?.role === "user" ? "Contact Us" : "Give Support"}
+                {user?.role === "user" ? t("header.contactUs") : t("header.giveSupport")}
                 <span className="badge-count">{notificationCount}</span>
               </div>
 
               <div onClick={handleLogout}>
-                <Logout /> Logout
+                <Logout /> {t("header.logout")}
               </div>
             </>
           )}
@@ -453,11 +478,11 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
           {!isSignedIn && (
             <>
               <div onClick={() => goTo("/signin")}>
-                <Login /> Sign In
+                <Login /> {t("header.signIn")}
               </div>
 
               <div onClick={() => goTo("/signup")}>
-                <PersonAdd /> Sign Up
+                <PersonAdd /> {t("header.signUp")}
               </div>
             </>
           )}
@@ -470,6 +495,11 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
               color="primary"
             />
             <DarkMode />
+          </div>
+
+          <div onClick={toggleLanguage}>
+            <Language />
+            {language === "en" ? "සිංහල" : "English"}
           </div>
         </div>
       </div>

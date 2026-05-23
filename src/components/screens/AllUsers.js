@@ -50,6 +50,8 @@ import CustomSnackbar from "./CustomSnackbar";
 
 import "../styles/allUsers.css";
 
+import { useTranslation } from "react-i18next";
+
 const statusTabs = ["active", "pending", "suspended"];
 
 // ================= DEBOUNCE =================
@@ -65,6 +67,7 @@ const useDebounce = (value, delay) => {
 };
 
 const AllUsers = () => {
+  const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
 
   const [users, setUsers] = useState([]);
@@ -119,20 +122,20 @@ const AllUsers = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Error loading users",
+          message: t("all_users_page.load_error"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error loading users",
+        message: t("all_users_page.load_error"),
         severity: "error",
       });
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, tabIndex, debouncedSearch, sortField, sortOrder]);
+  }, [page, rowsPerPage, tabIndex, debouncedSearch, sortField, sortOrder, t]);
 
   useEffect(() => {
     fetchUsers();
@@ -149,14 +152,20 @@ const AllUsers = () => {
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Status changes successfully",
+          message: t("all_users_page.status_change_success"),
           severity: "success",
+        });
+      } else {
+        setSnackbar({
+          open: true,
+          message: t("all_users_page.status_change_error"),
+          severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error loading users",
+        message: t("all_users_page.status_change_server_error"),
         severity: "error",
       });
     } finally {
@@ -179,9 +188,14 @@ const AllUsers = () => {
       suspended: "error",
     };
 
-    return <Chip label={status} color={map[status]} size="small" />;
+    return (
+      <Chip
+        label={t(`all_users_page.status_${status}`)}
+        color={map[status]}
+        size="small"
+      />
+    );
   };
-
   // Add Admin Modal Logic
 
   const [showAddAdminModal, setShowAddAdminModal] = useState(false);
@@ -240,7 +254,10 @@ const AllUsers = () => {
         update.isValidContactNo = /^\d{10}$/.test(value);
         break;
       case "password":
-        update.isValidPassword = value.length >= 6;
+        update.isValidPassword =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+            value
+          );
         update.passwordMatch = value === adminData.confirmPassword;
         break;
       case "confirmPassword":
@@ -261,7 +278,10 @@ const AllUsers = () => {
       /^[a-zA-Z]+$/.test(adminData.last_name) && adminData.last_name.length > 0;
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminData.email);
     const isContactNoValid = /^\d{10}$/.test(adminData.phone);
-    const isPasswordValid = adminData.password.length >= 6;
+    const isPasswordValid =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        adminData.password
+      );
     const matchPassword = adminData.password === adminData.confirmPassword;
 
     // Update the state with validation results
@@ -286,7 +306,7 @@ const AllUsers = () => {
     ) {
       setSnackbar({
         open: true,
-        message: "Please fill in all the fields with valid information.",
+        message: t("all_users_page.validation_error"),
         severity: "error",
       });
       return;
@@ -300,7 +320,7 @@ const AllUsers = () => {
       if (result.success) {
         setSnackbar({
           open: true,
-          message: "Admin account created successfully! Verify email to login.",
+          message: t("all_users_page.admin_create_success"),
           severity: "success",
         });
         setTimeout(() => {
@@ -311,9 +331,7 @@ const AllUsers = () => {
         setLoading(false);
         setSnackbar({
           open: true,
-          message:
-            result.message ||
-            "Failed to create admin account. Please try again.",
+          message: t("all_users_page.admin_create_error"),
           severity: "error",
         });
       }
@@ -321,7 +339,7 @@ const AllUsers = () => {
       setLoading(false);
       setSnackbar({
         open: true,
-        message: "An error occurred while adding the admin. Please try again.",
+        message: t("all_users_page.admin_create_server_error"),
         severity: "error",
       });
     }
@@ -330,20 +348,20 @@ const AllUsers = () => {
   return (
     <>
       <Box className="allUsers-container" p={2}>
-        <h2>User Management</h2>
+        <h2>{t("all_users_page.title")}</h2>
 
         <div className="button-group">
           <button onClick={handleAddAdminModalOpen} className="button-success">
             <Add style={{ marginRight: 5 }} />
-            Add New Admin
+            {t("all_users_page.add_admin")}
           </button>
         </div>
 
         {/* TABS */}
         <Tabs value={tabIndex} onChange={(e, v) => setTabIndex(v)}>
-          <Tab label="Active" />
-          <Tab label="Pending" />
-          <Tab label="Suspended" />
+          <Tab label={t("all_users_page.tab_active")} />
+          <Tab label={t("all_users_page.tab_pending")} />
+          <Tab label={t("all_users_page.tab_suspended")} />
         </Tabs>
 
         {/* SEARCH + EXPORT */}
@@ -351,7 +369,7 @@ const AllUsers = () => {
           <TextField
             className="custom-textfield"
             size="small"
-            label="Search User"
+            label={t("all_users_page.search_label")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
@@ -370,10 +388,10 @@ const AllUsers = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Avatar</TableCell>
+                  <TableCell>{t("all_users_page.table_avatar")}</TableCell>
 
                   <TableCell onClick={() => handleSort("first_name")}>
-                    Name{" "}
+                    {t("all_users_page.table_name")}{" "}
                     {sortField === "first_name" ? (
                       sortOrder === "asc" ? (
                         <ArrowUpward />
@@ -384,11 +402,11 @@ const AllUsers = () => {
                       <ArrowDownward style={{ opacity: 0.3 }} />
                     )}
                   </TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Contact No</TableCell>
-                  <TableCell>Role</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell>{t("all_users_page.table_email")}</TableCell>
+                  <TableCell>{t("all_users_page.table_contact")}</TableCell>
+                  <TableCell>{t("all_users_page.table_role")}</TableCell>
+                  <TableCell>{t("all_users_page.table_status")}</TableCell>
+                  <TableCell>{t("all_users_page.table_actions")}</TableCell>
                 </TableRow>
               </TableHead>
 
@@ -396,7 +414,7 @@ const AllUsers = () => {
                 {users.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={7} align="center">
-                      No users found
+                      {t("all_users_page.empty")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -406,9 +424,8 @@ const AllUsers = () => {
                         <Avatar
                           src={
                             u.profile_image
-                              ?
-                                u.profile_image
-                              : AppConst.PROFILE_PLACEHOLDER_IMAGE 
+                              ? u.profile_image
+                              : AppConst.PROFILE_PLACEHOLDER_IMAGE
                           }
                         />
                       </TableCell>
@@ -427,8 +444,8 @@ const AllUsers = () => {
                           <Tooltip
                             title={
                               myData?.email === u.email
-                                ? "You cannot suspend yourself"
-                                : "Suspend"
+                                ? t("all_users_page.tooltip_self_suspend")
+                                : t("all_users_page.tooltip_suspend")
                             }
                           >
                             <span>
@@ -444,7 +461,7 @@ const AllUsers = () => {
                             </span>
                           </Tooltip>
                         ) : (
-                          <Tooltip title="Activate">
+                          <Tooltip title={t("all_users_page.tooltip_activate")}>
                             <IconButton
                               onClick={() =>
                                 handleStatusChange(u.id, u.email, "active")
@@ -491,13 +508,13 @@ const AllUsers = () => {
           >
             <Close />
           </IconButton>
-          <h2 className="modal-title">Add New Admin</h2>
+          <h2 className="modal-title">{t("all_users_page.modal_title")}</h2>
           <div className="form-row-modal">
             <div className="input-container">
               <TextField
                 className="custom-textfield"
                 size="small"
-                label="First Name"
+                label={t("all_users_page.first_name")}
                 value={adminData.first_name}
                 onChange={(e) =>
                   handleAdminChange("first_name", e.target.value)
@@ -508,7 +525,7 @@ const AllUsers = () => {
                 error={!adminData.isValidFirstName}
                 helperText={
                   !adminData.isValidFirstName
-                    ? "First name is required and must contain only letters."
+                    ? t("all_users_page.first_name_error")
                     : ""
                 }
                 required
@@ -526,7 +543,7 @@ const AllUsers = () => {
               <TextField
                 className="custom-textfield"
                 size="small"
-                label="Last Name"
+                label={t("all_users_page.last_name")}
                 value={adminData.last_name}
                 onChange={(e) => handleAdminChange("last_name", e.target.value)}
                 fullWidth
@@ -535,7 +552,7 @@ const AllUsers = () => {
                 error={!adminData.isValidLastName}
                 helperText={
                   !adminData.isValidLastName
-                    ? "Last name is required and must contain only letters."
+                    ? t("all_users_page.last_name_error")
                     : ""
                 }
                 required
@@ -555,7 +572,7 @@ const AllUsers = () => {
               <TextField
                 className="custom-textfield"
                 size="small"
-                label="Email"
+                label={t("all_users_page.email")}
                 value={adminData.email}
                 onChange={(e) => handleAdminChange("email", e.target.value)}
                 fullWidth
@@ -564,9 +581,7 @@ const AllUsers = () => {
                 error={!adminData.isValidEmail}
                 required
                 helperText={
-                  !adminData.isValidEmail
-                    ? "A valid email address is required."
-                    : ""
+                  !adminData.isValidEmail ? t("all_users_page.email_error") : ""
                 }
                 InputProps={{
                   startAdornment: (
@@ -587,7 +602,7 @@ const AllUsers = () => {
               <TextField
                 className="custom-textfield"
                 size="small"
-                label="Contact No."
+                label={t("all_users_page.contact_no")}
                 value={adminData.phone}
                 onChange={(e) => handleAdminChange("phone", e.target.value)}
                 fullWidth
@@ -596,7 +611,7 @@ const AllUsers = () => {
                 error={!adminData.isValidContactNo}
                 helperText={
                   !adminData.isValidContactNo
-                    ? "Contact number must be 10 digits."
+                    ? t("all_users_page.contact_error")
                     : ""
                 }
                 required
@@ -616,7 +631,7 @@ const AllUsers = () => {
               <TextField
                 className="custom-textfield"
                 size="small"
-                label="New Password"
+                label={t("all_users_page.new_password")}
                 type={adminData.showPassword ? "text" : "password"}
                 value={adminData.newPassword}
                 onChange={(e) => handleAdminChange("password", e.target.value)}
@@ -626,7 +641,7 @@ const AllUsers = () => {
                 error={!adminData.isValidPassword}
                 helperText={
                   !adminData.isValidPassword
-                    ? "Password must be at least 6 characters long."
+                    ? t("all_users_page.password_error")
                     : ""
                 }
                 required
@@ -661,7 +676,7 @@ const AllUsers = () => {
               <TextField
                 size="small"
                 className="custom-textfield"
-                label="Confirm Password"
+                label={t("all_users_page.confirm_password")}
                 type={adminData.showPassword ? "text" : "password"}
                 value={adminData.confirmPassword}
                 onChange={(e) =>
@@ -672,7 +687,9 @@ const AllUsers = () => {
                 variant="outlined"
                 error={!adminData.passwordMatch}
                 helperText={
-                  !adminData.passwordMatch ? "Passwords do not match." : ""
+                  !adminData.passwordMatch
+                    ? t("all_users_page.confirm_password_error")
+                    : ""
                 }
                 required
                 InputProps={{
@@ -688,14 +705,14 @@ const AllUsers = () => {
 
           <div className="button-group">
             <button onClick={handleAdminFormSubmit} className="button-success">
-              Save
+              {t("all_users_page.save")}
             </button>
 
             <button
               onClick={() => setShowAddAdminModal(false)}
               className="button-error"
             >
-              Cancel
+              {t("all_users_page.cancel")}
             </button>
           </div>
         </div>

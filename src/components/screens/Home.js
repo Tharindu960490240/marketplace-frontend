@@ -34,7 +34,10 @@ import { get_token, getMyData } from "../../services/authService";
 import LoadingSpinner from "./LoadingSpinner";
 import CustomSnackbar from "./CustomSnackbar";
 
+import { useTranslation } from "react-i18next";
+
 const Home = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");
@@ -71,15 +74,13 @@ const Home = () => {
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error loading categories",
+        message: t("home_page.error_loading_categories"),
         severity: "error",
       });
     } finally {
       setLoading(false);
     }
-  }, []);
-
-
+  }, [t]);
 
   const fetchAds = useCallback(async () => {
     try {
@@ -91,7 +92,7 @@ const Home = () => {
           page: page + 1,
           limit: rowsPerPage,
           search: searchText,
-          district: location?.label,
+          district: location,
           category_id: category?.id,
           status: "active",
         },
@@ -112,20 +113,20 @@ const Home = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Failed to load ads",
+          message: res.message || t("home_page.failed_load_ads"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Server error while loading ads",
+        message: t("home_page.server_error_loading_ads"),
         severity: "error",
       });
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, searchText, location?.label, category?.id]);
+  }, [page, rowsPerPage, searchText, location, category?.id, t]);
 
   useEffect(() => {
     fetchCategories();
@@ -150,14 +151,14 @@ const Home = () => {
       if (!res.success) {
         setSnackbar({
           open: true,
-          message: res.message || "Failed to update views",
+          message: t("home_page.failed_update_views"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Failed to update views",
+        message: t("home_page.server_error"),
         severity: "error",
       });
     }
@@ -169,7 +170,7 @@ const Home = () => {
     if (!token) {
       return setSnackbar({
         open: true,
-        message: "Session expired. Please login again.",
+        message: t("home_page.session_expired"),
         severity: "error",
       });
     }
@@ -193,30 +194,32 @@ const Home = () => {
         window.dispatchEvent(new Event("savedChanged"));
         setSnackbar({
           open: true,
-          message: isSaved ? "Removed from saved" : "Ad saved",
+          message: isSaved
+            ? t("home_page.removed_saved")
+            : t("home_page.ad_saved"),
           severity: "success",
         });
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Failed to update save",
+          message: res.message || t("home_page.failed_update_save"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Server error",
+        message: t("home_page.server_error"),
         severity: "error",
       });
     }
   };
 
   const getRatingLabel = (rating) => {
-    if (!rating) return "No rating";
+    if (!rating) return t("home_page.no_rating");
 
     const rounded = Math.round(rating * 2) / 2;
-    return AppConst.RATING_LABLES[rounded] || "No rating";
+    return AppConst.RATING_LABLES[rounded] || t("home_page.no_rating");
   };
 
   const statusChip = (status) => {
@@ -230,7 +233,23 @@ const Home = () => {
       Fixed: "warning",
     };
 
-    return <Chip label={status} color={map[status]} size="small" />;
+    const labelMap = {
+      active: t("home_page.active"),
+      pending: t("home_page.pending"),
+      sold: t("home_page.sold"),
+      rejected: t("home_page.rejected"),
+      deleted: t("home_page.deleted"),
+      Negotiable: t("home_page.negotiable"),
+      Fixed: t("home_page.fixed"),
+    };
+
+    return (
+      <Chip
+        label={labelMap[status] || status}
+        color={map[status]}
+        size="small"
+      />
+    );
   };
 
   return (
@@ -239,11 +258,8 @@ const Home = () => {
       <section className="hero-search">
         <div className="container">
           <div className="hero-content">
-            <h1>Your Marketplace for Animals, Pet Care & Farm Supplies</h1>
-            <p>
-              Buy and sell pets, livestock, animal food, and veterinary
-              medicines safely and easily across Sri Lanka
-            </p>
+            <h1>{t("home_page.hero_title")}</h1>
+            <p>{t("home_page.hero_description")}</p>
           </div>
 
           {/* SEARCH */}
@@ -251,7 +267,7 @@ const Home = () => {
             <TextField
               className="custom-textfield"
               size="small"
-              label="Search Animals"
+              label={t("home_page.search_animals")}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               InputProps={{
@@ -265,14 +281,15 @@ const Home = () => {
 
             <Autocomplete
               options={districts}
-              value={location}
-              onChange={(e, v) => setLocation(v)}
+              getOptionLabel={(o) => (o ? `${o.label} - ${o.si}` : "")}
+              value={districts.find((d) => d.value === location) || null}
+              onChange={(e, v) => setLocation(v?.value || null)}
               renderInput={(params) => (
                 <TextField
                   {...params}
                   className="custom-textfield"
                   size="small"
-                  label="Location"
+                  label={t("home_page.location")}
                   InputProps={{
                     ...params.InputProps,
                     startAdornment: (
@@ -299,7 +316,7 @@ const Home = () => {
                   {...params}
                   className="custom-textfield"
                   size="small"
-                  label="Category"
+                  label={t("home_page.category")}
                   InputProps={{
                     ...params.InputProps,
                     startAdornment: (
@@ -324,7 +341,7 @@ const Home = () => {
 
         <div className="listing-grid">
           {ads.length === 0 ? (
-            <p className="no-data">No listings found</p>
+            <p className="no-data">{t("home_page.no_listings_found")}</p>
           ) : (
             ads.map((item) => (
               <div className="listing-card modern" key={item.id}>
@@ -334,7 +351,7 @@ const Home = () => {
                     src={
                       item.primary_image
                         ? item.primary_image
-                        : AppConst.ADS_PLACEHOLDER_IMAGE 
+                        : AppConst.ADS_PLACEHOLDER_IMAGE
                     }
                     alt={item.title}
                   />
@@ -398,13 +415,15 @@ const Home = () => {
                         navigate(`/ad/${item.id}`);
                       }}
                     >
-                      View Details
+                      {t("home_page.view_details")}
                     </button>
 
                     {user?.role !== "admin" && user?.id !== item.user_id && (
                       <Tooltip
                         title={
-                          savedMap[item.id] ? "Remove from saved" : "Save ad"
+                          savedMap[item.id]
+                            ? t("home_page.remove_saved")
+                            : t("home_page.save_ad")
                         }
                       >
                         <button
@@ -414,12 +433,12 @@ const Home = () => {
                           {savedMap[item.id] ? (
                             <>
                               <Bookmark style={{ marginRight: 5 }} />
-                              Saved
+                              {t("home_page.saved")}
                             </>
                           ) : (
                             <>
                               <BookmarkAdd style={{ marginRight: 5 }} />
-                              Save
+                              {t("home_page.save_ad")}
                             </>
                           )}
                         </button>

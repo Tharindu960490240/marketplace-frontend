@@ -41,6 +41,8 @@ import CustomSnackbar from "./CustomSnackbar";
 import "../styles/allAds.css";
 import * as AppConst from "../../const/const";
 
+import { useTranslation } from "react-i18next";
+
 // ================= USER STATUS TABS =================
 const statusTabs = ["pending", "active", "sold", "rejected", "deleted"];
 
@@ -57,6 +59,7 @@ const useDebounce = (value, delay) => {
 };
 
 const MyAds = () => {
+  const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
 
   const [ads, setAds] = useState([]);
@@ -90,7 +93,7 @@ const MyAds = () => {
       if (!token) {
         setSnackbar({
           open: true,
-          message: "Session expired. Please login again.",
+          message: t("my_ads_page.session_expired"),
           severity: "error",
         });
         return;
@@ -113,20 +116,20 @@ const MyAds = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Error loading ads",
+          message: t("my_ads_page.load_error"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error loading ads",
+        message: t("my_ads_page.server_error"),
         severity: "error",
       });
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, debouncedSearch, tabIndex]);
+  }, [page, rowsPerPage, debouncedSearch, tabIndex, t]);
 
   // ================= MARK AS SOLD (USER ACTION) =================
   const changeStatus = async (id, status) => {
@@ -134,7 +137,7 @@ const MyAds = () => {
     if (!token) {
       setSnackbar({
         open: true,
-        message: "Session expired. Please login again.",
+        message: t("my_ads_page.session_expired"),
         severity: "error",
       });
       return;
@@ -148,7 +151,7 @@ const MyAds = () => {
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Marked as " + status,
+          message: t("my_ads_page.marked_as") + " " + status,
           severity: "success",
         });
 
@@ -156,14 +159,14 @@ const MyAds = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Failed to update",
+          message: t("my_ads_page.update_error"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Server error",
+        message: t("my_ads_page.server_error"),
         severity: "error",
       });
     } finally {
@@ -177,7 +180,7 @@ const MyAds = () => {
     if (!token) {
       setSnackbar({
         open: true,
-        message: "Session expired. Please login again.",
+        message: t("my_ads_page.session_expired"),
         severity: "error",
       });
       return;
@@ -191,7 +194,7 @@ const MyAds = () => {
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Ad deleted",
+          message: t("my_ads_page.delete_success"),
           severity: "success",
         });
 
@@ -200,14 +203,14 @@ const MyAds = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Delete failed",
+          message: t("my_ads_page.delete_error"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error deleting ad",
+        message: t("my_ads_page.server_error"),
         severity: "error",
       });
     } finally {
@@ -224,7 +227,13 @@ const MyAds = () => {
       deleted: "error",
     };
 
-    return <Chip label={status} color={map[status]} size="small" />;
+    return (
+      <Chip
+        label={t(`my_ads_page.status_${status}`)}
+        color={map[status]}
+        size="small"
+      />
+    );
   };
 
   const openDelete = (id) => {
@@ -239,14 +248,14 @@ const MyAds = () => {
   return (
     <>
       <Box className="allAds-container">
-        <h2>My Ads</h2>
+        <h2>{t("my_ads_page.title")}</h2>
 
         {/* SEARCH */}
         <Box className="allAds-actions">
           <TextField
             className="custom-textfield"
             size="small"
-            label="Search My Ads"
+            label={t("my_ads_page.search_label")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
@@ -267,11 +276,11 @@ const MyAds = () => {
             setPage(0);
           }}
         >
-          <Tab label="Pending" />
-          <Tab label="Active" />
-          <Tab label="Sold" />
-          <Tab label="Rejected" />
-          <Tab label="Deleted" />
+          <Tab label={t("my_ads_page.tab_pending")} />
+          <Tab label={t("my_ads_page.tab_active")} />
+          <Tab label={t("my_ads_page.tab_sold")} />
+          <Tab label={t("my_ads_page.tab_rejected")} />
+          <Tab label={t("my_ads_page.tab_deleted")} />
         </Tabs>
 
         {/* TABLE */}
@@ -280,12 +289,12 @@ const MyAds = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Image</TableCell>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>Views</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell>{t("my_ads_page.table_image")}</TableCell>
+                  <TableCell>{t("my_ads_page.table_title")}</TableCell>
+                  <TableCell>{t("my_ads_page.table_status")}</TableCell>
+                  <TableCell>{t("my_ads_page.table_price")}</TableCell>
+                  <TableCell>{t("my_ads_page.table_views")}</TableCell>
+                  <TableCell>{t("my_ads_page.table_actions")}</TableCell>
                 </TableRow>
               </TableHead>
 
@@ -293,7 +302,7 @@ const MyAds = () => {
                 {ads.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} align="center">
-                      No ads found
+                      {t("my_ads_page.empty")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -304,9 +313,8 @@ const MyAds = () => {
                         <img
                           src={
                             ad.primary_image
-                              ?
-                                ad.primary_image
-                              : AppConst.ADS_PLACEHOLDER_IMAGE 
+                              ? ad.primary_image
+                              : AppConst.ADS_PLACEHOLDER_IMAGE
                           }
                           alt=""
                           style={{
@@ -329,7 +337,7 @@ const MyAds = () => {
 
                       {/* ACTIONS */}
                       <TableCell>
-                        <Tooltip title="View">
+                        <Tooltip title={t("my_ads_page.tooltip_view")}>
                           <IconButton
                             onClick={() =>
                               window.open(`/ad/${ad.id}`, "_blank")
@@ -341,7 +349,7 @@ const MyAds = () => {
 
                         {/* USER: MARK AS SOLD */}
                         {ad.status === "active" && (
-                          <Tooltip title="Mark as Sold">
+                          <Tooltip title={t("my_ads_page.tooltip_mark_sold")}>
                             <IconButton
                               onClick={() => changeStatus(ad.id, "sold")}
                             >
@@ -351,7 +359,7 @@ const MyAds = () => {
                         )}
 
                         {ad.status === "sold" && (
-                          <Tooltip title="Mark as Active">
+                          <Tooltip title={t("my_ads_page.tooltip_mark_active")}>
                             <IconButton
                               onClick={() => changeStatus(ad.id, "active")}
                             >
@@ -363,7 +371,7 @@ const MyAds = () => {
                         {(ad.status === "pending" ||
                           ad.status === "active" ||
                           ad.status === "sold") && (
-                          <Tooltip title="Delete">
+                          <Tooltip title={t("my_ads_page.tooltip_delete")}>
                             <IconButton onClick={() => openDelete(ad.id)}>
                               <Delete color="error" />
                             </IconButton>
@@ -400,7 +408,7 @@ const MyAds = () => {
         maxWidth="xs"
       >
         <DialogTitle id="delete-category-dialog-title">
-          Delete Ad
+          {t("my_ads_page.dialog_title")}
           <IconButton
             aria-label="close"
             onClick={() => setDeleteDialogOpen(false)}
@@ -417,8 +425,7 @@ const MyAds = () => {
 
         <DialogContent dividers>
           <DialogContentText>
-            Are you sure you want to delete this ad? This action cannot be
-            undone.
+            {t("my_ads_page.dialog_message")}
           </DialogContentText>
         </DialogContent>
 
@@ -427,11 +434,11 @@ const MyAds = () => {
             className="button-success"
             onClick={() => setDeleteDialogOpen(false)}
           >
-            Cancel
+            {t("my_ads_page.cancel")}
           </button>
 
           <button className="button-error" onClick={handleDelete}>
-            Delete
+            {t("my_ads_page.delete")}
           </button>
         </DialogActions>
       </Dialog>

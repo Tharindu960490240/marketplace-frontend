@@ -7,7 +7,11 @@ import Fade from "@mui/material/Fade";
 
 import "../styles/loadingSpinner.css";
 
+import { useTranslation } from "react-i18next";
+
 const LoadingSpinner = ({ open }) => {
+  const { t } = useTranslation();
+
   return (
     <Modal
       open={open}
@@ -25,9 +29,7 @@ const LoadingSpinner = ({ open }) => {
         <Box className="loading-spinner-box">
           <CircularProgress size={42} thickness={4} />
 
-          <Typography className="loading-text">
-            Loading...
-          </Typography>
+          <Typography className="loading-text">{t("loading")}</Typography>
         </Box>
       </Fade>
     </Modal>

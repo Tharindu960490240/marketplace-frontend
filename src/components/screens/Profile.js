@@ -36,7 +36,11 @@ import {
   Avatar,
 } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
 const Profile = ({ onSignOut, isSignedIn }) => {
+  const { t } = useTranslation();
+
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
@@ -74,7 +78,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
       const token = await get_token();
 
       if (!token) {
-        showMessage("Session expired. Please login again.", "error");
+        showMessage(t("profile_page.sessionExpired"), "error");
         setLoading(false);
         return;
       }
@@ -96,7 +100,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchUser();
@@ -116,7 +120,19 @@ const Profile = ({ onSignOut, isSignedIn }) => {
       const token = await get_token();
 
       if (!token) {
-        showMessage("Session expired. Please login again.", "error");
+        showMessage(t("profile_page.sessionExpired"), "error");
+        return;
+      }
+
+      const isValidContactNo = /^\d{10}$/.test(phone);
+      setIsValidContactNo(isValidContactNo);
+
+      if (!isValidContactNo) {
+        setSnackbar({
+          open: true,
+          message: t("profile_page.fillValidFields"),
+          severity: "error",
+        });
         return;
       }
 
@@ -125,19 +141,22 @@ const Profile = ({ onSignOut, isSignedIn }) => {
       const res = await updateProfile(token, { phone });
 
       if (res.success) {
-        showMessage("Profile updated successfully", "success");
+        showMessage(t("profile_page.profileUpdated"), "success");
         await fetchUser();
       } else {
-        showMessage(res.message || "Profile update failed", "error");
+        showMessage(t("profile_page.profileUpdateFailed"), "error");
       }
     } catch (err) {
-      showMessage(
-        err?.response?.data?.message || "Profile update failed",
-        "error",
-      );
+      showMessage(t("profile_page.profileUpdateFailed"), "error");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleContactNoChange = (val) => {
+    const isValidContactNo = /^\d{10}$/.test(val);
+    setPhone(val);
+    setIsValidContactNo(isValidContactNo);
   };
 
   // ================= IMAGE VALIDATION =================
@@ -149,7 +168,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
     const allowedTypes = ["image/jpeg", "image/png"];
 
     if (!allowedTypes.includes(file.type)) {
-      showMessage("Only JPG or PNG images allowed", "error");
+      showMessage(t("profile_page.onlyImagesAllowed"), "error");
       return;
     }
 
@@ -163,7 +182,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
   // ================= UPLOAD IMAGE =================
   const handleUpload = async () => {
     if (!image) {
-      showMessage("Please select an image first", "error");
+      showMessage(t("profile_page.selectImageFirst"), "error");
       return;
     }
 
@@ -171,7 +190,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
       const token = await get_token();
 
       if (!token) {
-        showMessage("Session expired. Please login again.", "error");
+        showMessage(t("profile_page.sessionExpired"), "error");
         return;
       }
 
@@ -180,18 +199,15 @@ const Profile = ({ onSignOut, isSignedIn }) => {
       const res = await updateProfileImage(token, image);
 
       if (res.success) {
-        showMessage("Profile image updated successfully", "success");
+        showMessage(t("profile_page.imageUpdated"), "success");
         setImage(null);
         await fetchUser();
         window.dispatchEvent(new Event("profileUpdated"));
       } else {
-        showMessage(res.message || "Image upload failed", "error");
+        showMessage(t("profile_page.imageUploadFailed"), "error");
       }
     } catch (err) {
-      showMessage(
-        err?.response?.data?.message || "Image upload failed",
-        "error",
-      );
+      showMessage(t("profile_page.imageUploadFailed"), "error");
     } finally {
       setLoading(false);
     }
@@ -200,12 +216,6 @@ const Profile = ({ onSignOut, isSignedIn }) => {
   // ================= OPEN FILE DIALOG =================
   const openFilePicker = () => {
     fileInputRef.current.click();
-  };
-
-  const handleContactNoChange = (val) => {
-    const isValidContactNo = /^\d{10}$/.test(val);
-    setPhone(val);
-    setIsValidContactNo(isValidContactNo);
   };
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -275,17 +285,17 @@ const Profile = ({ onSignOut, isSignedIn }) => {
     const token = await get_token();
 
     if (!token) {
-      showMessage("Session expired. Please login again.", "error");
+      showMessage(t("profile_page.sessionExpired"), "error");
       return;
     }
 
     const isOldPasswordValid =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        resetData.oldPassword
+        resetData.oldPassword,
       );
     const isPasswordValid =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        resetData.newPassword
+        resetData.newPassword,
       );
     const matchPassword = resetData.newPassword === resetData.confirmPassword;
 
@@ -300,7 +310,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
     if (!isOldPasswordValid || !isPasswordValid || !matchPassword) {
       setSnackbar({
         open: true,
-        message: "Please fill in all the fields with valid information.",
+        message: t("profile_page.fillValidFields"),
         severity: "error",
       });
       return;
@@ -316,7 +326,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
       if (result.success) {
         setSnackbar({
           open: true,
-          message: "Password successfully reset!",
+          message: t("profile_page.passwordResetSuccess"),
           severity: "success",
         });
         // Log out the user after password reset
@@ -329,8 +339,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
         setLoading(false);
         setSnackbar({
           open: true,
-          message:
-            result.message || "Failed to reset password. Please try again.",
+          message: result.message || t("profile_page.passwordResetFailed"),
           severity: "error",
         });
       }
@@ -339,8 +348,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
       setLoading(false);
       setSnackbar({
         open: true,
-        message:
-          "An error occurred during password reset. Please try again later.",
+        message: t("profile_page.passwordResetFailed"),
         severity: "error",
       });
       console.error("Password reset error:", error);
@@ -353,7 +361,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
     setLoading(true);
     setSnackbar({
       open: true,
-      message: "You have successfully logged out.",
+      message: t("profile_page.loggedOut"),
       severity: "success",
     });
 
@@ -368,7 +376,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
     const token = await get_token();
 
     if (!token) {
-      showMessage("Session expired. Please login again.", "error");
+      showMessage(t("profile_page.sessionExpired"), "error");
       return;
     }
 
@@ -380,7 +388,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Account deleted successfully.",
+          message: t("profile_page.accountDeleted"),
           severity: "success",
         });
 
@@ -394,7 +402,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
         setLoading(false);
         setSnackbar({
           open: true,
-          message: res.message || "Failed to delete account.",
+          message: res.message || t("profile_page.accountDeleteFailed"),
           severity: "error",
         });
       }
@@ -402,7 +410,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
       setLoading(false);
       setSnackbar({
         open: true,
-        message: "Something went wrong. Try again later.",
+        message: t("profile_page.accountDeleteFailed"),
         severity: "error",
       });
     }
@@ -453,14 +461,14 @@ const Profile = ({ onSignOut, isSignedIn }) => {
               className={image ? "button-success" : "button-disable"}
               onClick={handleUpload}
             >
-              Save Profile Picture
+              {t("profile_page.upload")}
             </button>
 
             <button
               className="button-success"
               onClick={handlePasswordModalOpen}
             >
-              Change Password
+              {t("profile_page.changePassword")}
             </button>
           </div>
         </div>
@@ -468,11 +476,11 @@ const Profile = ({ onSignOut, isSignedIn }) => {
         {/* ================= STATS ================= */}
         <div className="profile-stats">
           <div className="stat-item">
-            <h3>Role</h3>
+            <h3>{t("profile_page.role")}</h3>
             <span>{user.role}</span>
           </div>
           <div className="stat-item">
-            <h3>Status</h3>
+            <h3>{t("profile_page.status")}</h3>
             <span>{user.status}</span>
           </div>
         </div>
@@ -481,10 +489,12 @@ const Profile = ({ onSignOut, isSignedIn }) => {
         <div className="profile-sections">
           {/* PERSONAL INFO */}
           <div className="section-card">
-            <h3 className="profile-sections-title ">Personal Info</h3>
+            <h3 className="profile-sections-title">
+              {t("profile_page.personalInfo")}
+            </h3>
 
             <div className="info-row">
-              <span className="info-label">Phone</span>
+              <span className="info-label">{t("profile_page.phone")}</span>
               <TextField
                 className="custom-textfield"
                 size="small"
@@ -496,7 +506,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
                 }}
                 error={!isValidContactNo}
                 helperText={
-                  !isValidContactNo ? "Contact number must be 10 digits." : ""
+                  !isValidContactNo ? t("profile_page.invalidContactNo") : ""
                 }
                 InputProps={{
                   startAdornment: (
@@ -509,20 +519,20 @@ const Profile = ({ onSignOut, isSignedIn }) => {
             </div>
 
             <button className="button-success" onClick={handleUpdateProfile}>
-              Save Changes
+              {t("profile_page.saveChanges")}
             </button>
           </div>
 
           {/* DANGER ZONE */}
           <div hidden={user?.role === "admin"} className="danger-zone">
-            <h3>Danger Zone</h3>
-            <p>Permanently delete your account</p>
+            <h3>{t("profile_page.dangerZone")}</h3>
+            <p>{t("profile_page.permanentlyDeleteAccount")}</p>
 
             <button
               className="button-error"
               onClick={() => setDeleteDialogOpen(true)}
             >
-              Delete Account
+              {t("profile_page.deleteAccount")}
             </button>
           </div>
         </div>
@@ -542,13 +552,13 @@ const Profile = ({ onSignOut, isSignedIn }) => {
           >
             <Close />
           </IconButton>
-          <h2 className="modal-title">Reset Password</h2>
+          <h2 className="modal-title">{t("profile_page.resetPassword")}</h2>
 
           <div className="input-container">
             <TextField
               className="custom-textfield"
               size="small"
-              label="Old Password"
+              label={t("profile_page.oldPassword")}
               type={resetData.showPassword ? "text" : "password"}
               value={resetData.oldPassword}
               onChange={handleOldPasswordChange}
@@ -558,7 +568,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
               error={!resetData.isValidOldPassword}
               helperText={
                 !resetData.isValidOldPassword
-                  ? "Old password must be at least 6 characters long."
+                  ? t("profile_page.invalidPasswordStrength")
                   : ""
               }
               required
@@ -587,7 +597,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
             <TextField
               className="custom-textfield"
               size="small"
-              label="New Password"
+              label={t("profile_page.newPassword")}
               type={resetData.showPassword ? "text" : "password"}
               value={resetData.newPassword}
               onChange={handlePasswordChange}
@@ -597,7 +607,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
               error={!resetData.isValidPassword}
               helperText={
                 !resetData.isValidPassword
-                  ? "Password must be at least 6 characters long."
+                  ? t("profile_page.invalidPasswordStrength")
                   : ""
               }
               required
@@ -626,7 +636,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
             <TextField
               className="custom-textfield"
               size="small"
-              label="Confirm Password"
+              label={t("profile_page.confirmPassword")}
               type={resetData.showPassword ? "text" : "password"}
               value={resetData.confirmPassword}
               onChange={handleConfirmPasswordChange}
@@ -636,7 +646,9 @@ const Profile = ({ onSignOut, isSignedIn }) => {
               error={!resetData.passwordMatch}
               required
               helperText={
-                !resetData.passwordMatch ? "Passwords do not match." : ""
+                !resetData.passwordMatch
+                  ? t("profile_page.passwordMismatch")
+                  : ""
               }
               InputProps={{
                 startAdornment: (
@@ -650,14 +662,14 @@ const Profile = ({ onSignOut, isSignedIn }) => {
 
           <div className="button-group">
             <button onClick={handlePasswordReset} className="button-success">
-              Save
+              {t("profile_page.save")}
             </button>
 
             <button
               onClick={() => setShowPasswordModal(false)}
               className="button-error"
             >
-              Cancel
+              {t("profile_page.cancel")}
             </button>
           </div>
         </div>
@@ -677,7 +689,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
         maxWidth="xs"
       >
         <DialogTitle id="delete-dialog-title">
-          Are you sure you want to permanently delete your account?
+          {t("profile_page.confirmAccountDeletion")}
           <IconButton
             aria-label="close"
             onClick={() => setDeleteDialogOpen(false)}
@@ -693,9 +705,7 @@ const Profile = ({ onSignOut, isSignedIn }) => {
         </DialogTitle>
         <DialogContent dividers>
           <DialogContentText>
-            To confirm deletion, please note that this action is permanent and
-            cannot be undone. All your data will be permanently removed from our
-            system.
+            {t("profile_page.confirmAccountDeletionMessage")}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
@@ -703,10 +713,10 @@ const Profile = ({ onSignOut, isSignedIn }) => {
             className="button-success"
             onClick={() => setDeleteDialogOpen(false)}
           >
-            Cancel
+            {t("profile_page.cancel")}
           </button>
           <button className="button-error" onClick={handleDelete}>
-            Delete
+            {t("profile_page.deleteAccount")}
           </button>
         </DialogActions>
       </Dialog>

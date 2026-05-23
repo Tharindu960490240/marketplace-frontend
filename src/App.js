@@ -37,6 +37,10 @@ if (!document.documentElement.getAttribute("data-theme")) {
   document.documentElement.setAttribute("data-theme", "light");
 }
 
+if (!document.documentElement.getAttribute("language")) {
+  document.documentElement.setAttribute("language", "en");
+}
+
 // =======================
 // Layout Wrapper
 // =======================

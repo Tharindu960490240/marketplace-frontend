@@ -44,6 +44,8 @@ import "../styles/allAds.css";
 
 import * as AppConst from "../../const/const";
 
+import { useTranslation } from "react-i18next";
+
 // ================= UPDATED ONLY: ADD REJECT TAB =================
 const statusTabs = ["pending", "active", "sold", "rejected", "deleted"];
 
@@ -60,6 +62,7 @@ const useDebounce = (value, delay) => {
 };
 
 const AllAds = () => {
+  const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
 
   const [ads, setAds] = useState([]);
@@ -100,7 +103,7 @@ const AllAds = () => {
       if (!token) {
         setSnackbar({
           open: true,
-          message: "Session expired. Please login again.",
+          message: t("all_ads_page.session_expired"),
           severity: "error",
         });
         return;
@@ -124,20 +127,20 @@ const AllAds = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Error loading ads",
+          message: t("all_ads_page.load_error"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error loading ads",
+        message: t("all_ads_page.load_error"),
         severity: "error",
       });
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, debouncedSearch, tabIndex]);
+  }, [page, rowsPerPage, debouncedSearch, tabIndex, t]);
 
   // ================= NEW: REJECT FUNCTION =================
   const handleReject = async () => {
@@ -145,7 +148,22 @@ const AllAds = () => {
     if (!token) {
       setSnackbar({
         open: true,
-        message: "Session expired. Please login again.",
+        message: t("all_ads_page.session_expired"),
+        severity: "error",
+      });
+      return;
+    }
+
+    const isValid = rejectData.reason.trim().length > 0;
+    setRejectData((prev) => ({
+      ...prev,
+      isValid,
+    }));
+
+    if (!isValid) {
+      setSnackbar({
+        open: true,
+        message: t("all_ads_page.reject_reason_required"),
         severity: "error",
       });
       return;
@@ -164,7 +182,7 @@ const AllAds = () => {
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Ad rejected successfully",
+          message: t("all_ads_page.reject_success"),
           severity: "success",
         });
 
@@ -179,14 +197,14 @@ const AllAds = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Failed to reject ad",
+          message: t("all_ads_page.reject_error"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error rejecting ad",
+        message: t("all_ads_page.reject_server_error"),
         severity: "error",
       });
     } finally {
@@ -200,7 +218,7 @@ const AllAds = () => {
     if (!token) {
       setSnackbar({
         open: true,
-        message: "Session expired. Please login again.",
+        message: t("all_ads_page.session_expired"),
         severity: "error",
       });
       return;
@@ -213,21 +231,21 @@ const AllAds = () => {
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Ad activated successfully",
+          message: t("all_ads_page.activate_success"),
           severity: "success",
         });
         fetchAds();
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Failed to activate ad",
+          message: t("all_ads_page.activate_error"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error activating ad",
+        message: t("all_ads_page.activate_server_error"),
         severity: "error",
       });
     } finally {
@@ -240,7 +258,7 @@ const AllAds = () => {
     if (!token) {
       setSnackbar({
         open: true,
-        message: "Session expired. Please login again.",
+        message: t("all_ads_page.session_expired"),
         severity: "error",
       });
       return;
@@ -254,7 +272,7 @@ const AllAds = () => {
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Ad deleted successfully",
+          message: t("all_ads_page.delete_success"),
           severity: "success",
         });
 
@@ -263,14 +281,14 @@ const AllAds = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Delete failed",
+          message: t("all_ads_page.delete_error"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error deleteing ad",
+        message: t("all_ads_page.delete_server_error"),
         severity: "error",
       });
     } finally {
@@ -324,7 +342,13 @@ const AllAds = () => {
       deleted: "error",
     };
 
-    return <Chip label={status} color={map[status]} size="small" />;
+    return (
+      <Chip
+        label={t(`all_ads_page.status_${status}`)}
+        color={map[status]}
+        size="small"
+      />
+    );
   };
 
   const openDelete = (id) => {
@@ -338,7 +362,6 @@ const AllAds = () => {
 
   const validateReason = (val) => {
     const isValid = val.trim().length > 0;
-
     setRejectData((prev) => ({
       ...prev,
       isValid,
@@ -351,14 +374,14 @@ const AllAds = () => {
   return (
     <>
       <Box className="allAds-container" p={2}>
-        <h2>Ads Management</h2>
+        <h2>{t("all_ads_page.title")}</h2>
 
         {/* SEARCH */}
         <Box className="allAds-actions">
           <TextField
             className="custom-textfield"
             size="small"
-            label="Search Ads"
+            label={t("all_ads_page.search_label")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
@@ -379,11 +402,11 @@ const AllAds = () => {
             setPage(0);
           }}
         >
-          <Tab label="Pending" />
-          <Tab label="Active" />
-          <Tab label="Sold" />
-          <Tab label="Rejected" />
-          <Tab label="Deleted" />
+          <Tab label={t("all_ads_page.tab_pending")} />
+          <Tab label={t("all_ads_page.tab_active")} />
+          <Tab label={t("all_ads_page.tab_sold")} />
+          <Tab label={t("all_ads_page.tab_rejected")} />
+          <Tab label={t("all_ads_page.tab_deleted")} />
         </Tabs>
 
         {/* TABLE */}
@@ -392,15 +415,15 @@ const AllAds = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Image</TableCell>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Location</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>Views</TableCell>
-                  <TableCell>Created</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell>{t("all_ads_page.table_image")}</TableCell>
+                  <TableCell>{t("all_ads_page.table_title")}</TableCell>
+                  <TableCell>{t("all_ads_page.table_category")}</TableCell>
+                  <TableCell>{t("all_ads_page.table_location")}</TableCell>
+                  <TableCell>{t("all_ads_page.table_status")}</TableCell>
+                  <TableCell>{t("all_ads_page.table_price")}</TableCell>
+                  <TableCell>{t("all_ads_page.table_views")}</TableCell>
+                  <TableCell>{t("all_ads_page.table_created")}</TableCell>
+                  <TableCell>{t("all_ads_page.table_actions")}</TableCell>
                 </TableRow>
               </TableHead>
 
@@ -408,7 +431,7 @@ const AllAds = () => {
                 {ads.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={9} align="center">
-                      No ads found
+                      {t("all_ads_page.empty")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -418,9 +441,8 @@ const AllAds = () => {
                         <img
                           src={
                             ad.primary_image
-                              ?
-                                ad.primary_image
-                              : AppConst.ADS_PLACEHOLDER_IMAGE 
+                              ? ad.primary_image
+                              : AppConst.ADS_PLACEHOLDER_IMAGE
                           }
                           alt={ad.title}
                           style={{
@@ -451,7 +473,7 @@ const AllAds = () => {
                       </TableCell>
 
                       <TableCell>
-                        <Tooltip title="View Details">
+                        <Tooltip title={t("all_ads_page.tooltip_view")}>
                           <IconButton
                             onClick={() =>
                               window.open(`/ad/${ad.id}`, "_blank")
@@ -463,7 +485,7 @@ const AllAds = () => {
 
                         {/* ACTIVATE */}
                         {ad.status === "pending" && (
-                          <Tooltip title="Activate">
+                          <Tooltip title={t("all_ads_page.tooltip_activate")}>
                             <IconButton onClick={() => handleActivate(ad.id)}>
                               <ToggleOn color="success" />
                             </IconButton>
@@ -473,7 +495,7 @@ const AllAds = () => {
                         {/* ================= NEW: REJECT ================= */}
                         {(ad.status === "pending" ||
                           ad.status === "active") && (
-                          <Tooltip title="Reject">
+                          <Tooltip title={t("all_ads_page.tooltip_reject")}>
                             <IconButton
                               onClick={() =>
                                 setRejectData((prev) => ({
@@ -491,7 +513,7 @@ const AllAds = () => {
                         )}
 
                         {ad.status !== "deleted" && (
-                          <Tooltip title="Delete">
+                          <Tooltip title={t("all_ads_page.tooltip_delete")}>
                             <IconButton onClick={() => openDelete(ad.id)}>
                               <Delete color="error" />
                             </IconButton>
@@ -529,7 +551,7 @@ const AllAds = () => {
         maxWidth="xs"
       >
         <DialogTitle id="delete-category-dialog-title">
-          Delete Ad
+          {t("all_ads_page.dialog_title")}
           <IconButton
             aria-label="close"
             onClick={() => setDeleteDialogOpen(false)}
@@ -546,8 +568,7 @@ const AllAds = () => {
 
         <DialogContent dividers>
           <DialogContentText>
-            Are you sure you want to delete this ad? This action cannot be
-            undone.
+            {t("all_ads_page.dialog_message")}
           </DialogContentText>
         </DialogContent>
 
@@ -556,11 +577,11 @@ const AllAds = () => {
             className="button-success"
             onClick={() => setDeleteDialogOpen(false)}
           >
-            Cancel
+            {t("all_ads_page.cancel")}
           </button>
 
           <button className="button-error" onClick={handleDelete}>
-            Delete
+            {t("all_ads_page.delete")}
           </button>
         </DialogActions>
       </Dialog>
@@ -586,12 +607,15 @@ const AllAds = () => {
           >
             <Close />
           </IconButton>
-          <h2 className="modal-title">Reject Ad</h2>
+          <h2 className="modal-title">
+            {" "}
+            {t("all_ads_page.reject_modal_title")}
+          </h2>
 
           <div className="form-row full">
             <TextField
               className="custom-textfield"
-              label="Reject reason"
+              label={t("all_ads_page.reject_reason")}
               multiline
               rows={4}
               required
@@ -599,8 +623,8 @@ const AllAds = () => {
               error={!rejectData.isValid}
               helperText={
                 !rejectData.isValid
-                  ? "Reject reason is required"
-                  : "eg: Fake imformations provided "
+                  ? t("all_ads_page.reject_reason_required")
+                  : t("all_ads_page.reject_reason_helper")
               }
               onChange={(e) => {
                 validateReason(e.target.value);
@@ -616,7 +640,7 @@ const AllAds = () => {
           </div>
           <div className="button-group">
             <button onClick={handleReject} className="button-success">
-              Reject
+              {t("all_ads_page.reject_button")}
             </button>
 
             <button
@@ -631,7 +655,7 @@ const AllAds = () => {
               }
               className="button-error"
             >
-              Cancel
+              {t("all_ads_page.cancel")}
             </button>
           </div>
         </div>

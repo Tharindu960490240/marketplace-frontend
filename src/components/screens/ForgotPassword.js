@@ -10,7 +10,11 @@ import CustomSnackbar from "./CustomSnackbar";
 
 import { sendPasswordResetLink } from "../../services/authService";
 
+import { useTranslation } from "react-i18next";
+
 const ForgotPassword = () => {
+  const { t } = useTranslation();
+
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     email: "",
@@ -51,7 +55,7 @@ const ForgotPassword = () => {
     if (!isValidEmail) {
       setSnackbar({
         open: true,
-        message: "Please enter a valid email address",
+        message: t("frorgotPassword_page.enterValidEmail"),
         severity: "error",
       });
       return;
@@ -66,7 +70,7 @@ const ForgotPassword = () => {
       if (response.success) {
         setSnackbar({
           open: true,
-          message: "Password reset link sent to your email",
+          message: t("frorgotPassword_page.resetLinkSent"),
           severity: "success",
         });
 
@@ -83,14 +87,14 @@ const ForgotPassword = () => {
       } else {
         setSnackbar({
           open: true,
-          message: response.message || "Failed to send reset link",
+          message: t("frorgotPassword_page.resetFailedLink"),
           severity: "error",
         });
       }
     } catch (error) {
       setSnackbar({
         open: true,
-        message: error.message || "Something went wrong",
+        message: t("frorgotPassword_page.somethingWrong"),
         severity: "error",
       });
     } finally {
@@ -106,12 +110,12 @@ const ForgotPassword = () => {
   return (
     <div className="forgot-password-container">
       <div className="forgot-password-box">
-        <h2>Forgot Password</h2>
+        <h2>{t("frorgotPassword_page.forgotPasswordTitle")}</h2>
 
         <div className="input-container">
           <TextField
             size="small"
-            label="Email"
+            label={t("frorgotPassword_page.email")}
             type="email"
             fullWidth
             value={data.email}
@@ -120,7 +124,9 @@ const ForgotPassword = () => {
             variant="outlined"
             className="custom-textfield"
             error={!data.isValidUser}
-            helperText={!data.isValidUser ? "Invalid email address.." : ""}
+            helperText={
+              !data.isValidUser ? t("frorgotPassword_page.emailError") : ""
+            }
             required
             InputProps={{
               startAdornment: (
@@ -140,13 +146,14 @@ const ForgotPassword = () => {
         {/* Reset Button */}
         <div className="button-group">
           <button className="button-success" onClick={handlePasswordReset}>
-            Send Reset Link
+            {t("frorgotPassword_page.sendResetLink")}
           </button>
         </div>
 
         {/* Sign In Link */}
         <p className="signin-link">
-          Remembered your password? <Link to="/signin">Sign In</Link>
+          {t("frorgotPassword_page.rememberedPassword")}{" "}
+          <Link to="/signin">{t("frorgotPassword_page.signIn")}</Link>
         </p>
       </div>
 

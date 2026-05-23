@@ -28,14 +28,18 @@ import { get_token } from "../../services/authService";
 import LoadingSpinner from "./LoadingSpinner";
 import CustomSnackbar from "./CustomSnackbar";
 
+import { useTranslation } from "react-i18next";
+
 /* ================= VALIDATION ================= */
-const nameRegex = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/;
+const nameRegex = /^[\p{L}]+(?:\s[\p{L}]+)*$/u;
 const priceRegex = /^\d+(\.\d{1,2})?$/;
 
 const MAX_IMAGES = 5;
 const ALLOWED_TYPES = ["image/jpeg", "image/png"];
 
 const PostAd = () => {
+  const { t } = useTranslation();
+
   const [categoryList, setCategoryList] = useState([]);
 
   const [submitted, setSubmitted] = useState(false);
@@ -81,8 +85,7 @@ const PostAd = () => {
   /* ================= CATEGORIES ================= */
   const fetchCategories = useCallback(async () => {
     const token = await get_token();
-    if (!token)
-      return showMessage("Session expired. Please login again.", "error");
+    if (!token) return showMessage(t("post_ad.session_expired"), "error");
 
     try {
       setLoading(true);
@@ -90,12 +93,12 @@ const PostAd = () => {
       if (res?.success) {
         setCategoryList(res.data || []);
       }
-    } catch {
-      showMessage("Error loading categories", "error");
+    } catch (err) {
+      showMessage(t("post_ad.error_loading_categories"), "error");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchCategories();
@@ -138,7 +141,7 @@ const PostAd = () => {
     const files = Array.from(e.target.files || []);
 
     if (images.length + files.length > MAX_IMAGES) {
-      return showMessage("Max 5 images allowed", "error");
+      return showMessage(t("post_ad.max_images"), "error");
     }
 
     const valid = files.filter((f) => ALLOWED_TYPES.includes(f.type));
@@ -192,14 +195,11 @@ const PostAd = () => {
     });
 
     if (!isValid) {
-      return showMessage(
-        "Please fill in all the fields with valid information.",
-        "error",
-      );
+      return showMessage(t("post_ad.fill_all_fields"), "error");
     }
 
     if (images.length === 0) {
-      return showMessage("At least one image is required", "error");
+      return showMessage(t("post_ad.image_required"), "error");
     }
 
     try {
@@ -207,8 +207,7 @@ const PostAd = () => {
 
       const token = await get_token();
 
-      if (!token)
-        return showMessage("Session expired. Please login again.", "error");
+      if (!token) return showMessage(t("post_ad.session_expired"), "error");
 
       const payload = {
         title: adData.title,
@@ -217,13 +216,13 @@ const PostAd = () => {
         sub_category: adData.sub_category,
         price: adData.price,
         negotiable: adData.negotiable,
-        district: adData.district?.label,
+        district: adData.district,
         city: adData.city,
       };
-
+      
       const res = await createAd(token, payload);
 
-      if (!res.success) return showMessage(res.message, "error");
+      if (!res.success) return showMessage(t("post_ad.ad_error"), "error");
 
       const adId = res.data.ad.id;
 
@@ -235,7 +234,7 @@ const PostAd = () => {
         );
       }
 
-      showMessage("Ad published successfully!", "success");
+      showMessage(t("post_ad.ad_success"), "success");
 
       /* RESET */
       setAdData({
@@ -257,8 +256,8 @@ const PostAd = () => {
         description: true,
       });
       setImages([]);
-    } catch {
-      showMessage("Something went wrong", "error");
+    } catch (err) {
+      showMessage(t("post_ad.something_went_wrong"), "error");
     } finally {
       setSubmitted(false);
       setLoading(false);
@@ -268,22 +267,22 @@ const PostAd = () => {
   /* ================= UI ================= */
   return (
     <div className="ads-container">
-      <div className="ads-box">
-        <h2>Post New Ad</h2>
+      <div className="ads-subcontainer">
+        <h2>{t("post_ad.title_page")}</h2>
 
         {/* TITLE + CATEGORY */}
         <div className="form-row desktop-two mobile-full">
           <TextField
             size="small"
             className="custom-textfield"
-            label="Title"
+            label={t("post_ad.title")}
             required
             value={adData.title}
             error={!validation.title}
             helperText={
               !validation.title
-                ? "Title must contain only letters."
-                : "eg: Dog for sale"
+                ? t("post_ad.title_error")
+                : t("post_ad.title_hint")
             }
             onChange={(e) => {
               setAdData({ ...adData, title: e.target.value });
@@ -308,11 +307,13 @@ const PostAd = () => {
               <TextField
                 className="custom-textfield"
                 {...params}
-                label="Category"
+                label={t("post_ad.category")}
                 required
                 error={submitted && !adData.category}
                 helperText={
-                  !adData.category ? "Category is required" : "eg: Animal"
+                  submitted && !adData.category
+                    ? t("post_ad.category_error")
+                    : t("post_ad.category_hint")
                 }
                 InputProps={{
                   ...params.InputProps,
@@ -335,14 +336,14 @@ const PostAd = () => {
           <TextField
             size="small"
             className="custom-textfield"
-            label="Sub Category"
+            label={t("post_ad.sub_category")}
             required
             value={adData.sub_category}
             error={!validation.sub_category}
             helperText={
               !validation.sub_category
-                ? "Sub Category must contain only letters."
-                : "eg: Rottweiler Dog"
+                ? t("post_ad.sub_category_error")
+                : t("post_ad.sub_category_hint")
             }
             onChange={(e) => {
               setAdData({ ...adData, sub_category: e.target.value });
@@ -360,14 +361,14 @@ const PostAd = () => {
           <TextField
             size="small"
             className="custom-textfield"
-            label="Price"
+            label={t("post_ad.price")}
             required
             value={adData.price}
             error={!validation.price}
             helperText={
               !validation.price
-                ? "Invalid price (100 or 100.50)"
-                : "e.g. 1500.00"
+                ? t("post_ad.price_error")
+                : t("post_ad.price_hint")
             }
             onChange={(e) => {
               setAdData({ ...adData, price: e.target.value });
@@ -389,17 +390,24 @@ const PostAd = () => {
             className="custom-textfield"
             size="small"
             options={districts}
-            value={adData.district}
-            onChange={(e, v) => setAdData({ ...adData, district: v })}
-            getOptionLabel={(o) => o?.label || ""}
+            value={districts.find((d) => d.value === adData.district) || null}
+            onChange={(e, v) =>
+              setAdData({
+                ...adData,
+                district: v ? v.value : null,
+              })
+            }
+            getOptionLabel={(o) => `${o?.label} - ${o?.si}`}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="District"
+                label={t("post_ad.district")}
                 required
                 error={submitted && !adData.district}
                 helperText={
-                  !adData.district ? "District is required" : "eg: Colombo"
+                  submitted && !adData.district
+                    ? t("post_ad.district_error")
+                    : t("post_ad.district_hint")
                 }
                 InputProps={{
                   ...params.InputProps,
@@ -416,14 +424,14 @@ const PostAd = () => {
           <TextField
             className="custom-textfield"
             size="small"
-            label="City"
+            label={t("post_ad.city")}
             required
             value={adData.city}
             error={!validation.city}
             helperText={
               !validation.city
-                ? "City must contain only letters."
-                : "eg:  Dehiwala"
+                ? t("post_ad.city_error")
+                : t("post_ad.city_hint")
             }
             onChange={(e) => {
               setAdData({ ...adData, city: e.target.value });
@@ -454,14 +462,14 @@ const PostAd = () => {
                 }
               />
             }
-            label="Negotiable"
+            label={t("post_ad.negotiable")}
           />
         </div>
         <div className="form-row full">
           {/* DESCRIPTION */}
           <TextField
             className="custom-textfield"
-            label="Description"
+            label={t("post_ad.description")}
             multiline
             rows={4}
             required
@@ -469,8 +477,8 @@ const PostAd = () => {
             error={!validation.description}
             helperText={
               !validation.description
-                ? "Description is required"
-                : "eg: good healthy doge for sale "
+                ? t("post_ad.description_error")
+                : t("post_ad.description_hint")
             }
             onChange={(e) => {
               setAdData({
@@ -496,7 +504,7 @@ const PostAd = () => {
           }`}
         >
           <CloudUpload />
-          Upload Images
+          {t("post_ad.upload_images")}
           <input
             type="file"
             multiple
@@ -520,7 +528,7 @@ const PostAd = () => {
 
         {/* SUBMIT */}
         <button className="button-success" onClick={handleSubmit}>
-          Publish Ad
+          {t("post_ad.publish_ad")}
         </button>
       </div>
 

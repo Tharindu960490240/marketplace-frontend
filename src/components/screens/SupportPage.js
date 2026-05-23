@@ -29,7 +29,10 @@ import * as AppConst from "../../const/const";
 
 import { get_token, getProfile } from "../../services/authService";
 
+import { useTranslation } from "react-i18next";
+
 const SupportPage = () => {
+  const { t } = useTranslation();
   const [tickets, setTickets] = useState([]);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -77,26 +80,29 @@ const SupportPage = () => {
       const res = await getProfile(token);
 
       if (!res.success) {
-        return showSnackbar(res.message || "Failed to load profile", "error");
+        return showSnackbar(
+          t("support_page.user_profile_load_failed"),
+          "error",
+        );
       }
       setUser(res.user);
     } catch (err) {
-      showSnackbar("Failed to load user profile", "error");
+      showSnackbar(t("support_page.user_profile_load_failed"), "error");
     }
-  }, []);
+  }, [t]);
 
   // ================= LOAD TICKETS =================
   const loadTickets = useCallback(async () => {
     try {
       const token = await get_token();
       if (!token)
-        return showSnackbar("Session expired. Please login again.", "error");
+        return showSnackbar(t("support_page.session_expired"), "error");
 
       const res = await getSupportTickets(token);
 
       if (!res.success) {
         return showSnackbar(
-          res.message || "Failed to load support tickets",
+          res.message || t("support_page.tickets_load_failed"),
           "error",
         );
       }
@@ -108,29 +114,35 @@ const SupportPage = () => {
 
       setTickets(enriched);
     } catch (err) {
-      showSnackbar("Something went wrong while loading tickets", "error");
+      showSnackbar(t("support_page.tickets_load_failed"), "error");
     }
-  }, []);
+  }, [t]);
 
   // ================= LOAD MESSAGES =================
-  const loadMessages = useCallback(async (ticket) => {
-    try {
-      const token = await get_token();
-      if (!token)
-        return showSnackbar("Session expired. Please login again.", "error");
+  const loadMessages = useCallback(
+    async (ticket) => {
+      try {
+        const token = await get_token();
+        if (!token)
+          return showSnackbar(t("support_page.session_expired"), "error");
 
-      const res = await getSupportMessages(token, ticket.id);
+        const res = await getSupportMessages(token, ticket.id);
 
-      if (!res.success) {
-        return showSnackbar(res.message || "Failed to load messages", "error");
+        if (!res.success) {
+          return showSnackbar(
+            res.message || t("support_page.messages_load_failed"),
+            "error",
+          );
+        }
+
+        setMessages(res.data);
+        window.dispatchEvent(new Event("notificationUpdated"));
+      } catch (err) {
+        showSnackbar(t("support_page.messages_load_failed"), "error");
       }
-
-      setMessages(res.data);
-      window.dispatchEvent(new Event("notificationUpdated"));
-    } catch (err) {
-      showSnackbar("Failed to load messages", "error");
-    }
-  }, []);
+    },
+    [t],
+  );
 
   // ================= CREATE TICKET =================
   const handleCreateTicket = async () => {
@@ -145,10 +157,7 @@ const SupportPage = () => {
     });
 
     if (subjectError || messageError) {
-      return showSnackbar(
-        "Please fill in all required fields correctly",
-        "error",
-      );
+      return showSnackbar(t("support_page.fill_required_fields"), "error");
     }
 
     try {
@@ -156,7 +165,7 @@ const SupportPage = () => {
 
       const token = await get_token();
       if (!token)
-        return showSnackbar("Session expired. Please login again.", "error");
+        return showSnackbar(t("support_page.session_expired"), "error");
 
       const res = await createSupportTicket(token, {
         subject,
@@ -165,7 +174,7 @@ const SupportPage = () => {
 
       if (!res.success) {
         return showSnackbar(
-          res.message || "Failed to create support ticket",
+          res.message || t("support_page.ticket_create_failed"),
           "error",
         );
       }
@@ -174,10 +183,10 @@ const SupportPage = () => {
       setMessageInput("");
       setSubmitted(false);
       setErrors({ subject: false, message: false });
-      showSnackbar("Ticket created successfully");
+      showSnackbar(t("support_page.ticket_created_successfully"));
       loadTickets();
     } catch (err) {
-      showSnackbar("Something went wrong while creating ticket", "error");
+      showSnackbar(t("support_page.ticket_create_failed"), "error");
     } finally {
       setLoading(false);
     }
@@ -186,14 +195,14 @@ const SupportPage = () => {
   // ================= SEND MESSAGE =================
   const handleSendMessage = async () => {
     if (!replyInput.trim() || !selectedTicket)
-      return showSnackbar("Message cannot be empty", "error");
+      return showSnackbar(t("support_page.message_empty"), "error");
 
     try {
       setLoading(true);
 
       const token = await get_token();
       if (!token)
-        return showSnackbar("Session expired. Please login again.", "error");
+        return showSnackbar(t("support_page.session_expired"), "error");
 
       const res = await sendSupportMessage(token, {
         ticketId: selectedTicket.id,
@@ -201,14 +210,14 @@ const SupportPage = () => {
       });
 
       if (!res.success) {
-        return showSnackbar(res.message || "Failed to send message", "error");
+        return showSnackbar(t("support_page.message_send_failed"), "error");
       }
 
       setReplyInput("");
       loadMessages(selectedTicket);
       loadTickets();
     } catch (err) {
-      showSnackbar("Something went wrong while sending message", "error");
+      showSnackbar(t("support_page.message_send_error"), "error");
     } finally {
       setLoading(false);
     }
@@ -336,21 +345,24 @@ const SupportPage = () => {
 
       const token = await get_token();
       if (!token)
-        return showSnackbar("Session expired. Please login again.", "error");
+        return showSnackbar(t("support_page.session_expired"), "error");
 
       const res = await closeSupportTicket(token, selectedTicket.id);
 
       if (!res.success) {
-        return showSnackbar(res.message || "Failed to close ticket", "error");
+        return showSnackbar(
+          res.message || t("support_page.ticket_close_failed"),
+          "error",
+        );
       }
 
-      showSnackbar("Ticket closed successfully");
+      showSnackbar(t("support_page.ticket_close_success"));
       loadTickets();
       setSelectedTicket((prev) =>
         prev ? { ...prev, status: "closed" } : prev,
       );
     } catch (err) {
-      showSnackbar("Something went wrong while closing ticket", "error");
+      showSnackbar(t("support_page.ticket_close_failed"), "error");
     } finally {
       setLoading(false);
     }
@@ -362,18 +374,20 @@ const SupportPage = () => {
     <div className="support-container">
       {/* LEFT */}
       <div className={`support-left ${isMobileChatOpen ? "hide-mobile" : ""}`}>
-        <h3>Support</h3>
+        <h3>{t("support_page.title")}</h3>
         {user?.role !== "admin" && (
           <div className="new-ticket">
             <TextField
               size="small"
               fullWidth
-              label="Subject"
+              label={t("support_page.subject")}
               required
               value={subject}
               error={submitted && errors.subject}
               helperText={
-                submitted && errors.subject ? "Subject is required" : ""
+                submitted && errors.subject
+                  ? t("support_page.subject_required")
+                  : ""
               }
               onChange={(e) => setSubject(e.target.value)}
               InputProps={{
@@ -391,11 +405,13 @@ const SupportPage = () => {
               fullWidth
               multiline
               rows={3}
-              label="Message"
+              label={t("support_page.message")}
               value={messageInput}
               error={submitted && errors.message}
               helperText={
-                submitted && errors.message ? "Message is required" : ""
+                submitted && errors.message
+                  ? t("support_page.message_required")
+                  : ""
               }
               onChange={(e) => setMessageInput(e.target.value)}
               InputProps={{
@@ -410,7 +426,7 @@ const SupportPage = () => {
             />
 
             <button className="button-success" onClick={handleCreateTicket}>
-              Create Ticket
+              {t("support_page.create_ticket")}
             </button>
           </div>
         )}
@@ -418,15 +434,17 @@ const SupportPage = () => {
         {/* FILTER DROPDOWN */}
         <div className="ticket-filter">
           <FormControl fullWidth size="small" className="custom-textfield">
-            <InputLabel>Filter Tickets</InputLabel>
+            <InputLabel>{t("support_page.filter_tickets")}</InputLabel>
             <Select
               value={ticketFilter}
-              label="Filter Tickets"
+              label={t("support_page.filter_tickets")}
               onChange={(e) => setTicketFilter(e.target.value)}
             >
-              <MenuItem value="all">All Tickets</MenuItem>
-              <MenuItem value="open">Open</MenuItem>
-              <MenuItem value="closed">Closed</MenuItem>
+              <MenuItem value="all">{t("support_page.all_tickets")}</MenuItem>
+              <MenuItem value="open">{t("support_page.open_tickets")}</MenuItem>
+              <MenuItem value="closed">
+                {t("support_page.closed_tickets")}
+              </MenuItem>
             </Select>
           </FormControl>
         </div>
@@ -446,7 +464,7 @@ const SupportPage = () => {
                     src={
                       t.profile_image
                         ? t.profile_image
-                        : AppConst.PROFILE_PLACEHOLDER_IMAGE 
+                        : AppConst.PROFILE_PLACEHOLDER_IMAGE
                     }
                   />
 
@@ -484,7 +502,7 @@ const SupportPage = () => {
         }`}
       >
         {!selectedTicket ? (
-          <div className="empty">Select a ticket</div>
+          <div className="empty">{t("support_page.select_ticket")}</div>
         ) : (
           <>
             <div className="chat-header">
@@ -498,7 +516,7 @@ const SupportPage = () => {
 
               {user?.role === "admin" && selectedTicket.status !== "closed" && (
                 <button className="button-warning" onClick={handleCloseTicket}>
-                  Close Ticket
+                  {t("support_page.close_ticket")}
                 </button>
               )}
             </div>
@@ -544,8 +562,8 @@ const SupportPage = () => {
                 fullWidth
                 placeholder={
                   selectedTicket?.status === "closed"
-                    ? "Ticket is closed"
-                    : "Type reply..."
+                    ? t("support_page.ticket_closed")
+                    : t("support_page.type_reply")
                 }
                 value={replyInput}
                 onChange={(e) => setReplyInput(e.target.value)}

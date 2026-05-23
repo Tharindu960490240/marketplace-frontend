@@ -9,7 +9,10 @@ import { ROUTES } from "../../const/const";
 
 import "../styles/verifyAccount.css";
 
+import { useTranslation } from "react-i18next";
+
 const VerifyAccount = () => {
+  const { t } = useTranslation();
   const { token } = useParams();
   const navigate = useNavigate();
 
@@ -35,22 +38,20 @@ const VerifyAccount = () => {
         if (result.success) {
           setSnackbar({
             open: true,
-            message: result.data.message || "Account verified successfully!",
+            message: t("verify_account_page.verifySuccess"),
             severity: "success",
           });
         } else {
           setSnackbar({
             open: true,
-            message: result.message || "Verification failed",
+            message: t("verify_account_page.verifyFailed"),
             severity: "error",
           });
         }
       } catch (err) {
         setSnackbar({
           open: true,
-          message:
-            err?.response?.data?.message ||
-            "Something went wrong during verification",
+          message: t("verify_account_page.verifyError"),
           severity: "error",
         });
       } finally {
@@ -63,16 +64,14 @@ const VerifyAccount = () => {
     };
 
     verifyUser();
-  }, [token, navigate]);
+  }, [token, navigate, t]);
 
   return (
     <div className="verify-container">
       <div className="verify-box">
-        <h2 className="verify-title">Verifying your account...</h2>
+        <h2 className="verify-title">{t("verify_account_page.verifyingAccount")}</h2>
 
-        <p className="verify-subtext">
-          Please wait while we confirm your email address.
-        </p>
+        <p className="verify-subtext">{t("verify_account_page.verifySubtext")}</p>
 
         {/* Spinner */}
         <LoadingSpinner open={loading} />

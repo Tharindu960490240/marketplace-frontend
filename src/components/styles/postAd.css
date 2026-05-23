@@ -18,7 +18,7 @@
 }
 
 /* Title */
-.ads-box h2 {
+.ads-subcontainer h2 {
   text-align: center;
   margin-bottom: 30px;
   font-size: 28px;
@@ -127,7 +127,7 @@
     padding: 20px;
   }
 
-  .ads-box h2 {
+  .ads-subcontainer h2 {
     font-size: 22px;
   }
 

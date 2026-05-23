@@ -11,7 +11,11 @@ import CustomSnackbar from "./CustomSnackbar";
 
 import { resetPassword } from "../../services/authService";
 
+import { useTranslation } from "react-i18next";
+
 const ResetPassword = ({ onSignOut }) => {
+  const { t } = useTranslation();
+
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     email: "",
@@ -60,7 +64,7 @@ const ResetPassword = ({ onSignOut }) => {
         if (exp < currentTime) {
           setSnackbar({
             open: true,
-            message: "The reset token has expired. Please request a new one.",
+            message: t("reset_password_page.tokenExpired"),
             severity: "error",
           });
           setLoading(true);
@@ -81,7 +85,7 @@ const ResetPassword = ({ onSignOut }) => {
       } catch (error) {
         setSnackbar({
           open: true,
-          message: "Invalid token. Please request a new reset link.",
+          message: t("reset_password_page.invalidToken"),
           severity: "error",
         });
         setLoading(true);
@@ -91,7 +95,7 @@ const ResetPassword = ({ onSignOut }) => {
         }, 2500);
       }
     }
-  }, [location.search, navigate, stableOnSignOut]);
+  }, [location.search, navigate, stableOnSignOut, t]);
 
   // Handle New Password Input Change
   const handleNewPasswordChange = (val) => {
@@ -128,7 +132,7 @@ const ResetPassword = ({ onSignOut }) => {
   const handlePasswordReset = async () => {
     const isPasswordValid =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        data.password
+        data.password,
       );
     const matchPassword = data.password === data.confirmPassword;
 
@@ -142,7 +146,7 @@ const ResetPassword = ({ onSignOut }) => {
     if (!isPasswordValid || !matchPassword) {
       setSnackbar({
         open: true,
-        message: "Please fill in all the fields with valid information.",
+        message: t("reset_password_page.fillValidFields"),
         severity: "error",
       });
       return;
@@ -158,7 +162,7 @@ const ResetPassword = ({ onSignOut }) => {
       if (!token) {
         setSnackbar({
           open: true,
-          message: "Invalid or missing reset token",
+          message: t("reset_password_page.missingToken"),
           severity: "error",
         });
         return;
@@ -170,7 +174,7 @@ const ResetPassword = ({ onSignOut }) => {
       if (response.success) {
         setSnackbar({
           open: true,
-          message: "Password reset successful. Redirecting...",
+          message: t("reset_password_page.resetSuccess"),
           severity: "success",
         });
 
@@ -193,14 +197,14 @@ const ResetPassword = ({ onSignOut }) => {
       } else {
         setSnackbar({
           open: true,
-          message: response.message || "Password reset failed",
+          message: t("reset_password_page.resetFailed"),
           severity: "error",
         });
       }
     } catch (error) {
       setSnackbar({
         open: true,
-        message: error.message || "Something went wrong",
+        message: t("reset_password_page.somethingWrong"),
         severity: "error",
       });
     } finally {
@@ -216,13 +220,13 @@ const ResetPassword = ({ onSignOut }) => {
   return (
     <div className="forgot-password-container">
       <div className="forgot-password-box">
-        <h2>Reset Password</h2>
+        <h2>{t("reset_password_page.resetPassword")}</h2>
 
         {/* Email Input */}
         <div className="input-container">
           <TextField
             size="small"
-            label="Email"
+            label={t("reset_password_page.email")}
             type="email"
             fullWidth
             value={data.email}
@@ -231,7 +235,7 @@ const ResetPassword = ({ onSignOut }) => {
             variant="outlined"
             className="custom-textfield"
             error={!data.isValidUser}
-            helperText={!data.isValidUser ? "Invalid email address." : ""}
+            helperText={!data.isValidUser ? t("reset_password_page.emailError") : ""}
             required
             InputProps={{
               startAdornment: (
@@ -253,7 +257,7 @@ const ResetPassword = ({ onSignOut }) => {
           <TextField
             className="custom-textfield"
             size="small"
-            label="New Password"
+            label={t("reset_password_page.newPassword")}
             type={data.showPassword ? "text" : "password"}
             fullWidth
             value={data.password}
@@ -264,8 +268,8 @@ const ResetPassword = ({ onSignOut }) => {
             required
             helperText={
               !data.isPasswordValid
-                ? "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character."
-                : "eg: MyPass2025!"
+                ? t("reset_password_page.invalidPasswordStrength")
+                : t("reset_password_page.passwordHint")
             }
             InputProps={{
               startAdornment: (
@@ -288,7 +292,7 @@ const ResetPassword = ({ onSignOut }) => {
         <div className="input-container">
           <TextField
             size="small"
-            label="Confirm Password"
+            label={t("reset_password_page.confirmPassword")}
             type={data.showPassword ? "text" : "password"}
             fullWidth
             value={data.confirmPassword}
@@ -297,7 +301,7 @@ const ResetPassword = ({ onSignOut }) => {
             variant="outlined"
             className="custom-textfield"
             error={!data.passwordMatch}
-            helperText={!data.passwordMatch ? "Passwords do not match." : ""}
+            helperText={!data.passwordMatch ? t("reset_password_page.passwordMismatch") : ""}
             required
             InputProps={{
               startAdornment: (
@@ -312,13 +316,13 @@ const ResetPassword = ({ onSignOut }) => {
         <div className="button-group">
           {/* Reset Button */}
           <button className="button-success" onClick={handlePasswordReset}>
-            Reset
+            {t("reset_password_page.resetPassword")}
           </button>
         </div>
 
         {/* Sign In Link */}
         <p className="signin-link">
-          Remembered your password? <Link to="/signin">Sign In</Link>
+          {t("reset_password_page.rememberedPassword")} <Link to="/signin">{t("reset_password_page.signIn")}</Link>
         </p>
       </div>
 

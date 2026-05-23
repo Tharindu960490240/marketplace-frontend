@@ -48,6 +48,8 @@ import CustomSnackbar from "./CustomSnackbar";
 
 import "../styles/allCategories.css";
 
+import { useTranslation } from "react-i18next";
+
 // ================= TABS =================
 const statusTabs = ["active", "inactive"];
 
@@ -64,6 +66,7 @@ const useDebounce = (value, delay) => {
 };
 
 const AllCategories = () => {
+  const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
 
   const [categories, setCategories] = useState([]);
@@ -98,7 +101,7 @@ const AllCategories = () => {
       if (!token) {
         setSnackbar({
           open: true,
-          message: "Session expired. Please login again.",
+          message: t("all_categories_page.session_expired"),
           severity: "error",
         });
         return;
@@ -118,20 +121,20 @@ const AllCategories = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Error loading categories",
+          message: t("all_categories_page.load_error"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error loading categories",
+        message: t("all_categories_page.load_error"),
         severity: "error",
       });
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, debouncedSearch, tabIndex]);
+  }, [page, rowsPerPage, debouncedSearch, tabIndex, t]);
 
   // ================= ADD =================
   const handleAddCategory = async () => {
@@ -140,15 +143,15 @@ const AllCategories = () => {
     if (!token) {
       setSnackbar({
         open: true,
-        message: "Session expired. Please login again.",
+        message: t("all_categories_page.session_expired"),
         severity: "error",
       });
       return;
     }
 
-    const value = categoryData.category.trim();
-
-    const isValidCategory = value.length > 0 && /^[A-Za-z\s]+$/.test(value);
+    const isValidCategory = /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(
+      categoryData.category,
+    );
 
     setCategoryData({
       ...categoryData,
@@ -158,7 +161,7 @@ const AllCategories = () => {
     if (!isValidCategory) {
       setSnackbar({
         open: true,
-        message: "Please enter a valid category name (letters only).",
+        message: t("all_categories_page.validation_category"),
         severity: "error",
       });
       return;
@@ -168,13 +171,13 @@ const AllCategories = () => {
       setLoading(true);
 
       const res = await createCategory(token, {
-        name: value,
+        name: categoryData.category,
       });
 
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Category added successfully",
+          message: t("all_categories_page.add_success"),
           severity: "success",
         });
 
@@ -187,14 +190,14 @@ const AllCategories = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || "Error adding category",
+          message: res.message || t("all_categories_page.add_error"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: err.message || "Error adding category",
+        message: err.message || t("all_categories_page.add_error"),
         severity: "error",
       });
     } finally {
@@ -209,7 +212,7 @@ const AllCategories = () => {
     if (!token) {
       setSnackbar({
         open: true,
-        message: "Session expired. Please login again.",
+        message: t("all_categories_page.session_expired"),
         severity: "error",
       });
       return;
@@ -223,7 +226,7 @@ const AllCategories = () => {
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Status updated",
+          message: t("all_categories_page.status_updated"),
           severity: "success",
         });
         fetchCategories();
@@ -231,7 +234,7 @@ const AllCategories = () => {
         setLoading(false);
         setSnackbar({
           open: true,
-          message: res.message || "Error updating status",
+          message: t("all_categories_page.status_update_error"),
           severity: "error",
         });
       }
@@ -239,7 +242,7 @@ const AllCategories = () => {
       setLoading(false);
       setSnackbar({
         open: true,
-        message: "Error updating status",
+        message: t("all_categories_page.status_update_error"),
         severity: "error",
       });
     }
@@ -262,7 +265,7 @@ const AllCategories = () => {
   };
 
   const handleCategoryChange = (val) => {
-    const isValidCategory = /^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(val);
+    const isValidCategory = /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(val);
     setCategoryData({ ...categoryData, category: val, isValidCategory });
   };
 
@@ -272,7 +275,7 @@ const AllCategories = () => {
     if (!token) {
       setSnackbar({
         open: true,
-        message: "Session expired. Please login again.",
+        message: t("all_categories_page.session_expired"),
         severity: "error",
       });
       return;
@@ -286,7 +289,7 @@ const AllCategories = () => {
       if (res.success) {
         setSnackbar({
           open: true,
-          message: "Category deleted successfully.",
+          message: t("all_categories_page.delete_success"),
           severity: "success",
         });
 
@@ -297,7 +300,7 @@ const AllCategories = () => {
         setLoading(false);
         setSnackbar({
           open: true,
-          message: res.message || "Failed to delete category.",
+          message: t("all_categories_page.delete_error"),
           severity: "error",
         });
       }
@@ -305,7 +308,7 @@ const AllCategories = () => {
       setLoading(false);
       setSnackbar({
         open: true,
-        message: "Something went wrong. Try again later.",
+        message: t("all_categories_page.delete_error"),
         severity: "error",
       });
     } finally {
@@ -323,7 +326,12 @@ const AllCategories = () => {
       inactive: "error",
     };
 
-    return <Chip label={status} color={map[status]} size="small" />;
+    const label =
+      status === "active"
+        ? t("all_categories_page.status_active")
+        : t("all_categories_page.status_inactive");
+
+    return <Chip label={label} color={map[status]} size="small" />;
   };
 
   useEffect(() => {
@@ -333,12 +341,12 @@ const AllCategories = () => {
   return (
     <>
       <Box className="allCategories-container" p={2}>
-        <h2>Category Management</h2>
+        <h2>{t("all_categories_page.title")}</h2>
 
         <div className="button-group">
           <button onClick={handleModalOpen} className="button-success">
             <Add style={{ marginRight: 5 }} />
-            Add New Category
+            {t("all_categories_page.add_new")}
           </button>
         </div>
         {/*  TABS (NEW) */}
@@ -349,8 +357,8 @@ const AllCategories = () => {
             setPage(0);
           }}
         >
-          <Tab label="Active" />
-          <Tab label="Inactive" />
+          <Tab label={t("all_categories_page.tab_active")} />
+          <Tab label={t("all_categories_page.tab_inactive")} />
         </Tabs>
 
         {/* ACTION BAR */}
@@ -358,7 +366,7 @@ const AllCategories = () => {
           <TextField
             className="custom-textfield"
             size="small"
-            label="Search Category"
+            label={t("all_categories_page.search_label")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
@@ -377,10 +385,10 @@ const AllCategories = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Created</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell>{t("all_categories_page.name")}</TableCell>
+                  <TableCell>{t("all_categories_page.status")}</TableCell>
+                  <TableCell>{t("all_categories_page.created")}</TableCell>
+                  <TableCell>{t("all_categories_page.actions")}</TableCell>
                 </TableRow>
               </TableHead>
 
@@ -388,7 +396,7 @@ const AllCategories = () => {
                 {categories.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} align="center">
-                      No categories found
+                      {t("all_categories_page.empty")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -401,7 +409,9 @@ const AllCategories = () => {
                       </TableCell>
                       <TableCell>
                         {c.status !== "active" ? (
-                          <Tooltip title="Activate">
+                          <Tooltip
+                            title={t("all_categories_page.tooltip_activate")}
+                          >
                             <IconButton
                               color="secondary"
                               onClick={() => handleToggleStatus(c.id, c.status)}
@@ -410,7 +420,9 @@ const AllCategories = () => {
                             </IconButton>
                           </Tooltip>
                         ) : (
-                          <Tooltip title="Inactivate">
+                          <Tooltip
+                            title={t("all_categories_page.tooltip_deactivate")}
+                          >
                             <IconButton
                               onClick={() => handleToggleStatus(c.id, c.status)}
                             >
@@ -418,7 +430,9 @@ const AllCategories = () => {
                             </IconButton>
                           </Tooltip>
                         )}
-                        <Tooltip title="Delete">
+                        <Tooltip
+                          title={t("all_categories_page.tooltip_delete")}
+                        >
                           <IconButton
                             color="secondary"
                             onClick={() => deleteDialogOpenCategory(c.id)}
@@ -462,12 +476,14 @@ const AllCategories = () => {
           >
             <Close />
           </IconButton>
-          <h2 className="modal-title">Add New Category</h2>
+          <h2 className="modal-title">
+            {t("all_categories_page.modal_title")}
+          </h2>
 
           <TextField
             className="custom-textfield"
             size="small"
-            label="New Category"
+            label={t("all_categories_page.modal_input")}
             type="text"
             fullWidth
             margin="normal"
@@ -477,7 +493,7 @@ const AllCategories = () => {
             error={!categoryData.isValidCategory}
             helperText={
               !categoryData.isValidCategory
-                ? "Category name is required and must contain only letters"
+                ? t("all_categories_page.modal_error")
                 : ""
             }
             value={categoryData.category}
@@ -492,14 +508,14 @@ const AllCategories = () => {
 
           <div className="button-group">
             <button onClick={handleAddCategory} className="button-success">
-              Save
+              {t("all_categories_page.save")}
             </button>
 
             <button
               onClick={() => setShowModal(false)}
               className="button-error"
             >
-              Cancel
+              {t("all_categories_page.cancel")}
             </button>
           </div>
         </div>
@@ -516,7 +532,7 @@ const AllCategories = () => {
         maxWidth="xs"
       >
         <DialogTitle id="delete-category-dialog-title">
-          Delete Category
+          {t("all_categories_page.dialog_title")}
           <IconButton
             aria-label="close"
             onClick={() => setDeleteDialogOpen(false)}
@@ -533,8 +549,7 @@ const AllCategories = () => {
 
         <DialogContent dividers>
           <DialogContentText>
-            Are you sure you want to delete this category? This action cannot be
-            undone.
+            {t("all_categories_page.dialog_message")}
           </DialogContentText>
         </DialogContent>
 
@@ -543,11 +558,11 @@ const AllCategories = () => {
             className="button-success"
             onClick={() => setDeleteDialogOpen(false)}
           >
-            Cancel
+            {t("all_categories_page.cancel")}
           </button>
 
           <button className="button-error" onClick={handleDelete}>
-            Delete
+            {t("all_categories_page.delete")}
           </button>
         </DialogActions>
       </Dialog>

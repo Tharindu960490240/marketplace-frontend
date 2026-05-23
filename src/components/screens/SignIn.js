@@ -11,7 +11,10 @@ import CustomSnackbar from "./CustomSnackbar";
 
 import { loginUser } from "../../services/authService";
 
+import { useTranslation } from "react-i18next";
 const SignIn = ({ onSignIn }) => {
+  const { t } = useTranslation();
+
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [data, setData] = useState({
@@ -69,7 +72,7 @@ const SignIn = ({ onSignIn }) => {
     if (!isEmailValid || !isPasswordValid) {
       setSnackbar({
         open: true,
-        message: "Please enter a valid email address and password",
+        message: t("signin_page.validEmailPassword"),
         severity: "error",
       });
       return;
@@ -92,7 +95,7 @@ const SignIn = ({ onSignIn }) => {
 
         setSnackbar({
           open: true,
-          message: "Login successful! Welcome back.",
+          message: t("signin_page.loginSuccess"),
           severity: "success",
         });
 
@@ -107,9 +110,7 @@ const SignIn = ({ onSignIn }) => {
         setLoading(false);
         setSnackbar({
           open: true,
-          message:
-            loginResponse.message ||
-            "Incorrect email or password. Please try again.",
+          message: loginResponse.message || t("signin_page.loginFailed"),
           severity: "error",
         });
       }
@@ -118,8 +119,7 @@ const SignIn = ({ onSignIn }) => {
       setLoading(false);
       setSnackbar({
         open: true,
-        message:
-          "An unexpected error occurred during login. Please try again later.",
+        message: t("signin_page.unexpectedError"),
         severity: "error",
       });
       console.error("Login error:", error);
@@ -137,12 +137,12 @@ const SignIn = ({ onSignIn }) => {
 
       {/* Form */}
       <div className="signin-box">
-        <h2>Sign In</h2>
+        <h2>{t("signin_page.signIn")}</h2>
 
         <div className="input-container">
           <TextField
             size="small"
-            label="Email"
+            label={t("signin_page.email")}
             type="email"
             fullWidth
             value={data.email}
@@ -152,7 +152,7 @@ const SignIn = ({ onSignIn }) => {
             variant="outlined"
             className="custom-textfield"
             error={!data.isValidUser}
-            helperText={!data.isValidUser ? "Invalid email address." : ""}
+            helperText={!data.isValidUser ? t("signin_page.emailError") : ""}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -171,7 +171,7 @@ const SignIn = ({ onSignIn }) => {
         <div className="input-container">
           <TextField
             size="small"
-            label="Password"
+            label={t("signin_page.password")}
             type={data.secureTextEntry ? "password" : "text"}
             fullWidth
             value={data.password}
@@ -181,7 +181,9 @@ const SignIn = ({ onSignIn }) => {
             variant="outlined"
             className="custom-textfield"
             error={!data.isValidPassword}
-            helperText={!data.isValidPassword ? "Invalid password, must be at least 8 characters long." : ""}
+            helperText={
+              !data.isValidPassword ? t("signin_page.invalidPassword") : ""
+            }
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -201,14 +203,16 @@ const SignIn = ({ onSignIn }) => {
 
         <div className="button-group">
           <button onClick={handleSignIn} className="button-success">
-            Sign In
+            {t("signin_page.signIn")}
           </button>
         </div>
         <p className="forgot-password-link">
-          Forgot your password? <Link to="/forgot-password">Reset it</Link>
+          {t("signin_page.forgotPassword")}{" "}
+          <Link to="/forgot-password">{t("signin_page.resetIt")}</Link>
         </p>
         <p className="signup-link">
-          Don't have an account? <Link to="/signup">Sign Up</Link>
+          {t("signin_page.dontHaveAccount")}{" "}
+          <Link to="/signup">{t("signin_page.signUp")}</Link>
         </p>
       </div>
 

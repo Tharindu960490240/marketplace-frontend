@@ -30,9 +30,12 @@ import { get_token } from "../../services/authService";
 import LoadingSpinner from "./LoadingSpinner";
 import CustomSnackbar from "./CustomSnackbar";
 
+import { useTranslation } from "react-i18next";
+
 import "../styles/adminDashboard.css";
 
 const AdminDashboard = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [data, setData] = useState(null);
@@ -58,7 +61,7 @@ const AdminDashboard = () => {
       const token = await get_token();
 
       if (!token) {
-        showMessage("Session expired. Please login again.", "error");
+        showMessage(t("admin_dashboard.session_expired"), "error");
         return;
       }
 
@@ -70,17 +73,17 @@ const AdminDashboard = () => {
         if (res.success) {
           setData(res.data);
         } else {
-          showMessage(res.message || "Failed to load dashboard", "error");
+          showMessage(t("admin_dashboard.failed_load_dashboard"), "error");
         }
       } catch (err) {
-        showMessage("Server error", "error");
+        showMessage(t("admin_dashboard.server_error"), "error");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [t]);
 
   const goTo = (path) => {
     navigate(path);
@@ -94,6 +97,8 @@ const AdminDashboard = () => {
     ads: Number(g.ads),
   }));
 
+  /* ================= UPDATE statusChip ================= */
+
   const statusChip = (status) => {
     const map = {
       pending: "warning",
@@ -103,7 +108,21 @@ const AdminDashboard = () => {
       deleted: "error",
     };
 
-    return <Chip label={status} color={map[status]} size="small" />;
+    const labelMap = {
+      pending: t("admin_dashboard.pending"),
+      active: t("admin_dashboard.active"),
+      sold: t("admin_dashboard.sold"),
+      rejected: t("admin_dashboard.rejected"),
+      deleted: t("admin_dashboard.deleted"),
+    };
+
+    return (
+      <Chip
+        label={labelMap[status] || status}
+        color={map[status]}
+        size="small"
+      />
+    );
   };
 
   return (
@@ -115,7 +134,7 @@ const AdminDashboard = () => {
             <TrendingUp />
             <div>
               <h2>{data.activeAds}</h2>
-              <p>Active Ads</p>
+              <p>{t("admin_dashboard.active_ads")}</p>
             </div>
           </div>
         </Grid>
@@ -125,7 +144,7 @@ const AdminDashboard = () => {
             <HourglassEmpty />
             <div>
               <h2>{data.pendingAds}</h2>
-              <p>Pending Ads</p>
+              <p>{t("admin_dashboard.pending_ads")}</p>
             </div>
           </div>
         </Grid>
@@ -135,7 +154,7 @@ const AdminDashboard = () => {
             <People />
             <div>
               <h2>{data.users}</h2>
-              <p>Users</p>
+              <p>{t("admin_dashboard.users")}</p>
             </div>
           </div>
         </Grid>
@@ -145,7 +164,7 @@ const AdminDashboard = () => {
             <Visibility />
             <div>
               <h2>{data.views}</h2>
-              <p>Views</p>
+              <p>{t("admin_dashboard.views")}</p>
             </div>
           </div>
         </Grid>
@@ -155,7 +174,7 @@ const AdminDashboard = () => {
             <AdsClick />
             <div>
               <h2>{data.totalAds}</h2>
-              <p>Total Ads</p>
+              <p>{t("admin_dashboard.total_ads")}</p>
             </div>
           </div>
         </Grid>
@@ -165,7 +184,7 @@ const AdminDashboard = () => {
             <Category />
             <div>
               <h2>{data.categories.length}</h2>
-              <p>Categories</p>
+              <p>{t("admin_dashboard.categories")}</p>
             </div>
           </div>
         </Grid>
@@ -176,8 +195,9 @@ const AdminDashboard = () => {
         {/* GROWTH */}
         <Grid item xs={12} md={6}>
           <div className="card-box">
-            <h3>Growth Overview</h3>
-            <p>Ads created per month</p>
+            <h3>{t("admin_dashboard.growth_overview")}</h3>
+
+            <p>{t("admin_dashboard.ads_created_per_month")}</p>
 
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={growthData}>
@@ -199,8 +219,9 @@ const AdminDashboard = () => {
         {/* CATEGORY */}
         <Grid item xs={12} md={6}>
           <div className="card-box">
-            <h3>Category Distribution</h3>
-            <p>Ads by category</p>
+            <h3>{t("admin_dashboard.category_distribution")}</h3>
+
+            <p>{t("admin_dashboard.ads_by_category")}</p>
 
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={data.categories}>
@@ -219,7 +240,7 @@ const AdminDashboard = () => {
       <Grid container spacing={2} className="section">
         <Grid item xs={12} md={4}>
           <div className="card-box">
-            <h3>Recent Ads</h3>
+            <h3>{t("admin_dashboard.recent_ads")}</h3>
 
             {data.recentAds.map((ad) => (
               <div className="list-item" key={ad.id}>
@@ -232,12 +253,12 @@ const AdminDashboard = () => {
 
         <Grid item xs={12} md={4}>
           <div className="card-box">
-            <h3>Top Users</h3>
+            <h3>{t("admin_dashboard.top_users")}</h3>
 
             {data.topUsers.map((u) => (
               <div className="list-item" key={u.id}>
                 <span>{u.name}</span>
-                <span>{u.ads} ads</span>
+                <span>{t("admin_dashboard.ads_count", { count: u.ads })}</span>
               </div>
             ))}
           </div>
@@ -245,7 +266,7 @@ const AdminDashboard = () => {
 
         <Grid item xs={12} md={4}>
           <div className="card-box">
-            <h3>Activity</h3>
+            <h3>{t("admin_dashboard.activity")}</h3>
 
             {data.activity.map((a, i) => (
               <div className="activity" key={i}>
@@ -259,13 +280,13 @@ const AdminDashboard = () => {
       {/* ================= ACTIONS ================= */}
       <div className="button-group">
         <button className="button-success" onClick={() => goTo("/ads")}>
-          Manage Ads
+          {t("admin_dashboard.manage_ads")}
         </button>
         <button className="button-success" onClick={() => goTo("/categories")}>
-          Manage Categories
+          {t("admin_dashboard.manage_categories")}
         </button>
         <button className="button-success" onClick={() => goTo("/users")}>
-          Manage Users
+          {t("admin_dashboard.manage_users")}
         </button>
       </div>
 
