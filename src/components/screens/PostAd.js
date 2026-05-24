@@ -21,7 +21,7 @@ import {
 
 import "../styles/postAd.css";
 
-import { createAd, uploadAdImages } from "../../services/adsService";
+import { createAd, uploadAdImages, deleteAd } from "../../services/adsService";
 import { getActiveCategories } from "../../services/categoryService";
 import { get_token } from "../../services/authService";
 
@@ -38,7 +38,15 @@ const nameRegex =
 const priceRegex = /^\d+(\.\d{1,2})?$/;
 
 const MAX_IMAGES = 5;
-const ALLOWED_TYPES = ["image/jpeg", "image/png"];
+
+const ALLOWED_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+];
 
 const PostAd = () => {
   const { t } = useTranslation();
@@ -229,36 +237,39 @@ const PostAd = () => {
 
       const adId = res.data.ad.id;
 
-      if (images.length > 0) {
-        await uploadAdImages(
-          token,
-          adId,
-          images.map((i) => i.file),
-        );
+      const imgre = await uploadAdImages(
+        token,
+        adId,
+        images.map((i) => i.file),
+      );
+
+      if (imgre.success) {
+        showMessage(t("post_ad.ad_success"), "success");
+
+        /* RESET */
+        setAdData({
+          title: "",
+          category: null,
+          sub_category: "",
+          price: "",
+          district: null,
+          city: "",
+          description: "",
+          negotiable: false,
+        });
+
+        setValidation({
+          title: true,
+          sub_category: true,
+          price: true,
+          city: true,
+          description: true,
+        });
+        setImages([]);
+      } else {
+        await deleteAd(token, adId);
+        showMessage(t("post_ad.something_went_wrong"), "warning");
       }
-
-      showMessage(t("post_ad.ad_success"), "success");
-
-      /* RESET */
-      setAdData({
-        title: "",
-        category: null,
-        sub_category: "",
-        price: "",
-        district: null,
-        city: "",
-        description: "",
-        negotiable: false,
-      });
-
-      setValidation({
-        title: true,
-        sub_category: true,
-        price: true,
-        city: true,
-        description: true,
-      });
-      setImages([]);
     } catch (err) {
       showMessage(t("post_ad.something_went_wrong"), "error");
     } finally {
