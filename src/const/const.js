@@ -100,64 +100,31 @@ export const ROUTES = {
 };
 
 export const DISTRICTS = [
-  { label: "Ampara" },
-  { label: "Anuradhapura" },
-  { label: "Badulla" },
-  { label: "Batticaloa" },
-  { label: "Colombo" },
-  { label: "Galle" },
-  { label: "Gampaha" },
-  { label: "Hambantota" },
-  { label: "Jaffna" },
-  { label: "Kalutara" },
-  { label: "Kandy" },
-  { label: "Kegalle" },
-  { label: "Kilinochchi" },
-  { label: "Kurunegala" },
-  { label: "Mannar" },
-  { label: "Matale" },
-  { label: "Matara" },
-  { label: "Monaragala" },
-  { label: "Mullaitivu" },
-  { label: "Nuwara Eliya" },
-  { label: "Polonnaruwa" },
-  { label: "Puttalam" },
-  { label: "Ratnapura" },
-  { label: "Trincomalee" },
-  { label: "Vavuniya" },
-];
-
-export const ANIMAL_TYPES = [
-  // Pets
-  { label: "Dog" },
-  { label: "Cat" },
-  { label: "Rabbit" },
-  { label: "Bird" },
-  { label: "Fish" },
-
-  // Farm Animals
-  { label: "Cow" },
-  { label: "Buffalo" },
-  { label: "Goat" },
-  { label: "Sheep" },
-  { label: "Pig" },
-
-  // Poultry
-  { label: "Chicken" },
-  { label: "Duck" },
-  { label: "Turkey" },
-  { label: "Quail" },
-
-  // Large / Working Animals
-  { label: "Horse" },
-  { label: "Donkey" },
-
-  // Exotic / Others
-  { label: "Turtle" },
-  { label: "Reptile" },
-
-  // Fallback
-  { label: "Other" },
+  { value: "Ampara", label: "Ampara", si: "අම්පාර" },
+  { value: "Anuradhapura", label: "Anuradhapura", si: "අනුරාධපුර" },
+  { value: "Badulla", label: "Badulla", si: "බදුල්ල" },
+  { value: "Batticaloa", label: "Batticaloa", si: "මඩකලපුව" },
+  { value: "Colombo", label: "Colombo", si: "කොළඹ" },
+  { value: "Galle", label: "Galle", si: "ගාල්ල" },
+  { value: "Gampaha", label: "Gampaha", si: "ගම්පහ" },
+  { value: "Hambantota", label: "Hambantota", si: "හම්බන්තොට" },
+  { value: "Jaffna", label: "Jaffna", si: "යාපනය" },
+  { value: "Kalutara", label: "Kalutara", si: "කළුතර" },
+  { value: "Kandy", label: "Kandy", si: "මහනුවර" },
+  { value: "Kegalle", label: "Kegalle", si: "කෑගල්ල" },
+  { value: "Kilinochchi", label: "Kilinochchi", si: "කිලිනොච්චි" },
+  { value: "Kurunegala", label: "Kurunegala", si: "කුරුණෑගල" },
+  { value: "Mannar", label: "Mannar", si: "මන්නාරම" },
+  { value: "Matale", label: "Matale", si: "මාතලේ" },
+  { value: "Matara", label: "Matara", si: "මාතර" },
+  { value: "Monaragala", label: "Monaragala", si: "මොණරාගල" },
+  { value: "Mullaitivu", label: "Mullaitivu", si: "මුලතිව්" },
+  { value: "Nuwara Eliya", label: "Nuwara Eliya", si: "නුවරඑළිය" },
+  { value: "Polonnaruwa", label: "Polonnaruwa", si: "පොළොන්නරුව" },
+  { value: "Puttalam", label: "Puttalam", si: "පුත්තලම" },
+  { value: "Ratnapura", label: "Ratnapura", si: "රත්නපුර" },
+  { value: "Trincomalee", label: "Trincomalee", si: "ත්‍රිකුණාමලය" },
+  { value: "Vavuniya", label: "Vavuniya", si: "වව්නියාව" },
 ];
 
 export const RATING_LABLES = {
