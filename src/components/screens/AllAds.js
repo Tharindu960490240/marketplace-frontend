@@ -463,7 +463,7 @@ const AllAds = () => {
                       <TableCell>{statusChip(ad.status)}</TableCell>
 
                       <TableCell>
-                        ${Number(ad.price).toLocaleString()}
+                        Rs. {Number(ad.price).toLocaleString()}
                       </TableCell>
 
                       <TableCell>{ad.views_count}</TableCell>
