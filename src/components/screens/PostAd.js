@@ -19,6 +19,8 @@ import {
   ScatterPlot,
 } from "@mui/icons-material";
 
+import imageCompression from "browser-image-compression";
+
 import "../styles/postAd.css";
 
 import { createAd, uploadAdImages, deleteAd } from "../../services/adsService";
@@ -148,7 +150,7 @@ const PostAd = () => {
   };
 
   /* ================= IMAGE HANDLER ================= */
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files || []);
 
     if (images.length + files.length > MAX_IMAGES) {
@@ -157,15 +159,20 @@ const PostAd = () => {
 
     const valid = files.filter((f) => ALLOWED_TYPES.includes(f.type));
 
-    const newImages = valid.map((file) => ({
-      id: uuidv4(),
-      file,
-      url: URL.createObjectURL(file),
-    }));
+    const compressedFiles = await Promise.all(
+      valid.map(async (file) => {
+        const compressed = await compressImage(file);
 
-    setImages((p) => [...p, ...newImages]);
+        return {
+          id: uuidv4(),
+          file: compressed,
+          url: URL.createObjectURL(compressed),
+        };
+      }),
+    );
+
+    setImages((p) => [...p, ...compressedFiles]);
   };
-
   const removeImage = (id) => {
     setImages((p) => {
       const imageToRemove = p.find((img) => img.id === id);
@@ -275,6 +282,21 @@ const PostAd = () => {
     } finally {
       setSubmitted(false);
       setLoading(false);
+    }
+  };
+
+  const compressImage = async (file) => {
+    const options = {
+      maxSizeMB: 0.5,
+      maxWidthOrHeight: 800,
+      useWebWorker: true,
+    };
+
+    try {
+      return await imageCompression(file, options);
+    } catch (err) {
+      console.error("Compression error:", err);
+      return file; // fallback to original
     }
   };
 
