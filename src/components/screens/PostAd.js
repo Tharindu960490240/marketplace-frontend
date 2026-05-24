@@ -33,7 +33,8 @@ import { v4 as uuidv4 } from "uuid";
 import { useTranslation } from "react-i18next";
 
 /* ================= VALIDATION ================= */
-const nameRegex = /^[\p{L}]+(?:\s[\p{L}]+)*$/u;
+const nameRegex =
+  /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u;
 const priceRegex = /^\d+(\.\d{1,2})?$/;
 
 const MAX_IMAGES = 5;

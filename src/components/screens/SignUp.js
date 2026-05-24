@@ -79,12 +79,12 @@ const SignUp = () => {
   };
 
   const handleFirstNameChange = (val) => {
-    const isValidFirstName = /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(val);
+    const isValidFirstName = /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(val);
     setUserData({ ...userData, first_name: val, isValidFirstName });
   };
 
   const handleLastNameChange = (val) => {
-    const isValidLastName = /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(val);
+    const isValidLastName = /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(val);
     setUserData({ ...userData, last_name: val, isValidLastName });
   };
 
@@ -122,10 +122,10 @@ const SignUp = () => {
 
   const handleUserFormSubmit = async () => {
     const isFirstNameValid =
-      /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(userData.first_name) &&
+      /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(userData.first_name) &&
       userData.first_name.length > 0;
     const isLastNameValid =
-      /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(userData.last_name) &&
+      /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(userData.last_name) &&
       userData.last_name.length > 0;
 
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.email);
