@@ -191,7 +191,15 @@ const SavedAds = () => {
                     </span>
                   </div>
 
-                  <p>{item.sub_category}</p>
+                  <h3>
+                    {item.category?.name}
+                    {item.sub_category && (
+                      <span style={{ fontWeight: "normal", fontSize: "16px" }}>
+                        {" "}
+                        - {item.sub_category}
+                      </span>
+                    )}
+                  </h3>
 
                   <div className="price-row">
                     <span className="price">Rs. {item.price}</span>

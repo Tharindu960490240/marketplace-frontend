@@ -418,6 +418,7 @@ const AllAds = () => {
                   <TableCell>{t("all_ads_page.table_image")}</TableCell>
                   <TableCell>{t("all_ads_page.table_title")}</TableCell>
                   <TableCell>{t("all_ads_page.table_category")}</TableCell>
+                  <TableCell>{t("all_ads_page.table_sub_category")}</TableCell>
                   <TableCell>{t("all_ads_page.table_location")}</TableCell>
                   <TableCell>{t("all_ads_page.table_status")}</TableCell>
                   <TableCell>{t("all_ads_page.table_price")}</TableCell>
@@ -430,7 +431,7 @@ const AllAds = () => {
               <TableBody>
                 {ads.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} align="center">
+                    <TableCell colSpan={10} align="center">
                       {t("all_ads_page.empty")}
                     </TableCell>
                   </TableRow>
@@ -456,6 +457,7 @@ const AllAds = () => {
 
                       <TableCell>{ad.title}</TableCell>
                       <TableCell>{ad.category?.name || "-"}</TableCell>
+                      <TableCell>{ad.sub_category}</TableCell>
                       <TableCell>
                         {ad.district}, {ad.city}
                       </TableCell>

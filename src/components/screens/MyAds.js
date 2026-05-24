@@ -291,6 +291,8 @@ const MyAds = () => {
                 <TableRow>
                   <TableCell>{t("my_ads_page.table_image")}</TableCell>
                   <TableCell>{t("my_ads_page.table_title")}</TableCell>
+                  <TableCell>{t("my_ads_page.table_category")}</TableCell>
+                  <TableCell>{t("my_ads_page.table_sub_category")}</TableCell>
                   <TableCell>{t("my_ads_page.table_status")}</TableCell>
                   <TableCell>{t("my_ads_page.table_price")}</TableCell>
                   <TableCell>{t("my_ads_page.table_views")}</TableCell>
@@ -301,7 +303,7 @@ const MyAds = () => {
               <TableBody>
                 {ads.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} align="center">
+                    <TableCell colSpan={8} align="center">
                       {t("my_ads_page.empty")}
                     </TableCell>
                   </TableRow>
@@ -326,7 +328,8 @@ const MyAds = () => {
                       </TableCell>
 
                       <TableCell>{ad.title}</TableCell>
-
+                      <TableCell>{ad.category?.name || "-"}</TableCell>
+                      <TableCell>{ad.sub_category }</TableCell>
                       <TableCell>{statusChip(ad.status)}</TableCell>
 
                       <TableCell>
