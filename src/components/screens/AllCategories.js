@@ -149,7 +149,7 @@ const AllCategories = () => {
       return;
     }
 
-    const isValidCategory = /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(
+    const isValidCategory = /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(
       categoryData.category,
     );
 
@@ -265,7 +265,7 @@ const AllCategories = () => {
   };
 
   const handleCategoryChange = (val) => {
-    const isValidCategory = /^[\p{L}]+(?:\s[\p{L}]+)*$/u.test(val);
+    const isValidCategory = /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(val);
     setCategoryData({ ...categoryData, category: val, isValidCategory });
   };
 
