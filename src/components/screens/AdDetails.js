@@ -383,10 +383,8 @@ const AdDetails = () => {
             <Bookmark className="saved-badge" sx={{ color: pink[500] }} />
           )}
           <h2>{ad.title}</h2>
-          <h3>
-            {ad.category?.name}
-            {ad.sub_category && <span style={{fontWeight:"normal",fontSize:"16px"}}> - {ad.sub_category}</span>}
-          </h3>
+          <h3 style={{ marginBottom: 0 }}>{ad.category?.name}</h3>
+          {ad.sub_category && <span>{ad.sub_category}</span>}
 
           <p className="price">
             Rs. {ad.price}{" "}

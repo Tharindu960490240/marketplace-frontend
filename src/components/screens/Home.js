@@ -375,15 +375,8 @@ const Home = () => {
                     </span>
                   </div>
 
-                  <h3>
-                    {item.category?.name}
-                    {item.sub_category && (
-                      <span style={{ fontWeight: "normal", fontSize: "16px" }}>
-                        {" "}
-                        - {item.sub_category}
-                      </span>
-                    )}
-                  </h3>
+                  <h3 style={{ marginBottom: 0 }}>{item.category?.name}</h3>
+                  {item.sub_category && <span>{item.sub_category}</span>}
 
                   <div className="price-row">
                     <span className="price">Rs. {item.price}</span>
