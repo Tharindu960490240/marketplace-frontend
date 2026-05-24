@@ -228,7 +228,15 @@ const TopHeader = ({ onSignOut, isSignedIn }) => {
       <header className="header">
         {/* LEFT LOGO */}
         <div className="header-left" onClick={() => goTo("/")}>
-          <img src="/assets/navbarlogo.png" alt="logo" className="logo-img" />
+          <img
+            src={
+              darkMode
+                ? "/assets/navbar_logo_d.png"
+                : "/assets/navbar_logo.png"
+            }
+            alt="logo"
+            className="logo-img"
+          />
         </div>
 
         {/* CENTER NAV */}

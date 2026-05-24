@@ -299,10 +299,7 @@
   .header {
     padding: 0 16px;
   }
-}
 
-/* ================= SMALL MOBILE ================= */
-@media (max-width: 800px) {
   .mobile-menu-icon {
     display: flex;
     align-items: center;

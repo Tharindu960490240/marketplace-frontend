@@ -15,7 +15,7 @@
   background-color: var(--card-color);
   color: var(--text-color);
 
-   border-radius: 15px;
+  border-radius: 15px;
   box-shadow: 0 4px 12px var(--border-color);
 
   padding: 20px;
@@ -33,6 +33,10 @@
   background: url("/public/assets/logo.png") no-repeat center;
   background-size: contain;
   height: 300px;
+}
+
+[data-theme="dark"] .signin-logo {
+  background-image: url("/public/assets/logoD.png");
 }
 
 /* ===============================
