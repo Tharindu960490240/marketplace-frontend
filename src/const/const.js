@@ -2,15 +2,15 @@
 
 // export const API_BASE_URL = "https://marketplace-backend-chec.onrender.com/api";
 
-export const API_BASE_URL = "http://52.221.196.150/api";
+// export const API_BASE_URL = "http://18.188.218.74/api";
 
-// export const API_BASE_URL = "/api";
+export const API_BASE_URL = "/api";
 
 export const PROFILE_PLACEHOLDER_IMAGE =
-  "https://sathwa-sewana-marketplace-uploads.s3.ap-southeast-1.amazonaws.com/default/user.png";
+  "https://agri-link-services-marketplace-uploads.s3.us-east-2.amazonaws.com/default/user.png";
 
 export const ADS_PLACEHOLDER_IMAGE =
-  "https://sathwa-sewana-marketplace-uploads.s3.ap-southeast-1.amazonaws.com/default/ad.png";
+  "https://agri-link-services-marketplace-uploads.s3.us-east-2.amazonaws.com/default/ad.png";
 
 export const FRONTEND_BASE_URL = "http://localhost:4200";
 
