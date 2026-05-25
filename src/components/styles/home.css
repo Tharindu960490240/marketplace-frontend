@@ -156,15 +156,15 @@
   position: absolute;
   top: 12px;
   left: 12px;
-
-  /* background: linear-gradient(135deg, #4caf50, #2e7d32); */
+  background: linear-gradient(135deg, #4caf50, #1b5e20);
   color: white;
-
   font-size: 10px;
   font-weight: 600;
-
-  padding: 5px 10px;
   border-radius: 20px;
+}
+
+.marketplace .badge span {
+  color: rgba(255, 255, 255, 0.8) !important;
 }
 
 /* ================= INFO ================= */

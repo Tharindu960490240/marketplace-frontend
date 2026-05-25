@@ -393,10 +393,9 @@ const AdDetails = () => {
             </span>
           </p>
 
-          <div className="meta">
-            <span>{ad.city}</span>
-            <span>{ad.district}</span>
-          </div>
+          <span className="location-tag">
+            {ad.city}, {ad.district}
+          </span>
 
           <div className="rating-box">
             <Box sx={{ display: "flex", alignItems: "center" }}>
