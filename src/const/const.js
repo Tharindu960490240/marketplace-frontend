@@ -6,13 +6,14 @@
 
 export const API_BASE_URL = "/api";
 
+export const FRONTEND_BASE_URL =
+  "http://ec2-18-188-218-74.us-east-2.compute.amazonaws.com/";
+
 export const PROFILE_PLACEHOLDER_IMAGE =
   "https://agri-link-services-marketplace-uploads.s3.us-east-2.amazonaws.com/default/user.png";
 
 export const ADS_PLACEHOLDER_IMAGE =
   "https://agri-link-services-marketplace-uploads.s3.us-east-2.amazonaws.com/default/ad.png";
-
-export const FRONTEND_BASE_URL = "http://localhost:4200";
 
 export const API_ENDPOINTS = {
   AUTH: {

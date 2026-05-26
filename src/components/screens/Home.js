@@ -449,7 +449,7 @@ const Home = () => {
                     )}
 
                     <ShareButton
-                      url={`${window.location.origin}/ad/${item.id}`}
+                      url={AppConst.FRONTEND_BASE_URL + "ad/" + item.id}
                       title={item.title}
                     />
                   </div>

@@ -523,7 +523,7 @@ const AllAds = () => {
                         )}
                         {ad.status === "active" && (
                           <ShareButton
-                            url={`${window.location.origin}/ad/${ad.id}`}
+                            url={AppConst.FRONTEND_BASE_URL + "ad/" + ad.id}
                             title={ad.title}
                           />
                         )}
