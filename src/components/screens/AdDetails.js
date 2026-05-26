@@ -47,6 +47,8 @@ import { useTranslation } from "react-i18next";
 
 import * as AppConst from "../../const/const";
 
+import ShareButton from "./ShareButton";
+
 const MAP_CONTAINER_STYLE = {
   width: "100%",
   height: "250px",
@@ -360,6 +362,24 @@ const AdDetails = () => {
   // Safe condition check guarding against empty states without freezing UI layout
   if (loading && !ad) return <LoadingSpinner open={loading} />;
 
+  if (ad && user?.role !== "admin" && ad?.status !== "active") {
+    const statusErrorMap = {
+      pending: t("ad_details_page.status_error_pending"),
+      sold: t("ad_details_page.status_error_sold"),
+      rejected: t("ad_details_page.status_error_rejected"),
+      deleted: t("ad_details_page.status_error_deleted"),
+    };
+
+    return (
+      <div className="ad-details-page error-state">
+        <p>
+          {statusErrorMap[ad.status] || t("ad_details_page.failed_load_ad")}
+        </p>
+        <CustomSnackbar {...snackbar} onClose={handleClose} />
+      </div>
+    );
+  }
+
   if (errorOccurred && !ad) {
     return (
       <div className="ad-details-page error-state">
@@ -411,12 +431,12 @@ const AdDetails = () => {
           <h3 style={{ marginBottom: 0 }}>{ad?.category?.name}</h3>
           {ad?.sub_category && <span>{ad.sub_category}</span>}
 
-          <p className="price">
+          <div className="price">
             Rs. {ad?.price}{" "}
             <span className="ad-pre">
               {statusChip(ad?.negotiable ? "Negotiable" : "Fixed")}
             </span>
-          </p>
+          </div>
 
           <span className="location-tag">
             {ad?.city}, {ad?.district}
@@ -438,8 +458,8 @@ const AdDetails = () => {
             </Box>
           </div>
 
-          {user?.role !== "admin" && user?.id !== ad?.user_id && (
-            <div className="button-group">
+          <div className="button-group">
+            {user?.role !== "admin" && user?.id !== ad?.user_id && (
               <Tooltip
                 title={
                   isSaved
@@ -464,8 +484,12 @@ const AdDetails = () => {
                   )}
                 </button>
               </Tooltip>
-            </div>
-          )}
+            )}
+            <ShareButton
+              url={`${window.location.origin}/ad/${ad.id}`}
+              title={ad.title}
+            />
+          </div>
 
           <div className="seller-card">
             <h4>{t("ad_details_page.seller_information")}</h4>

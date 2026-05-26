@@ -357,6 +357,11 @@ body.si {
   flex-direction: row;
 }
 
+.button-share {
+  width: 34px !important;
+  height: 34px !important;
+}
+
 /* ===============================
    Card
 =============================== */
@@ -409,7 +414,6 @@ body.si {
   border: 1px solid var(--border-color) !important;
   box-shadow: 0 4px 15px var(--border-color) !important;
 }
-
 
 /* ===============================
    Responsive

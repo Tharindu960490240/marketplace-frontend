@@ -280,7 +280,11 @@
         "no_reviews": "No reviews for this seller yet.",
         "delete_review": "Delete Review",
         "stars": "Stars",
-        "star": "Star"
+        "star": "Star",
+        "status_error_pending": "This advertisement is currently pending activation.",
+        "status_error_sold": "This item has already been sold.",
+        "status_error_rejected": "This advertisement has been rejected.",
+        "status_error_deleted": "This advertisement has been deleted."
     },
     "admin_dashboard": {
         "session_expired": "Your session has ended. Please sign in again.",
@@ -514,5 +518,11 @@
         "admin_create_server_error": "Something went wrong on our side. Please try again later.",
         "save": "Save",
         "cancel": "Cancel"
+    },
+    "share_component": {
+        "share_tooltip": "Share Link",
+        "copied": "Link successfully copied to clipboard!",
+        "failed_copy": "Failed to copy link automatically.",
+        "error": "An error occurred while attempting to share."
     }
 }

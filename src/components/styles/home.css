@@ -273,6 +273,13 @@
   transform: translateY(-1px);
 }
 
+.marketplace .button-share {
+  margin-top: 10px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  height: 40px !important;
+}
+
 /* icon color inside active button */
 .wishlist-btn.active svg {
   color: #2196f3;

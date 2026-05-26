@@ -36,6 +36,8 @@ import CustomSnackbar from "./CustomSnackbar";
 
 import { useTranslation } from "react-i18next";
 
+import ShareButton from "./ShareButton";
+
 const Home = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -445,6 +447,11 @@ const Home = () => {
                         </button>
                       </Tooltip>
                     )}
+
+                    <ShareButton
+                      url={`${window.location.origin}/ad/${item.id}`}
+                      title={item.title}
+                    />
                   </div>
                 </div>
               </div>

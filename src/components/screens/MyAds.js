@@ -43,6 +43,8 @@ import * as AppConst from "../../const/const";
 
 import { useTranslation } from "react-i18next";
 
+import ShareButton from "./ShareButton";
+
 // ================= USER STATUS TABS =================
 const statusTabs = ["pending", "active", "sold", "rejected", "deleted"];
 
@@ -329,7 +331,7 @@ const MyAds = () => {
 
                       <TableCell>{ad.title}</TableCell>
                       <TableCell>{ad.category?.name || "-"}</TableCell>
-                      <TableCell>{ad.sub_category }</TableCell>
+                      <TableCell>{ad.sub_category}</TableCell>
                       <TableCell>{statusChip(ad.status)}</TableCell>
 
                       <TableCell>
@@ -379,6 +381,13 @@ const MyAds = () => {
                               <Delete color="error" />
                             </IconButton>
                           </Tooltip>
+                        )}
+
+                        {ad.status === "active" && (
+                          <ShareButton
+                            url={`${window.location.origin}/ad/${ad.id}`}
+                            title={ad.title}
+                          />
                         )}
                       </TableCell>
                     </TableRow>

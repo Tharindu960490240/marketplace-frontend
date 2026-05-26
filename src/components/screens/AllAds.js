@@ -45,6 +45,7 @@ import "../styles/allAds.css";
 import * as AppConst from "../../const/const";
 
 import { useTranslation } from "react-i18next";
+import ShareButton from "./ShareButton";
 
 // ================= UPDATED ONLY: ADD REJECT TAB =================
 const statusTabs = ["pending", "active", "sold", "rejected", "deleted"];
@@ -494,7 +495,6 @@ const AllAds = () => {
                           </Tooltip>
                         )}
 
-                        {/* ================= NEW: REJECT ================= */}
                         {(ad.status === "pending" ||
                           ad.status === "active") && (
                           <Tooltip title={t("all_ads_page.tooltip_reject")}>
@@ -520,6 +520,12 @@ const AllAds = () => {
                               <Delete color="error" />
                             </IconButton>
                           </Tooltip>
+                        )}
+                        {ad.status === "active" && (
+                          <ShareButton
+                            url={`${window.location.origin}/ad/${ad.id}`}
+                            title={ad.title}
+                          />
                         )}
                       </TableCell>
                     </TableRow>
