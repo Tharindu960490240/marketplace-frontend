@@ -1,7 +1,13 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { useParams } from "react-router-dom";
 import { pink } from "@mui/material/colors";
-
+import { GoogleMap, MarkerF, useJsApiLoader } from "@react-google-maps/api";
 import {
   Rating,
   Box,
@@ -29,14 +35,23 @@ import { createReview, deleteReview } from "../../services/reviewService";
 import { get_token, getMyData } from "../../services/authService";
 import { getAdById } from "../../services/adsService";
 import { saveAd, removeSavedAd } from "../../services/savedAdService";
-import { ADS_PLACEHOLDER_IMAGE } from "../../const/const";
+import {
+  ADS_PLACEHOLDER_IMAGE,
+  PROFILE_PLACEHOLDER_IMAGE,
+  RATING_LABLES,
+} from "../../const/const";
 
 import LoadingSpinner from "./LoadingSpinner";
 import CustomSnackbar from "./CustomSnackbar";
+import { useTranslation } from "react-i18next";
 
 import * as AppConst from "../../const/const";
 
-import { useTranslation } from "react-i18next";
+const MAP_CONTAINER_STYLE = {
+  width: "100%",
+  height: "250px",
+  borderRadius: "8px",
+};
 
 const AdDetails = () => {
   const { t } = useTranslation();
@@ -44,6 +59,7 @@ const AdDetails = () => {
 
   const [ad, setAd] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [errorOccurred, setErrorOccurred] = useState(false);
 
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(-1);
@@ -55,24 +71,31 @@ const AdDetails = () => {
 
   const [isSaved, setIsSaved] = useState(false);
   const [user, setUser] = useState(null);
-
   const [showReviews, setShowReviews] = useState(false);
-
-  const getLabelText = (value) => {
-    return `${value} ${
-      value !== 1 ? t("ad_details_page.stars") : t("ad_details_page.star")
-    }, ${AppConst.RATING_LABLES[value]}`;
-  };
-
-  const handleClose = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  };
 
   const [snackbar, setSnackbar] = useState({
     open: false,
     severity: "success",
     message: "",
   });
+
+  const timerRef = useRef(null);
+
+  const { isLoaded } = useJsApiLoader(AppConst.googleMapsConfig);
+
+  const handleClose = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  const adCoordinates = useMemo(() => {
+    if (ad?.latitude && ad?.longitude) {
+      return {
+        lat: parseFloat(ad.latitude),
+        lng: parseFloat(ad.longitude),
+      };
+    }
+    return null;
+  }, [ad]);
 
   const fetchAd = useCallback(async () => {
     try {
@@ -81,14 +104,13 @@ const AdDetails = () => {
       setComment("");
       setClickSubmit(false);
       setLoading(true);
+      setErrorOccurred(false);
       setCurrentIndex(0);
 
       const token = await get_token();
       const myData = await getMyData();
 
-      if (myData) {
-        setUser(myData);
-      }
+      if (myData) setUser(myData);
 
       const res = await getAdById(id, token);
 
@@ -96,6 +118,7 @@ const AdDetails = () => {
         setAd(res.data);
         setIsSaved(res.data.is_saved);
       } else {
+        setErrorOccurred(true);
         setSnackbar({
           open: true,
           message: t("ad_details_page.failed_load_ad"),
@@ -103,6 +126,7 @@ const AdDetails = () => {
         });
       }
     } catch (error) {
+      setErrorOccurred(true);
       setSnackbar({
         open: true,
         message: t("ad_details_page.server_error_load_ad"),
@@ -125,54 +149,61 @@ const AdDetails = () => {
 
   const imageCount = images.length;
 
-  useEffect(() => {
+  // Clean implementation of auto slide interval controls
+  const startTimer = useCallback(() => {
     if (imageCount <= 1 || paused) return;
-
-    const interval = setInterval(() => {
+    stopTimer();
+    timerRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev === imageCount - 1 ? 0 : prev + 1));
     }, 4000);
-
-    return () => clearInterval(interval);
   }, [imageCount, paused]);
 
+  const stopTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+  };
+
+  useEffect(() => {
+    startTimer();
+    return () => stopTimer();
+  }, [startTimer]);
+
   const nextImage = () => {
+    stopTimer();
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    startTimer();
   };
 
   const prevImage = () => {
+    stopTimer();
     setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    startTimer();
   };
 
   const handleSubmitReview = async () => {
     const token = await get_token();
-
-    if (!token)
+    if (!token) {
       return setSnackbar({
         open: true,
         message: t("ad_details_page.session_expired"),
         severity: "error",
       });
+    }
 
     setClickSubmit(true);
 
     if (!rating || !comment.trim()) {
-      setSnackbar({
+      return setSnackbar({
         open: true,
         message: t("ad_details_page.rating_comment_required"),
         severity: "error",
       });
-
-      return;
     }
 
     try {
       setLoading(true);
-
-      const res = await createReview(token, {
-        ad_id: id,
-        rating,
-        comment,
-      });
+      const res = await createReview(token, { ad_id: id, rating, comment });
 
       if (res.success) {
         setSnackbar({
@@ -180,12 +211,10 @@ const AdDetails = () => {
           message: t("ad_details_page.review_added_success"),
           severity: "success",
         });
-
         setRating(0);
         setHover(-1);
         setComment("");
         setClickSubmit(false);
-
         fetchAd();
       } else {
         setSnackbar({
@@ -207,17 +236,16 @@ const AdDetails = () => {
 
   const handleDeleteReview = async (reviewId) => {
     const token = await get_token();
-
-    if (!token)
+    if (!token) {
       return setSnackbar({
         open: true,
         message: t("ad_details_page.session_expired"),
         severity: "error",
       });
+    }
 
     try {
       setLoading(true);
-
       const res = await deleteReview(token, reviewId);
 
       if (res.success) {
@@ -226,7 +254,6 @@ const AdDetails = () => {
           message: t("ad_details_page.review_deleted_success"),
           severity: "success",
         });
-
         fetchAd();
       } else {
         setSnackbar({
@@ -248,7 +275,6 @@ const AdDetails = () => {
 
   const handleToggleSave = async () => {
     const token = await get_token();
-
     if (!token) {
       return setSnackbar({
         open: true,
@@ -259,20 +285,13 @@ const AdDetails = () => {
 
     try {
       setLoading(true);
-
-      let res;
-
-      if (isSaved) {
-        res = await removeSavedAd(token, id);
-      } else {
-        res = await saveAd(token, id);
-      }
+      const res = isSaved
+        ? await removeSavedAd(token, id)
+        : await saveAd(token, id);
 
       if (res.success) {
         setIsSaved((prev) => !prev);
-
         window.dispatchEvent(new Event("savedChanged"));
-
         setSnackbar({
           open: true,
           message: isSaved
@@ -298,12 +317,14 @@ const AdDetails = () => {
     }
   };
 
-  const getRatingLabel = (rating) => {
-    if (!rating) return t("ad_details_page.no_rating");
+  const getLabelText = (value) => {
+    return `${value} ${value !== 1 ? t("ad_details_page.stars") : t("ad_details_page.star")}, ${RATING_LABLES[value]}`;
+  };
 
-    const rounded = Math.round(rating * 2) / 2;
-
-    return AppConst.RATING_LABLES[rounded] || t("ad_details_page.no_rating");
+  const getRatingLabel = (ratingValue) => {
+    if (!ratingValue) return t("ad_details_page.no_rating");
+    const rounded = Math.round(ratingValue * 2) / 2;
+    return RATING_LABLES[rounded] || t("ad_details_page.no_rating");
   };
 
   const statusChip = (status) => {
@@ -336,13 +357,22 @@ const AdDetails = () => {
     );
   };
 
-  if (!ad) return <LoadingSpinner open={loading} />;
+  // Safe condition check guarding against empty states without freezing UI layout
+  if (loading && !ad) return <LoadingSpinner open={loading} />;
+
+  if (errorOccurred && !ad) {
+    return (
+      <div className="ad-details-page error-state">
+        <p>{t("ad_details_page.failed_load_ad")}</p>
+        <CustomSnackbar {...snackbar} onClose={handleClose} />
+      </div>
+    );
+  }
 
   return (
     <div className="ad-details-page">
-      {/* ================= MAIN ================= */}
       <div className="ad-container">
-        {/* LEFT */}
+        {/* LEFT PANEL */}
         <div className="ad-left">
           <span className="badge">{statusChip(ad?.status)}</span>
           <div
@@ -356,51 +386,46 @@ const AdDetails = () => {
                   key={index}
                   src={img}
                   alt={`ad-${index}`}
-                  className={`main-slider-img ${
-                    index === currentIndex ? "active" : "inactive"
-                  }`}
+                  className={`main-slider-img ${index === currentIndex ? "active" : "inactive"}`}
                 />
               ))}
             </div>
-
             <button className="slider-btn left" onClick={prevImage}>
               &#10094;
             </button>
-
             <button className="slider-btn right" onClick={nextImage}>
               &#10095;
             </button>
-
             <div className="image-counter">
               {currentIndex + 1} / {images.length}
             </div>
           </div>
         </div>
 
-        {/* RIGHT */}
+        {/* RIGHT PANEL */}
         <div className="ad-right">
           {isSaved && (
             <Bookmark className="saved-badge" sx={{ color: pink[500] }} />
           )}
-          <h2>{ad.title}</h2>
-          <h3 style={{ marginBottom: 0 }}>{ad.category?.name}</h3>
-          {ad.sub_category && <span>{ad.sub_category}</span>}
+          <h2>{ad?.title}</h2>
+          <h3 style={{ marginBottom: 0 }}>{ad?.category?.name}</h3>
+          {ad?.sub_category && <span>{ad.sub_category}</span>}
 
           <p className="price">
-            Rs. {ad.price}{" "}
+            Rs. {ad?.price}{" "}
             <span className="ad-pre">
-              {statusChip(ad.negotiable ? "Negotiable" : "Fixed")}
+              {statusChip(ad?.negotiable ? "Negotiable" : "Fixed")}
             </span>
           </p>
 
           <span className="location-tag">
-            {ad.city}, {ad.district}
+            {ad?.city}, {ad?.district}
           </span>
 
           <div className="rating-box">
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Rating
-                value={ad.avg_rating}
+                value={ad?.avg_rating || 0}
                 precision={0.5}
                 readOnly
                 emptyIcon={
@@ -408,12 +433,10 @@ const AdDetails = () => {
                 }
               />
               <span style={{ marginLeft: 8 }}>
-                ({ad.avg_rating || 0} - {getRatingLabel(ad.avg_rating)})
+                ({ad?.avg_rating || 0} - {getRatingLabel(ad?.avg_rating)})
               </span>
             </Box>
           </div>
-
-          {/* SAVE */}
 
           {user?.role !== "admin" && user?.id !== ad?.user_id && (
             <div className="button-group">
@@ -444,26 +467,35 @@ const AdDetails = () => {
             </div>
           )}
 
-          {/* SELLER */}
           <div className="seller-card">
             <h4>{t("ad_details_page.seller_information")}</h4>
-            <p>{ad.user?.name}</p>
-            <p>{ad.user?.phone}</p>
+            <p>{ad?.user?.name}</p>
+            <p>{ad?.user?.phone}</p>
           </div>
         </div>
       </div>
 
-      {/* ================= DESCRIPTION ================= */}
+      {adCoordinates && isLoaded && (
+        <div className="card map-card">
+          <GoogleMap
+            mapContainerStyle={MAP_CONTAINER_STYLE}
+            center={adCoordinates}
+            zoom={14}
+            options={{ disableDefaultUI: true, zoomControl: true }}
+          >
+            <MarkerF position={adCoordinates} />
+          </GoogleMap>
+        </div>
+      )}
+
       <div className="description">
         <h3>{t("ad_details_page.description")}</h3>
-        <p>{ad.description}</p>
+        <p>{ad?.description}</p>
       </div>
 
-      {/* ================= ADD REVIEW ================= */}
       {user?.role !== "admin" && user?.id !== ad?.user_id && (
         <div className="review-box">
           <h3>{t("ad_details_page.add_review")}</h3>
-
           <Box
             sx={{ mb: 2, width: 250, display: "flex", alignItems: "center" }}
           >
@@ -476,13 +508,11 @@ const AdDetails = () => {
               onChangeActive={(e, newHover) => setHover(newHover)}
               emptyIcon={<Star style={{ opacity: 0.55 }} fontSize="inherit" />}
             />
-
             <Box sx={{ ml: 2, fontSize: "inherit" }}>
-              {AppConst.RATING_LABLES[(hover !== -1 ? hover : rating) || 0]}
+              {RATING_LABLES[(hover !== -1 ? hover : rating) || 0]}
             </Box>
           </Box>
           <div className="form-row full">
-            {/* DESCRIPTION */}
             <TextField
               className="custom-textfield"
               label={t("ad_details_page.review_note")}
@@ -506,14 +536,11 @@ const AdDetails = () => {
               }}
             />
           </div>
-
           <button className="button-success" onClick={handleSubmitReview}>
             {t("ad_details_page.submit_review")}
           </button>
         </div>
       )}
-
-      {/* ================= REVIEWS ================= */}
 
       <div className="reviews-section">
         <div className="reviews-header">
@@ -539,21 +566,18 @@ const AdDetails = () => {
         </div>
 
         <Collapse in={showReviews} timeout="auto" unmountOnExit>
-          {ad.reviews?.length === 0 ? (
+          {ad?.reviews?.length === 0 ? (
             <p className="no-reviews">{t("ad_details_page.no_reviews")}</p>
           ) : (
-            ad.reviews?.map((rev) => (
+            ad?.reviews?.map((rev) => (
               <div key={rev.id} className="review-card">
                 <div className="review-header">
                   <div className="review-user">
                     <Avatar
                       src={
-                        rev.user?.url
-                          ? rev.user.url
-                          : AppConst.PROFILE_PLACEHOLDER_IMAGE
+                        rev.user?.url ? rev.user.url : PROFILE_PLACEHOLDER_IMAGE
                       }
                     />
-
                     <div>
                       <strong>{rev.user?.name}</strong>
                       <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -574,7 +598,6 @@ const AdDetails = () => {
                       </Box>
                     </div>
                   </div>
-
                   {(user?.role === "admin" || rev.user?.id === user?.id) && (
                     <Tooltip title={t("ad_details_page.delete_review")}>
                       <IconButton onClick={() => handleDeleteReview(rev.id)}>
@@ -583,9 +606,7 @@ const AdDetails = () => {
                     </Tooltip>
                   )}
                 </div>
-
                 <p className="review-comment">{rev.comment}</p>
-
                 <div className="review-date">
                   {new Date(rev.created_at).toLocaleDateString()}
                 </div>

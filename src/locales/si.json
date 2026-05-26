@@ -342,7 +342,10 @@
         "fill_all_fields": "කරුණාකර සියලුම තොරතුරු නිවැරදිව පුරවන්න.",
         "ad_success": "දැන්වීම සාර්ථකව පළ කරන ලදී!",
         "ad_error": "දැන්වීම පළ කිරීමට නොහැකි විය.",
-        "something_went_wrong": "යම් දෝෂයක් ඇති වී තිබේ."
+        "something_went_wrong": "යම් දෝෂයක් ඇති වී තිබේ.",
+        "search_location": "සිතියමෙන් ස්ථානය සොයන්න",
+        "search_location_placeholder": "ලිපිනය නිවැරදිව සලකුණු කිරීමට ටයිප් කරන්න...",
+        "search_location_helper": "උදා: 54 ගාලු පාර, කොළඹ 03"
     },
     "all_categories_page": {
         "title": "කාණ්ඩ කළමනාකරණය",

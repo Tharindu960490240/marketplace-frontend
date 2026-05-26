@@ -308,6 +308,11 @@
   font-size: 30px;
 }
 
+.map-card {
+  margin-top: 15px;
+  padding: 0 !important;
+}
+
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1024px) {
   .ad-container {

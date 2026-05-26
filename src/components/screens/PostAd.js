@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
+  GoogleMap,
+  useJsApiLoader,
+  MarkerF,
+  Autocomplete as MapAutocomplete,
+} from "@react-google-maps/api";
+import { useRef } from "react";
+
+import {
   TextField,
   Autocomplete,
   InputAdornment,
@@ -50,8 +58,15 @@ const ALLOWED_TYPES = [
   "image/heif",
 ];
 
+const DEFAULT_CENTER = { lat: 6.9271, lng: 79.8612 };
+
 const PostAd = () => {
   const { t } = useTranslation();
+
+  const autocompleteRef = useRef(null);
+
+  // Load Google Maps Script
+  const { isLoaded } = useJsApiLoader(AppConst.googleMapsConfig);
 
   const [categoryList, setCategoryList] = useState([]);
 
@@ -66,6 +81,7 @@ const PostAd = () => {
     city: "",
     description: "",
     negotiable: false,
+    coordinates: DEFAULT_CENTER,
   });
 
   const [validation, setValidation] = useState({
@@ -191,6 +207,41 @@ const PostAd = () => {
     };
   }, [images]);
 
+  // 1. Handle map click to drop a pin
+  const handleMapClick = (e) => {
+    setAdData((prev) => ({
+      ...prev,
+      coordinates: { lat: e.latLng.lat(), lng: e.latLng.lng() },
+    }));
+  };
+
+  const onPlaceChanged = () => {
+    if (autocompleteRef.current !== null) {
+      const place = autocompleteRef.current.getPlace();
+      if (!place || !place.geometry || !place.geometry.location) {
+        return;
+      }
+
+      // let cityName = "";
+      // if (place.address_components) {
+      //   const locality = place.address_components.find((c) =>
+      //     c.types.includes("locality"),
+      //   );
+      //   cityName = locality ? locality.long_name : place.name;
+      // }
+
+      setAdData((prev) => ({
+        ...prev,
+        coordinates: {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+        },
+        // city: cityName || prev.city,
+      }));
+      // if (cityName) validateCity(cityName);
+    }
+  };
+
   /* ================= SUBMIT ================= */
   const handleSubmit = async () => {
     setSubmitted(true);
@@ -236,6 +287,8 @@ const PostAd = () => {
         negotiable: adData.negotiable,
         district: adData.district,
         city: adData.city,
+        latitude: adData.coordinates.lat, // 👈 Add this
+        longitude: adData.coordinates.lng,
       };
 
       const res = await createAd(token, payload);
@@ -263,6 +316,7 @@ const PostAd = () => {
           city: "",
           description: "",
           negotiable: false,
+          coordinates: DEFAULT_CENTER,
         });
 
         setValidation({
@@ -273,6 +327,7 @@ const PostAd = () => {
           description: true,
         });
         setImages([]);
+        clearLocationAutocomplete();
       } else {
         await deleteAd(token, adId);
         showMessage(t("post_ad.something_went_wrong"), "warning");
@@ -299,6 +354,23 @@ const PostAd = () => {
       return file; // fallback to original
     }
   };
+
+  const clearLocationAutocomplete = () => {
+    // 1. Clear the Google Maps Autocomplete internal state
+    if (autocompleteRef.current) {
+      autocompleteRef.current.set("place", null);
+    }
+
+    // 2. Clear the physical text from the input DOM element
+    const inputElement = document.getElementById("search-location-input");
+    if (inputElement) {
+      inputElement.value = "";
+    }
+  };
+
+  useEffect(() => {
+    clearLocationAutocomplete();
+  }, [adData.district]);
 
   /* ================= UI ================= */
   return (
@@ -427,12 +499,16 @@ const PostAd = () => {
             size="small"
             options={districts}
             value={districts.find((d) => d.value === adData.district) || null}
-            onChange={(e, v) =>
+            onChange={(e, v) => {
               setAdData({
                 ...adData,
                 district: v ? v.value : null,
-              })
-            }
+                coordinates:
+                  v && v.lat && v.lng
+                    ? { lat: v.lat, lng: v.lng }
+                    : DEFAULT_CENTER,
+              });
+            }}
             getOptionLabel={(o) => `${o?.label} - ${o?.si}`}
             renderInput={(params) => (
               <TextField
@@ -501,6 +577,54 @@ const PostAd = () => {
             label={t("post_ad.negotiable")}
           />
         </div>
+
+        {isLoaded && (
+          <div className="form-row full" style={{ marginBottom: "15px" }}>
+            <MapAutocomplete
+              onLoad={(autocomplete) =>
+                (autocompleteRef.current = autocomplete)
+              }
+              onPlaceChanged={onPlaceChanged}
+            >
+              <TextField
+                id="search-location-input"
+                fullWidth
+                size="small"
+                className="custom-textfield"
+                label={t("post_ad.search_location")}
+                placeholder=""
+                helperText={t("post_ad.search_location_helper")}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LocationOn />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </MapAutocomplete>
+          </div>
+        )}
+        {isLoaded && (
+          <div
+            className="form-row full"
+            style={{ height: "300px", width: "100%", marginBottom: "20px" }}
+          >
+            <GoogleMap
+              mapContainerStyle={{
+                height: "100%",
+                width: "100%",
+                borderRadius: "4px",
+              }}
+              center={adData.coordinates}
+              zoom={13}
+              onClick={handleMapClick}
+            >
+              <MarkerF position={adData.coordinates} />
+            </GoogleMap>
+          </div>
+        )}
+
         <div className="form-row full">
           {/* DESCRIPTION */}
           <TextField

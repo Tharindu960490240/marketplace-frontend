@@ -342,7 +342,10 @@
         "fill_all_fields": "Please fill in all fields with valid information.",
         "ad_success": "Your ad was published successfully!",
         "ad_error": "Could not publish your ad. Please try again.",
-        "something_went_wrong": "Something went wrong. Please try again later."
+        "something_went_wrong": "Something went wrong. Please try again later.",
+        "search_location": "Search Map Location",
+        "search_location_placeholder": "Type to pinpoint address...",
+        "search_location_helper": "e.g., 54 Galle Road, Colombo 03"
     },
     "all_categories_page": {
         "title": "Category Management",
