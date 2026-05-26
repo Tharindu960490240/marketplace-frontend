@@ -485,10 +485,12 @@ const AdDetails = () => {
                 </button>
               </Tooltip>
             )}
-            <ShareButton
-              url={AppConst.FRONTEND_BASE_URL + "ad/" + ad.id}
-              title={ad.title}
-            />
+            {ad && (
+              <ShareButton
+                url={AppConst.FRONTEND_BASE_URL + "ad/" + ad.id}
+                title={ad.title}
+              />
+            )}
           </div>
 
           <div className="seller-card">

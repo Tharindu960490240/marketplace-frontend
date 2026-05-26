@@ -16,6 +16,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import CustomSnackbar from "./CustomSnackbar";
 
 import { useTranslation } from "react-i18next";
+import ShareButton from "./ShareButton";
 
 const SavedAds = () => {
   const { t } = useTranslation();
@@ -229,7 +230,6 @@ const SavedAds = () => {
                       {t("saved_ads_page.view_details")}
                     </button>
 
-                    {/* 🔥 ALWAYS UNSAVE */}
                     <Tooltip title={t("saved_ads_page.remove_saved")}>
                       <button
                         className="wishlist-btn active"
@@ -239,6 +239,11 @@ const SavedAds = () => {
                         {t("saved_ads_page.saved")}
                       </button>
                     </Tooltip>
+
+                    <ShareButton
+                      url={AppConst.FRONTEND_BASE_URL + "ad/" + item.id}
+                      title={item.title}
+                    />
                   </div>
                 </div>
               </div>

@@ -447,7 +447,6 @@ const Home = () => {
                         </button>
                       </Tooltip>
                     )}
-
                     <ShareButton
                       url={AppConst.FRONTEND_BASE_URL + "ad/" + item.id}
                       title={item.title}

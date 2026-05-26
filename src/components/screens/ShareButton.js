@@ -18,37 +18,73 @@ const ShareButton = ({ url, title, size = "small", color = "primary" }) => {
     const shareUrl = url || window.location.href;
     const shareTitle = title || document.title;
 
+    // 1. Try Native Mobile/Browser Sharing (Requires HTTPS on Hosted Apps)
     if (navigator.share) {
       try {
         await navigator.share({
           title: shareTitle,
           url: shareUrl,
         });
+        return; // Success, exit function
       } catch (error) {
         if (error.name !== "AbortError") {
-          setSnackbar({
+          return setSnackbar({
             open: true,
             severity: "error",
             message: t("share_component.error"),
           });
         }
+        return; // User canceled the share tray, exit cleanly
       }
-    } else {
-      // Fallback copying mechanism to Clipboard
+    }
+
+    // 2. Try Modern Clipboard API Fallback (Requires HTTPS on Hosted Apps)
+    if (navigator.clipboard && window.isSecureContext) {
       try {
         await navigator.clipboard.writeText(shareUrl);
-        setSnackbar({
+        return setSnackbar({
           open: true,
           severity: "success",
           message: t("share_component.copied"),
         });
       } catch (err) {
+        // Fail silently here and fall through to the legacy textarea method below
+      }
+    }
+
+    // 3. Robust Legacy Textarea Fallback (Works on HTTP, Hosted Sites & Old Browsers)
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = shareUrl;
+
+      // Ensure element stays hidden from view and doesn't scroll mobile viewports
+      textArea.style.position = "fixed";
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.opacity = "0";
+
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textArea);
+
+      if (successful) {
         setSnackbar({
           open: true,
-          severity: "error",
-          message: t("share_component.failed_copy"),
+          severity: "success",
+          message: t("share_component.copied"),
         });
+      } else {
+        throw new Error("Copy command execution failed.");
       }
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        severity: "error",
+        message: t("share_component.failed_copy"),
+      });
     }
   };
 
