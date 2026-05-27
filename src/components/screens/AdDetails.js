@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { useParams } from "react-router-dom";
 import { pink } from "@mui/material/colors";
-import { GoogleMap, MarkerF, useJsApiLoader } from "@react-google-maps/api";
+// import { GoogleMap, MarkerF, useJsApiLoader } from "@react-google-maps/api";
 import {
   Rating,
   Box,
@@ -49,11 +49,11 @@ import * as AppConst from "../../const/const";
 
 import ShareButton from "./ShareButton";
 
-const MAP_CONTAINER_STYLE = {
-  width: "100%",
-  height: "250px",
-  borderRadius: "8px",
-};
+// const MAP_CONTAINER_STYLE = {
+//   width: "100%",
+//   height: "250px",
+//   borderRadius: "8px",
+// };
 
 const AdDetails = () => {
   const { t } = useTranslation();
@@ -83,21 +83,21 @@ const AdDetails = () => {
 
   const timerRef = useRef(null);
 
-  const { isLoaded } = useJsApiLoader(AppConst.googleMapsConfig);
+  // const { isLoaded } = useJsApiLoader(AppConst.googleMapsConfig);
 
   const handleClose = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const adCoordinates = useMemo(() => {
-    if (ad?.latitude && ad?.longitude) {
-      return {
-        lat: parseFloat(ad.latitude),
-        lng: parseFloat(ad.longitude),
-      };
-    }
-    return null;
-  }, [ad]);
+  // const adCoordinates = useMemo(() => {
+  //   if (ad?.latitude && ad?.longitude) {
+  //     return {
+  //       lat: parseFloat(ad.latitude),
+  //       lng: parseFloat(ad.longitude),
+  //     };
+  //   }
+  //   return null;
+  // }, [ad]);
 
   const fetchAd = useCallback(async () => {
     try {
@@ -362,23 +362,23 @@ const AdDetails = () => {
   // Safe condition check guarding against empty states without freezing UI layout
   if (loading && !ad) return <LoadingSpinner open={loading} />;
 
-  if (ad && user?.role !== "admin" && ad?.status !== "active") {
-    const statusErrorMap = {
-      pending: t("ad_details_page.status_error_pending"),
-      sold: t("ad_details_page.status_error_sold"),
-      rejected: t("ad_details_page.status_error_rejected"),
-      deleted: t("ad_details_page.status_error_deleted"),
-    };
+  // if (ad && user?.role !== "admin" && ad?.status !== "active") {
+  //   const statusErrorMap = {
+  //     pending: t("ad_details_page.status_error_pending"),
+  //     sold: t("ad_details_page.status_error_sold"),
+  //     rejected: t("ad_details_page.status_error_rejected"),
+  //     deleted: t("ad_details_page.status_error_deleted"),
+  //   };
 
-    return (
-      <div className="ad-details-page error-state">
-        <p>
-          {statusErrorMap[ad.status] || t("ad_details_page.failed_load_ad")}
-        </p>
-        <CustomSnackbar {...snackbar} onClose={handleClose} />
-      </div>
-    );
-  }
+  //   return (
+  //     <div className="ad-details-page error-state">
+  //       <p>
+  //         {statusErrorMap[ad.status] || t("ad_details_page.failed_load_ad")}
+  //       </p>
+  //       <CustomSnackbar {...snackbar} onClose={handleClose} />
+  //     </div>
+  //   );
+  // }
 
   if (errorOccurred && !ad) {
     return (
@@ -501,7 +501,7 @@ const AdDetails = () => {
         </div>
       </div>
 
-      {adCoordinates && isLoaded && (
+      {/* {adCoordinates && isLoaded && (
         <div className="card map-card">
           <GoogleMap
             mapContainerStyle={MAP_CONTAINER_STYLE}
@@ -512,7 +512,7 @@ const AdDetails = () => {
             <MarkerF position={adCoordinates} />
           </GoogleMap>
         </div>
-      )}
+      )} */}
 
       <div className="description">
         <h3>{t("ad_details_page.description")}</h3>

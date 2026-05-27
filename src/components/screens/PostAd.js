@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  GoogleMap,
-  useJsApiLoader,
-  MarkerF,
-  Autocomplete as MapAutocomplete,
-} from "@react-google-maps/api";
-import { useRef } from "react";
+// import {
+//   GoogleMap,
+//   useJsApiLoader,
+//   MarkerF,
+//   Autocomplete as MapAutocomplete,
+// } from "@react-google-maps/api";
+// import { useRef } from "react";
 
 import {
   TextField,
@@ -58,15 +58,15 @@ const ALLOWED_TYPES = [
   "image/heif",
 ];
 
-const DEFAULT_CENTER = { lat: 6.9271, lng: 79.8612 };
+// const DEFAULT_CENTER = { lat: 6.9271, lng: 79.8612 };
 
 const PostAd = () => {
   const { t } = useTranslation();
 
-  const autocompleteRef = useRef(null);
+  // const autocompleteRef = useRef(null);
 
   // Load Google Maps Script
-  const { isLoaded } = useJsApiLoader(AppConst.googleMapsConfig);
+  // const { isLoaded } = useJsApiLoader(AppConst.googleMapsConfig);
 
   const [categoryList, setCategoryList] = useState([]);
 
@@ -81,7 +81,10 @@ const PostAd = () => {
     city: "",
     description: "",
     negotiable: false,
-    coordinates: DEFAULT_CENTER,
+    coordinates: {
+      latitude: null,
+      longitude: null,
+    },
   });
 
   const [validation, setValidation] = useState({
@@ -208,39 +211,39 @@ const PostAd = () => {
   }, [images]);
 
   // 1. Handle map click to drop a pin
-  const handleMapClick = (e) => {
-    setAdData((prev) => ({
-      ...prev,
-      coordinates: { lat: e.latLng.lat(), lng: e.latLng.lng() },
-    }));
-  };
+  // const handleMapClick = (e) => {
+  //   setAdData((prev) => ({
+  //     ...prev,
+  //     coordinates: { lat: e.latLng.lat(), lng: e.latLng.lng() },
+  //   }));
+  // };
 
-  const onPlaceChanged = () => {
-    if (autocompleteRef.current !== null) {
-      const place = autocompleteRef.current.getPlace();
-      if (!place || !place.geometry || !place.geometry.location) {
-        return;
-      }
+  // const onPlaceChanged = () => {
+  //   if (autocompleteRef.current !== null) {
+  //     const place = autocompleteRef.current.getPlace();
+  //     if (!place || !place.geometry || !place.geometry.location) {
+  //       return;
+  //     }
 
-      // let cityName = "";
-      // if (place.address_components) {
-      //   const locality = place.address_components.find((c) =>
-      //     c.types.includes("locality"),
-      //   );
-      //   cityName = locality ? locality.long_name : place.name;
-      // }
+  //     // let cityName = "";
+  //     // if (place.address_components) {
+  //     //   const locality = place.address_components.find((c) =>
+  //     //     c.types.includes("locality"),
+  //     //   );
+  //     //   cityName = locality ? locality.long_name : place.name;
+  //     // }
 
-      setAdData((prev) => ({
-        ...prev,
-        coordinates: {
-          lat: place.geometry.location.lat(),
-          lng: place.geometry.location.lng(),
-        },
-        // city: cityName || prev.city,
-      }));
-      // if (cityName) validateCity(cityName);
-    }
-  };
+  //     setAdData((prev) => ({
+  //       ...prev,
+  //       coordinates: {
+  //         lat: place.geometry.location.lat(),
+  //         lng: place.geometry.location.lng(),
+  //       },
+  //       // city: cityName || prev.city,
+  //     }));
+  //     // if (cityName) validateCity(cityName);
+  //   }
+  // };
 
   /* ================= SUBMIT ================= */
   const handleSubmit = async () => {
@@ -287,7 +290,7 @@ const PostAd = () => {
         negotiable: adData.negotiable,
         district: adData.district,
         city: adData.city,
-        latitude: adData.coordinates.lat, // 👈 Add this
+        latitude: adData.coordinates.lat,
         longitude: adData.coordinates.lng,
       };
 
@@ -316,7 +319,10 @@ const PostAd = () => {
           city: "",
           description: "",
           negotiable: false,
-          coordinates: DEFAULT_CENTER,
+          coordinates: {
+            latitude: null,
+            longitude: null,
+          },
         });
 
         setValidation({
@@ -327,7 +333,7 @@ const PostAd = () => {
           description: true,
         });
         setImages([]);
-        clearLocationAutocomplete();
+        // clearLocationAutocomplete();
       } else {
         await deleteAd(token, adId);
         showMessage(t("post_ad.something_went_wrong"), "warning");
@@ -355,22 +361,22 @@ const PostAd = () => {
     }
   };
 
-  const clearLocationAutocomplete = () => {
-    // 1. Clear the Google Maps Autocomplete internal state
-    if (autocompleteRef.current) {
-      autocompleteRef.current.set("place", null);
-    }
+  // const clearLocationAutocomplete = () => {
+  //   // 1. Clear the Google Maps Autocomplete internal state
+  //   if (autocompleteRef.current) {
+  //     autocompleteRef.current.set("place", null);
+  //   }
 
-    // 2. Clear the physical text from the input DOM element
-    const inputElement = document.getElementById("search-location-input");
-    if (inputElement) {
-      inputElement.value = "";
-    }
-  };
+  //   // 2. Clear the physical text from the input DOM element
+  //   const inputElement = document.getElementById("search-location-input");
+  //   if (inputElement) {
+  //     inputElement.value = "";
+  //   }
+  // };
 
-  useEffect(() => {
-    clearLocationAutocomplete();
-  }, [adData.district]);
+  // useEffect(() => {
+  //   clearLocationAutocomplete();
+  // }, [adData.district]);
 
   /* ================= UI ================= */
   return (
@@ -503,10 +509,10 @@ const PostAd = () => {
               setAdData({
                 ...adData,
                 district: v ? v.value : null,
-                coordinates:
-                  v && v.lat && v.lng
-                    ? { lat: v.lat, lng: v.lng }
-                    : DEFAULT_CENTER,
+                // coordinates:
+                //   v && v.lat && v.lng
+                //     ? { lat: v.lat, lng: v.lng }
+                //     : DEFAULT_CENTER,
               });
             }}
             getOptionLabel={(o) => `${o?.label} - ${o?.si}`}
@@ -578,7 +584,7 @@ const PostAd = () => {
           />
         </div>
 
-        {isLoaded && (
+        {/* {isLoaded && (
           <div className="form-row full" style={{ marginBottom: "15px" }}>
             <MapAutocomplete
               onLoad={(autocomplete) =>
@@ -623,7 +629,7 @@ const PostAd = () => {
               <MarkerF position={adData.coordinates} />
             </GoogleMap>
           </div>
-        )}
+        )} */}
 
         <div className="form-row full">
           {/* DESCRIPTION */}

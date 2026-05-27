@@ -2,9 +2,9 @@
 
 // export const API_BASE_URL = "https://marketplace-backend-chec.onrender.com/api";
 
-// export const API_BASE_URL = "http://18.188.218.74/api";
+export const API_BASE_URL = "http://18.188.218.74/api";
 
-export const API_BASE_URL = "/api";
+// export const API_BASE_URL = "/api";
 
 export const FRONTEND_BASE_URL =
   "http://ec2-18-188-218-74.us-east-2.compute.amazonaws.com/";
@@ -102,11 +102,11 @@ export const ROUTES = {
   RESET_PASSWORD: "/reset-password",
 };
 
-export const googleMapsConfig = {
-  id: "google-map-script",
-  googleMapsApiKey: "AIzaSyCeWXzrjTtcQPuoCfXSb35k0TPj9vJ4wiY",
-  libraries: ["places", "maps"],
-};
+// export const googleMapsConfig = {
+//   id: "google-map-script",
+//   googleMapsApiKey: "AIzaSyBVnhyhy6TFKpERbsN4d_GKJir9wQgrGeg",
+//   libraries: ["places", "maps"],
+// };
 
 export const DISTRICTS = [
   { value: "Ampara", label: "Ampara", si: "අම්පාර", lat: 7.3018, lng: 81.6747 },
