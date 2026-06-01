@@ -6,7 +6,7 @@
 
 // export const API_BASE_URL = "/api";
 
-export const API_BASE_URL = "https://api.agrilinkservices.com";
+export const API_BASE_URL = "https://api.agrilinkservices.com/api";
 
 export const FRONTEND_BASE_URL = "https://marketplace.agrilinkservices.com/";
 
