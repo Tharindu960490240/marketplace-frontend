@@ -2,12 +2,13 @@
 
 // export const API_BASE_URL = "https://marketplace-backend-chec.onrender.com/api";
 
-export const API_BASE_URL = "http://18.188.218.74/api";
+// export const API_BASE_URL = "http://18.188.218.74/api";
 
 // export const API_BASE_URL = "/api";
 
-export const FRONTEND_BASE_URL =
-  "http://ec2-18-188-218-74.us-east-2.compute.amazonaws.com/";
+export const API_BASE_URL = "https://api.agrilinkservices.com";
+
+export const FRONTEND_BASE_URL = "https://marketplace.agrilinkservices.com/";
 
 export const PROFILE_PLACEHOLDER_IMAGE =
   "https://agri-link-services-marketplace-uploads.s3.us-east-2.amazonaws.com/default/user.png";
