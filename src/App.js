@@ -30,6 +30,8 @@ import "./App.css";
 
 import LoadingSpinner from "./components/screens/LoadingSpinner";
 
+import { get_token, getProfile } from "./services/authService";
+
 // =======================
 // Theme default
 // =======================
@@ -56,7 +58,9 @@ const MainBodyWrapper = ({ children, isSignedIn }) => {
 
   return (
     <div
-      className={isSignedIn && !isAuthPage ? "mainBody signedIn" : "mainBody signedIn"}
+      className={
+        isSignedIn && !isAuthPage ? "mainBody signedIn" : "mainBody signedIn"
+      }
     >
       {children}
     </div>
@@ -69,57 +73,109 @@ const MainBodyWrapper = ({ children, isSignedIn }) => {
 const App = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [role, setRole] = useState(null);
+  const [token, setToken] = useState(null);
 
   // =======================
   // Session check
   // =======================
   useEffect(() => {
-    const token = localStorage.getItem("Token");
-    const timestamp = localStorage.getItem("sessionTimestamp");
-    const now = new Date().getTime();
+    const restoreSession = async () => {
+      const savedToken = localStorage.getItem("Token");
+      const timestamp = localStorage.getItem("sessionTimestamp");
+      const now = new Date().getTime();
 
-    if (token && timestamp) {
+      if (!savedToken || !timestamp) {
+        setIsLoading(false);
+        return;
+      }
+
       const diff = now - parseInt(timestamp, 10);
       const hours = diff / (1000 * 60 * 60);
 
       if (hours >= 24) {
         handleSignOut();
-      } else {
-        setIsSignedIn(true);
+        setIsLoading(false);
+        return;
       }
-    }
 
-    setIsLoading(false);
+      setIsSignedIn(true);
+      setToken(savedToken);
+
+      try {
+        const res = await getProfile(savedToken);
+
+        if (res.success) {
+          setRole(res.user.role);
+        } else {
+          handleSignOut();
+        }
+      } catch (err) {
+        console.error(err);
+        handleSignOut();
+        setIsLoading(false);
+      }
+
+      setIsLoading(false);
+    };
+
+    restoreSession();
   }, []);
 
   // =======================
   // Auth handlers
   // =======================
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     setIsSignedIn(true);
+    await fetchUserData();
+  };
+
+  const fetchUserData = async () => {
+    const saved_token = await get_token();
+    if (!saved_token) return;
+
+    try {
+      const res = await getProfile(saved_token);
+
+      if (res.success) {
+        const user = res.user;
+        setRole(user.role);
+        setToken(saved_token);
+      } else {
+        setRole(null);
+        setToken(null);
+      }
+    } catch (err) {
+      console.error(err);
+      setRole(null);
+      setToken(null);
+    }
   };
 
   const handleSignOut = () => {
     localStorage.clear();
     setIsSignedIn(false);
+    setRole(null);
+    setToken(null);
   };
 
-  if (isLoading)
-    return (
-      <div className="ad-details-page">
-        <LoadingSpinner open={isLoading} />
-      </div>
-    );
-
-  const ProtectedRoute = ({ isSignedIn, children }) => {
-    const token = localStorage.getItem("Token");
-
+  const ProtectedRoute = ({ isSignedIn, allowedRoles = [], children }) => {
     if (!isSignedIn || !token) {
+      return <Navigate to="/signin" replace />;
+    }
+
+    // role restriction
+    if (allowedRoles.length > 0 && !allowedRoles.includes(role || "")) {
       return <Navigate to="/home" replace />;
     }
 
     return children;
   };
+
+  if (isLoading) return <LoadingSpinner open={isLoading} />;
+
+  if (isSignedIn && token && role === null)
+    return <LoadingSpinner open={isLoading} />;
 
   return (
     <Router>
@@ -138,7 +194,10 @@ const App = () => {
           <Route
             path="/profile"
             element={
-              <ProtectedRoute isSignedIn={isSignedIn}>
+              <ProtectedRoute
+                isSignedIn={isSignedIn}
+                allowedRoles={["user", "admin"]}
+              >
                 <Profile onSignOut={handleSignOut} isSignedIn={isSignedIn} />
               </ProtectedRoute>
             }
@@ -146,7 +205,7 @@ const App = () => {
           <Route
             path="/post-ad"
             element={
-              <ProtectedRoute isSignedIn={isSignedIn}>
+              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["user"]}>
                 <PostAd />
               </ProtectedRoute>
             }
@@ -155,7 +214,7 @@ const App = () => {
           <Route
             path="/users"
             element={
-              <ProtectedRoute isSignedIn={isSignedIn}>
+              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["admin"]}>
                 <AllUsers />
               </ProtectedRoute>
             }
@@ -164,7 +223,7 @@ const App = () => {
           <Route
             path="/categories"
             element={
-              <ProtectedRoute isSignedIn={isSignedIn}>
+              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["admin"]}>
                 <AllCategories />
               </ProtectedRoute>
             }
@@ -173,7 +232,7 @@ const App = () => {
           <Route
             path="/ads"
             element={
-              <ProtectedRoute isSignedIn={isSignedIn}>
+              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["admin"]}>
                 <AllAds />
               </ProtectedRoute>
             }
@@ -182,7 +241,7 @@ const App = () => {
           <Route
             path="/saved-ads"
             element={
-              <ProtectedRoute isSignedIn={isSignedIn}>
+              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["user"]}>
                 <SavedAds />
               </ProtectedRoute>
             }
@@ -191,7 +250,7 @@ const App = () => {
           <Route
             path="/my-ads"
             element={
-              <ProtectedRoute isSignedIn={isSignedIn}>
+              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["user"]}>
                 <MyAds />
               </ProtectedRoute>
             }
@@ -200,7 +259,7 @@ const App = () => {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute isSignedIn={isSignedIn}>
+              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["admin"]}>
                 <AdminDashboard />
               </ProtectedRoute>
             }
@@ -209,7 +268,10 @@ const App = () => {
           <Route
             path="/support"
             element={
-              <ProtectedRoute isSignedIn={isSignedIn}>
+              <ProtectedRoute
+                isSignedIn={isSignedIn}
+                allowedRoles={["user", "admin"]}
+              >
                 <SupportPage />
               </ProtectedRoute>
             }
