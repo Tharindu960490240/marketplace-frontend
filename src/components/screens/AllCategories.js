@@ -149,7 +149,7 @@ const AllCategories = () => {
       return;
     }
 
-    const isValidCategory = /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(
+    const isValidCategory = /^[A-Za-z\u0D80-\u0DFF\p{L}\s\-()]+$/u.test(
       categoryData.category,
     );
 
@@ -161,7 +161,7 @@ const AllCategories = () => {
     if (!isValidCategory) {
       setSnackbar({
         open: true,
-        message: t("all_categories_page.validation_category"),
+        message: t("all_categories_page.invalid_name"),
         severity: "error",
       });
       return;
@@ -190,14 +190,14 @@ const AllCategories = () => {
       } else {
         setSnackbar({
           open: true,
-          message: res.message || t("all_categories_page.add_error"),
+          message: t("all_categories_page.add_error"),
           severity: "error",
         });
       }
     } catch (err) {
       setSnackbar({
         open: true,
-        message: err.message || t("all_categories_page.add_error"),
+        message: t("all_categories_page.add_error"),
         severity: "error",
       });
     } finally {
@@ -265,7 +265,7 @@ const AllCategories = () => {
   };
 
   const handleCategoryChange = (val) => {
-    const isValidCategory = /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(val);
+    const isValidCategory = /^[A-Za-z\u0D80-\u0DFF\p{L}\s\-()]+$/u.test(val);
     setCategoryData({ ...categoryData, category: val, isValidCategory });
   };
 

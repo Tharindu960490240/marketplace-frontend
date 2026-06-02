@@ -379,7 +379,7 @@
         "delete_success": "Category deleted successfully.",
         "delete_error": "Could not delete category.",
         "generic_error": "Something went wrong. Please try again later.",
-        "invalid_name": "Please enter a valid name (letters only).",
+        "invalid_name": "Please enter a valid category.",
         "status_active": "Active",
         "status_inactive": "Inactive",
         "tooltip_activate": "Activate",
