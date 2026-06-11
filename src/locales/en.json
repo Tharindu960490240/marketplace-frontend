@@ -188,7 +188,17 @@
         "verifyEmailText1": "Your account has been created successfully.",
         "verifyEmailText2": "We have sent a verification link to your email. Please check your inbox and spam folder, then click the link to activate your account.",
         "verifyEmailText3": "If you don't receive the email within a few minutes, please contact support for help.",
-        "fillValidFields": "Please fill in all fields correctly before signing up."
+        "fillValidFields": "Please fill in all fields correctly before signing up.",
+        "help_dialog": {
+            "title": "Need Help Signing Up?",
+            "step1_title": "1. Create Account",
+            "step1_text": "Fill in your first name, last name, email, and phone number (10 digits).",
+            "step2_title": "2. Password Requirements",
+            "step2_text": "Your password must be at least 8 characters long and include: 1 Uppercase, 1 Lowercase, 1 Number, and 1 Special character (e.g., @$!%*?&).",
+            "password_examples": "Password Examples: MyPass2025!, Agri@Link99, SafeFarm#1",
+            "step3_title": "3. Email Verification (Final Step)",
+            "step3_text": "After submitting, a verification link will be sent to your email. Check your Inbox or Spam folder and click the link to activate your account."
+        }
     },
     "home_page": {
         "hero_title": "Marketplace for Animals, Pets & Farm Supplies",

@@ -52,6 +52,7 @@ const SignUp = () => {
 
   const [userData, setUserData] = useState(initialUserData);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [helpDialogOpen, setHelpDialogOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({
@@ -79,12 +80,18 @@ const SignUp = () => {
   };
 
   const handleFirstNameChange = (val) => {
-    const isValidFirstName = /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(val);
+    const isValidFirstName =
+      /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(
+        val,
+      );
     setUserData({ ...userData, first_name: val, isValidFirstName });
   };
 
   const handleLastNameChange = (val) => {
-    const isValidLastName = /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(val);
+    const isValidLastName =
+      /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(
+        val,
+      );
     setUserData({ ...userData, last_name: val, isValidLastName });
   };
 
@@ -122,11 +129,13 @@ const SignUp = () => {
 
   const handleUserFormSubmit = async () => {
     const isFirstNameValid =
-      /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(userData.first_name) &&
-      userData.first_name.length > 0;
+      /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(
+        userData.first_name,
+      ) && userData.first_name.length > 0;
     const isLastNameValid =
-      /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(userData.last_name) &&
-      userData.last_name.length > 0;
+      /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(
+        userData.last_name,
+      ) && userData.last_name.length > 0;
 
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.email);
     const isContactNoValid = /^\d{10}$/.test(userData.phone);
@@ -366,11 +375,17 @@ const SignUp = () => {
           {t("signup_page.alreadyHaveAccount")}{" "}
           <Link to="/signin">{t("signup_page.signInLink")}</Link>
         </p>
+
+        <p className="signin-link">
+          <Link onClick={() => setHelpDialogOpen(true)}>
+            {" "}
+            {t("signup_page.help_dialog.title")}
+          </Link>
+        </p>
       </div>
 
       <CustomSnackbar {...snackbar} onClose={handleClose} />
       <LoadingSpinner open={loading} />
-
       <Dialog
         open={dialogOpen}
         onClose={handleDialogClose}
@@ -400,6 +415,51 @@ const SignUp = () => {
             <br />
             <br />
             {t("signup_page.verifyEmailText3")}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}></DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={helpDialogOpen}
+        onClose={() => setHelpDialogOpen(false)}
+        fullWidth
+        maxWidth="md"
+      >
+        <DialogTitle>
+          {t("signup_page.help_dialog.title")}{" "}
+          <IconButton
+            onClick={() => setHelpDialogOpen(false)}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+            }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          <DialogContentText>
+            <DialogContentText style={{ fontWeight: "bold" }}>
+              {t("signup_page.help_dialog.step1_title")}
+            </DialogContentText>
+            {t("signup_page.help_dialog.step1_text")}
+            <br />
+            <br />
+            <DialogContentText style={{ fontWeight: "bold" }}>
+              {" "}
+              {t("signup_page.help_dialog.step2_title")}
+            </DialogContentText>
+            {t("signup_page.help_dialog.step2_text")}
+            {t("signup_page.help_dialog.password_examples")}
+            <br />
+            <br />
+            <DialogContentText style={{ fontWeight: "bold" }}>
+              {" "}
+              {t("signup_page.help_dialog.step3_title")}
+            </DialogContentText>
+            {t("signup_page.help_dialog.step3_text")}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}></DialogActions>
