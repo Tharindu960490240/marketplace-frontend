@@ -349,7 +349,7 @@ const AllUsers = () => {
   const sendReminder = async (e, user) => {
     e.stopPropagation();
 
-    const shareUrl = `${AppConst.FRONTEND_BASE_URL}/verify/${user.email_verification_token}`;
+    const shareUrl = `${AppConst.FRONTEND_BASE_URL}verify/${user.email_verification_token}`;
     const shareTitle = t("all_users_page.share_email_title");
 
     // The bilingual message
