@@ -277,6 +277,9 @@ const MyAds = () => {
             setTabIndex(v);
             setPage(0);
           }}
+          variant="scrollable"
+          scrollButtons
+          allowScrollButtonsMobile
         >
           <Tab label={t("my_ads_page.tab_pending")} />
           <Tab label={t("my_ads_page.tab_active")} />

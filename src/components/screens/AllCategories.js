@@ -356,6 +356,9 @@ const AllCategories = () => {
             setTabIndex(v);
             setPage(0);
           }}
+          variant="scrollable"
+          scrollButtons
+          allowScrollButtonsMobile
         >
           <Tab label={t("all_categories_page.tab_active")} />
           <Tab label={t("all_categories_page.tab_inactive")} />

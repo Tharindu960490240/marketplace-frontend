@@ -365,7 +365,6 @@ Thank you / ස්තුතියි,
 The Agri Link Team
 `;
 
-
     if (navigator.share) {
       try {
         await navigator.share({
@@ -446,7 +445,13 @@ The Agri Link Team
         </div>
 
         {/* TABS */}
-        <Tabs value={tabIndex} onChange={(e, v) => setTabIndex(v)}>
+        <Tabs
+          value={tabIndex}
+          onChange={(e, v) => setTabIndex(v)}
+          variant="scrollable"
+          scrollButtons
+          allowScrollButtonsMobile
+        >
           <Tab label={t("all_users_page.tab_active")} />
           <Tab label={t("all_users_page.tab_pending")} />
           <Tab label={t("all_users_page.tab_suspended")} />
