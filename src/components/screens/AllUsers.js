@@ -365,17 +365,7 @@ Thank you / ස්තුතියි,
 The Agri Link Team
 `;
 
-    // 1. Try WhatsApp Direct Messaging (If contact_no exists)
-    if (user.contact_no) {
-      // Clean number: ensure it's just digits (remove + or spaces if present in DB)
-      const cleanNumber = user.contact_no.replace(/\D/g, "");
-      const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(reminderMessage)}`;
 
-      window.open(whatsappUrl, "_blank");
-      return;
-    }
-
-    // 2. Try Native Mobile/Browser Sharing (Fallback)
     if (navigator.share) {
       try {
         await navigator.share({
