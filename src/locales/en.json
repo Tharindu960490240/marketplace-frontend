@@ -527,7 +527,9 @@
         "admin_create_error": "Could not create admin account. Please try again.",
         "admin_create_server_error": "Something went wrong on our side. Please try again later.",
         "save": "Save",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "tooltip_send_reminder": "Send activation reminder",
+        "share_email_title": "Action Required: Please verify your account"
     },
     "share_component": {
         "share_tooltip": "Share Link",

@@ -34,6 +34,7 @@ import {
   VisibilityOff,
   Add,
   Close,
+  Message,
 } from "@mui/icons-material";
 
 import {
@@ -256,7 +257,7 @@ const AllUsers = () => {
       case "password":
         update.isValidPassword =
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-            value
+            value,
           );
         update.passwordMatch = value === adminData.confirmPassword;
         break;
@@ -280,7 +281,7 @@ const AllUsers = () => {
     const isContactNoValid = /^\d{10}$/.test(adminData.phone);
     const isPasswordValid =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        adminData.password
+        adminData.password,
       );
     const matchPassword = adminData.password === adminData.confirmPassword;
 
@@ -341,6 +342,103 @@ const AllUsers = () => {
         open: true,
         message: t("all_users_page.admin_create_server_error"),
         severity: "error",
+      });
+    }
+  };
+
+  const sendReminder = async (e, user) => {
+    e.stopPropagation();
+
+    const shareUrl = `${AppConst.FRONTEND_BASE_URL}/verify/${user.email_verification_token}`;
+    const shareTitle = t("all_users_page.share_email_title");
+
+    // The bilingual message
+    const reminderMessage = `Hi ${user.first_name || ""},
+
+We noticed you haven't activated your account on Agri Link Services Marketplace yet. 
+Agri Link Services Marketplace හි ඔබගේ ගිණුම තවමත් සක්‍රිය කර නොමැති බව අපට දන්වන්නට අවශ්‍යයි.
+
+Please click the link below to verify your account and start exploring:
+ඔබගේ ගිණුම සක්‍රිය කර අපගේ සේවාවන් භාවිත කිරීමට කරුණාකර පහත සබැඳිය ක්ලික් කරන්න:
+
+Thank you / ස්තුතියි,
+The Agri Link Team
+`;
+
+    // 1. Try WhatsApp Direct Messaging (If contact_no exists)
+    if (user.contact_no) {
+      // Clean number: ensure it's just digits (remove + or spaces if present in DB)
+      const cleanNumber = user.contact_no.replace(/\D/g, "");
+      const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(reminderMessage)}`;
+
+      window.open(whatsappUrl, "_blank");
+      return;
+    }
+
+    // 2. Try Native Mobile/Browser Sharing (Fallback)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          text: reminderMessage,
+          url: shareUrl,
+        });
+        return;
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          setSnackbar({
+            open: true,
+            severity: "error",
+            message: t("share_component.error"),
+          });
+        }
+        return;
+      }
+    }
+
+    // 3. Try Modern Clipboard API Fallback
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setSnackbar({
+          open: true,
+          severity: "success",
+          message: t("share_component.copied"),
+        });
+        return;
+      } catch (err) {
+        /* silent fail */
+      }
+    }
+
+    // 4. Robust Legacy Textarea Fallback
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = shareUrl;
+      textArea.style.position = "fixed";
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textArea);
+
+      if (successful) {
+        setSnackbar({
+          open: true,
+          severity: "success",
+          message: t("share_component.copied"),
+        });
+      } else {
+        throw new Error("Copy command execution failed.");
+      }
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        severity: "error",
+        message: t("share_component.failed_copy"),
       });
     }
   };
@@ -468,6 +566,16 @@ const AllUsers = () => {
                               }
                             >
                               <CheckCircle color="success" />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+
+                        {u.status === "pending" && (
+                          <Tooltip
+                            title={t("all_users_page.tooltip_send_reminder")}
+                          >
+                            <IconButton onClick={(e) => sendReminder(e, u)}>
+                              <Message color="info" />
                             </IconButton>
                           </Tooltip>
                         )}

@@ -20,6 +20,7 @@ import {
   Bookmark,
   Star,
   BookmarkAdd,
+  
 } from "@mui/icons-material";
 
 import * as AppConst from "../../const/const";
@@ -49,7 +50,7 @@ const Home = () => {
 
   const [ads, setAds] = useState([]);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [total, setTotal] = useState(0);
 
   const [savedMap, setSavedMap] = useState({});
