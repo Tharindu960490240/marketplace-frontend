@@ -228,7 +228,8 @@
         "rejected": "Rejected",
         "deleted": "Deleted",
         "negotiable": "Price Negotiable",
-        "fixed": "Fixed Price"
+        "fixed": "Fixed Price",
+        "views": "views"
     },
     "saved_ads_page": {
         "no_saved_ads": "No saved ads found.",

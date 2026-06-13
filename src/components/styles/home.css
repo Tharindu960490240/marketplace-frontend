@@ -219,7 +219,7 @@
 .per {
   font-size: 10px;
 
-  padding: 5px 10px;
+  padding: 5px 0px 5px 10px;
   border-radius: 20px;
 
   display: flex;
@@ -231,12 +231,17 @@
   display: flex;
   align-items: center;
   gap: 6px;
-
-  margin-top: 8px;
+  margin-top: 10px;
+  justify-content: space-between;
 }
 
-.review-count {
+.stats-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   color: var(--muted-color);
+  font-size: 0.9rem;
+  margin-top: 10px;
 }
 
 /* wishlist */
@@ -285,6 +290,9 @@
   color: #2196f3;
 }
 
+.button-group {
+  margin: 10px 0;
+}
 /* ================= EMPTY STATE ================= */
 .no-data {
   text-align: center;

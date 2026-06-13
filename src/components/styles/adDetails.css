@@ -149,11 +149,12 @@
   align-items: center;
   gap: 8px;
   margin: 10px 0;
+  justify-content: space-between;
 }
 
 /* ================= BUTTONS ================= */
-.button-group {
-  margin: 10px 0;
+.ad-details-page .button-group {
+  margin: 10px 0px;
 }
 
 .wishlist-btn {
@@ -163,6 +164,17 @@
   background: transparent;
   cursor: pointer;
   transition: 0.2s;
+}
+
+.ad-details-page .wishlist-btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-top: 0px;
+  max-width: 200px;
 }
 
 .wishlist-btn:hover {
@@ -313,12 +325,12 @@
   padding: 0 !important;
 }
 
-.error-state{
+.error-state {
   text-align: center;
 }
 
 .ad-details-page .button-share {
-  margin-top: 10px !important;
+  /* margin-top: 10px !important; */
   min-width: 40px !important;
   max-width: 40px !important;
   height: 40px !important;

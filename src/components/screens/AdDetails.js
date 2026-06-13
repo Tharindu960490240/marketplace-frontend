@@ -27,6 +27,7 @@ import {
   Delete,
   ExpandMore,
   ExpandLess,
+  Visibility,
 } from "@mui/icons-material";
 
 import "../styles/adDetails.css";
@@ -438,9 +439,17 @@ const AdDetails = () => {
             </span>
           </div>
 
-          <span className="location-tag">
-            {ad?.city}, {ad?.district}
-          </span>
+          <div className="price" style={{ fontWeight: "normal" }}>
+            <div className="stats-row" style={{ margin: 0 }}>
+              <Visibility color="info" sx={{ fontSize: 20 }} />
+              <span>
+                {ad.views_count.toLocaleString()} {t("home_page.views")}
+              </span>
+            </div>
+            <span className="location-tag">
+              {ad?.city}, {ad?.district}
+            </span>
+          </div>
 
           <div className="rating-box">
             <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -452,10 +461,16 @@ const AdDetails = () => {
                   <Star style={{ opacity: 0.55 }} fontSize="inherit" />
                 }
               />
-              <span style={{ marginLeft: 8 }}>
-                ({ad?.avg_rating || 0} - {getRatingLabel(ad?.avg_rating)})
-              </span>
             </Box>
+            <span
+              style={{
+                marginLeft: 8,
+                fontSize: "0.9rem",
+                color: "var(--muted-color)",
+              }}
+            >
+              ({ad?.avg_rating || 0} - {getRatingLabel(ad?.avg_rating)})
+            </span>
           </div>
 
           <div className="button-group">

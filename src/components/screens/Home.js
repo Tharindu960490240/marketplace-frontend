@@ -20,7 +20,7 @@ import {
   Bookmark,
   Star,
   BookmarkAdd,
-  
+  Visibility,
 } from "@mui/icons-material";
 
 import * as AppConst from "../../const/const";
@@ -393,7 +393,6 @@ const Home = () => {
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        marginBottom: "10px",
                       }}
                     >
                       <Rating
@@ -404,11 +403,23 @@ const Home = () => {
                           <Star style={{ opacity: 0.55 }} fontSize="inherit" />
                         }
                       />
-                      <span style={{ marginLeft: 8 }}>
-                        ({item.avg_rating || 0} -{" "}
-                        {getRatingLabel(item.avg_rating)})
-                      </span>
                     </Box>
+                    <span
+                      style={{
+                        marginLeft: 8,
+                        fontSize: "0.9rem",
+                        color: "var(--muted-color)",
+                      }}
+                    >
+                      ({item.avg_rating || 0} -{" "}
+                      {getRatingLabel(item.avg_rating)})
+                    </span>
+                  </div>
+                  <div className="stats-row">
+                    <Visibility color="info" sx={{ fontSize: 20 }} />
+                    <span>
+                      {item.views_count.toLocaleString()} {t("home_page.views")}
+                    </span>
                   </div>
 
                   <div className="button-group">

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { pink } from "@mui/material/colors";
 import { TablePagination, Rating, Box, Tooltip, Chip } from "@mui/material";
 
-import { Bookmark, Star } from "@mui/icons-material";
+import { Bookmark, Star, Visibility } from "@mui/icons-material";
 
 import * as AppConst from "../../const/const";
 import "../styles/home.css";
@@ -212,11 +212,24 @@ const SavedAds = () => {
                           <Star style={{ opacity: 0.55 }} fontSize="inherit" />
                         }
                       />
-                      <span style={{ marginLeft: 8 }}>
+                      <span
+                        style={{
+                          marginLeft: 8,
+                          fontSize: "0.9rem",
+                          color: "var(--muted-color)",
+                        }}
+                      >
                         ({item.avg_rating || 0} -{" "}
                         {getRatingLabel(item.avg_rating)})
                       </span>
                     </Box>
+                  </div>
+
+                  <div className="stats-row">
+                    <Visibility color="info" sx={{ fontSize: 20 }} />
+                    <span>
+                      {item.views_count.toLocaleString()} {t("home_page.views")}
+                    </span>
                   </div>
 
                   <div className="button-group">
