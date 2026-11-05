@@ -46,7 +46,12 @@ import { useAuth } from "../../context/AuthContext";
 import { useNotify } from "../../context/NotifyContext";
 import useDebounce from "../../hooks/useDebounce";
 import { shareOrCopy } from "../../utils/share";
-import { isEmail, isName, isPhone, isStrongPassword } from "../../utils/validation";
+import {
+  isEmail,
+  isName,
+  isPhone,
+  isStrongPassword,
+} from "../../utils/validation";
 import AdminLayout from "../common/AdminLayout";
 import StatusChip from "../common/StatusChip";
 import EmptyState from "../common/EmptyState";
@@ -138,7 +143,9 @@ const AllUsers = () => {
   /* ================= REMINDER ================= */
   const sendReminder = async (u) => {
     const url = `${AppConst.FRONTEND_BASE_URL}verify/${u.email_verification_token}`;
-    const text = t("all_users_page.reminder_message", { name: u.first_name || "" });
+    const text = t("all_users_page.reminder_message", {
+      name: u.first_name || "",
+    });
     const result = await shareOrCopy({
       url,
       title: t("all_users_page.share_email_title"),
@@ -155,7 +162,8 @@ const AllUsers = () => {
     email: !isEmail(admin.email),
     phone: !isPhone(admin.phone),
     password: !isStrongPassword(admin.password),
-    confirmPassword: !admin.confirmPassword || admin.password !== admin.confirmPassword,
+    confirmPassword:
+      !admin.confirmPassword || admin.password !== admin.confirmPassword,
   };
   const showAdminError = (f) => adminSubmitted && adminErrors[f];
 
@@ -196,21 +204,31 @@ const AllUsers = () => {
     }
   };
 
-  const SortIcon = sort.order === "asc" ? ArrowUpwardRounded : ArrowDownwardRounded;
+  const SortIcon =
+    sort.order === "asc" ? ArrowUpwardRounded : ArrowDownwardRounded;
 
   return (
     <AdminLayout
       title={t("all_users_page.title")}
       subtitle={t("all_users_page.subtitle")}
       actions={
-        <Button variant="contained" startIcon={<AddRounded />} onClick={() => setAdminOpen(true)}>
+        <Button
+          variant="contained"
+          startIcon={<AddRounded />}
+          onClick={() => setAdminOpen(true)}
+        >
           {t("all_users_page.add_admin")}
         </Button>
       }
     >
       <div className="data-card">
         <div className="data-toolbar">
-          <Tabs value={tab} onChange={(_e, v) => setTab(v)} variant="scrollable" allowScrollButtonsMobile>
+          <Tabs
+            value={tab}
+            onChange={(_e, v) => setTab(v)}
+            variant="scrollable"
+            allowScrollButtonsMobile
+          >
             {STATUS_TABS.map((s) => (
               <Tab key={s} label={t(`status.${s}`)} />
             ))}
@@ -232,102 +250,132 @@ const AllUsers = () => {
 
         {loading && <LinearProgress />}
 
-        <Table className="data-table">
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                <button className="sort-button" onClick={() => toggleSort("first_name")}>
-                  {t("all_users_page.table_name")}
-                  {sort.field === "first_name" && <SortIcon />}
-                </button>
-              </TableCell>
-              <TableCell>{t("all_users_page.table_contact")}</TableCell>
-              <TableCell>{t("all_users_page.table_role")}</TableCell>
-              <TableCell>{t("all_users_page.table_status")}</TableCell>
-              <TableCell align="right">{t("all_users_page.table_actions")}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {!loading && users.length === 0 && (
-              <TableRow className="data-empty">
-                <TableCell colSpan={5}>
-                  <EmptyState compact icon={<PeopleOutline />} title={t("all_users_page.empty")} />
+        <div className="data-scroll">
+          <Table className="data-table">
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <button
+                    className="sort-button"
+                    onClick={() => toggleSort("first_name")}
+                  >
+                    {t("all_users_page.table_name")}
+                    {sort.field === "first_name" && <SortIcon />}
+                  </button>
+                </TableCell>
+                <TableCell>{t("all_users_page.table_contact")}</TableCell>
+                <TableCell>{t("all_users_page.table_role")}</TableCell>
+                <TableCell>{t("all_users_page.table_status")}</TableCell>
+                <TableCell align="right">
+                  {t("all_users_page.table_actions")}
                 </TableCell>
               </TableRow>
-            )}
-
-            {users.map((u) => {
-              const isSelf = me?.email === u.email;
-              return (
-                <TableRow key={u.id}>
-                  <TableCell className="cell-main">
-                    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                      <Avatar src={u.profile_image || AppConst.PROFILE_PLACEHOLDER_IMAGE} />
-                      <div className="cell-title">
-                        <strong>
-                          {u.first_name} {u.last_name}
-                        </strong>
-                        <span className="cell-sub">{u.email}</span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell data-label={t("all_users_page.table_contact")}>
-                    {u.phone ? <a href={`tel:${u.phone}`}>{u.phone}</a> : "—"}
-                  </TableCell>
-                  <TableCell data-label={t("all_users_page.table_role")}>
-                    <span className="role-chip">{t(`roles.${u.role}`, { defaultValue: u.role })}</span>
-                  </TableCell>
-                  <TableCell data-label={t("all_users_page.table_status")}>
-                    <StatusChip status={u.status} />
-                  </TableCell>
-                  <TableCell>
-                    <div className="cell-actions">
-                      {u.status === "pending" && u.email_verification_token && (
-                        <Tooltip title={t("all_users_page.tooltip_send_reminder")}>
-                          <IconButton className="icon-btn" onClick={() => sendReminder(u)}>
-                            <ForwardToInboxOutlined fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-
-                      {u.status === "suspended" ? (
-                        <Tooltip title={t("all_users_page.tooltip_activate")}>
-                          <span>
-                            <IconButton
-                              className="icon-btn success"
-                              disabled={busy}
-                              onClick={() => changeStatus(u, "active")}
-                            >
-                              <CheckCircleOutline fontSize="small" />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip
-                          title={
-                            isSelf
-                              ? t("all_users_page.tooltip_self_suspend")
-                              : t("all_users_page.tooltip_suspend")
-                          }
-                        >
-                          <span>
-                            <IconButton
-                              className="icon-btn danger"
-                              disabled={isSelf || busy}
-                              onClick={() => setSuspendUser(u)}
-                            >
-                              <BlockRounded fontSize="small" />
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                      )}
-                    </div>
+            </TableHead>
+            <TableBody>
+              {!loading && users.length === 0 && (
+                <TableRow className="data-empty">
+                  <TableCell colSpan={5}>
+                    <EmptyState
+                      compact
+                      icon={<PeopleOutline />}
+                      title={t("all_users_page.empty")}
+                    />
                   </TableCell>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+              )}
+
+              {users.map((u) => {
+                const isSelf = me?.email === u.email;
+                return (
+                  <TableRow key={u.id}>
+                    <TableCell className="cell-main">
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 12,
+                          alignItems: "center",
+                        }}
+                      >
+                        <Avatar
+                          src={
+                            u.profile_image ||
+                            AppConst.PROFILE_PLACEHOLDER_IMAGE
+                          }
+                        />
+                        <div className="cell-title">
+                          <strong>
+                            {u.first_name} {u.last_name}
+                          </strong>
+                          <span className="cell-sub">{u.email}</span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell data-label={t("all_users_page.table_contact")}>
+                      {u.phone ? <a href={`tel:${u.phone}`}>{u.phone}</a> : "—"}
+                    </TableCell>
+                    <TableCell data-label={t("all_users_page.table_role")}>
+                      <span className="role-chip">
+                        {t(`roles.${u.role}`, { defaultValue: u.role })}
+                      </span>
+                    </TableCell>
+                    <TableCell data-label={t("all_users_page.table_status")}>
+                      <StatusChip status={u.status} />
+                    </TableCell>
+                    <TableCell>
+                      <div className="cell-actions">
+                        {u.status === "pending" &&
+                          u.email_verification_token && (
+                            <Tooltip
+                              title={t("all_users_page.tooltip_send_reminder")}
+                            >
+                              <IconButton
+                                className="icon-btn"
+                                onClick={() => sendReminder(u)}
+                              >
+                                <ForwardToInboxOutlined fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+
+                        {u.status === "suspended" ? (
+                          <Tooltip title={t("all_users_page.tooltip_activate")}>
+                            <span>
+                              <IconButton
+                                className="icon-btn success"
+                                disabled={busy}
+                                onClick={() => changeStatus(u, "active")}
+                              >
+                                <CheckCircleOutline fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip
+                            title={
+                              isSelf
+                                ? t("all_users_page.tooltip_self_suspend")
+                                : t("all_users_page.tooltip_suspend")
+                            }
+                          >
+                            <span>
+                              <IconButton
+                                className="icon-btn danger"
+                                disabled={isSelf || busy}
+                                onClick={() => setSuspendUser(u)}
+                              >
+                                <BlockRounded fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
 
         <TablePagination
           component="div"
@@ -336,7 +384,9 @@ const AllUsers = () => {
           rowsPerPage={rowsPerPage}
           rowsPerPageOptions={[10, 25, 50]}
           onPageChange={(_e, p) => setPage(p)}
-          onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+          onRowsPerPageChange={(e) =>
+            setRowsPerPage(parseInt(e.target.value, 10))
+          }
           labelRowsPerPage={t("common.rows_per_page")}
         />
       </div>
@@ -354,7 +404,12 @@ const AllUsers = () => {
       />
 
       {/* ================= ADD ADMIN ================= */}
-      <Dialog open={adminOpen} onClose={busy ? undefined : closeAdmin} fullWidth maxWidth="sm">
+      <Dialog
+        open={adminOpen}
+        onClose={busy ? undefined : closeAdmin}
+        fullWidth
+        maxWidth="sm"
+      >
         <form onSubmit={handleCreateAdmin} noValidate>
           <DialogTitle>
             {t("all_users_page.modal_title")}
@@ -371,34 +426,55 @@ const AllUsers = () => {
               <TextField
                 label={t("all_users_page.first_name")}
                 {...bindAdmin("first_name")}
-                helperText={showAdminError("first_name") ? t("all_users_page.first_name_error") : ""}
+                helperText={
+                  showAdminError("first_name")
+                    ? t("all_users_page.first_name_error")
+                    : ""
+                }
               />
               <TextField
                 label={t("all_users_page.last_name")}
                 {...bindAdmin("last_name")}
-                helperText={showAdminError("last_name") ? t("all_users_page.last_name_error") : ""}
+                helperText={
+                  showAdminError("last_name")
+                    ? t("all_users_page.last_name_error")
+                    : ""
+                }
               />
               <TextField
                 label={t("all_users_page.email")}
                 type="email"
                 {...bindAdmin("email")}
-                helperText={showAdminError("email") ? t("all_users_page.email_error") : ""}
+                helperText={
+                  showAdminError("email") ? t("all_users_page.email_error") : ""
+                }
               />
               <TextField
                 label={t("all_users_page.contact_no")}
                 inputMode="numeric"
                 {...bindAdmin("phone")}
                 onChange={(e) =>
-                  setAdmin((a) => ({ ...a, phone: e.target.value.replace(/\D/g, "").slice(0, 10) }))
+                  setAdmin((a) => ({
+                    ...a,
+                    phone: e.target.value.replace(/\D/g, "").slice(0, 10),
+                  }))
                 }
-                helperText={showAdminError("phone") ? t("all_users_page.contact_error") : ""}
+                helperText={
+                  showAdminError("phone")
+                    ? t("all_users_page.contact_error")
+                    : ""
+                }
               />
               {/* Value is bound to `password` (it was `newPassword`, so typing showed nothing) */}
               <PasswordField
                 label={t("all_users_page.new_password")}
                 autoComplete="new-password"
                 {...bindAdmin("password")}
-                helperText={showAdminError("password") ? t("all_users_page.password_error") : ""}
+                helperText={
+                  showAdminError("password")
+                    ? t("all_users_page.password_error")
+                    : ""
+                }
               />
               <PasswordField
                 label={t("all_users_page.confirm_password")}
@@ -406,7 +482,9 @@ const AllUsers = () => {
                 showToggle={false}
                 {...bindAdmin("confirmPassword")}
                 helperText={
-                  showAdminError("confirmPassword") ? t("all_users_page.confirm_password_error") : ""
+                  showAdminError("confirmPassword")
+                    ? t("all_users_page.confirm_password_error")
+                    : ""
                 }
               />
               <div className="span-2">

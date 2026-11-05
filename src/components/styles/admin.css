@@ -8,6 +8,12 @@
   align-items: start;
 }
 
+/* min-width:0 lets the column shrink; without it a wide table/pagination
+   pushes the grid past the viewport and the whole page scrolls sideways */
+.admin-main {
+  min-width: 0;
+}
+
 /* ================= SECTION NAV ================= */
 
 .admin-nav {
@@ -41,6 +47,36 @@
 .admin-nav-link.active {
   background: var(--c-primary-soft);
   color: var(--c-primary);
+}
+
+/* Horizontal bar variant (used on the Support page at every width).
+   Its wrapper (.support-admin-bar) supplies the gutter, so this must reset
+   the negative margins the mobile .admin-nav rule adds — otherwise the bar
+   sticks out past the viewport and the page scrolls sideways. */
+.admin-nav.admin-nav-bar {
+  position: static;
+  top: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  overflow-x: auto;
+  margin: 0;
+  padding: 0 0 4px;
+  scrollbar-width: none;
+}
+
+.admin-nav.admin-nav-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-nav.admin-nav-bar .admin-nav-link {
+  flex: 0 0 auto;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+}
+
+.admin-nav.admin-nav-bar .admin-nav-link.active {
+  border-color: color-mix(in srgb, var(--c-primary) 40%, var(--c-border));
 }
 
 /* ================= PAGE HEADER ================= */
@@ -206,7 +242,7 @@ a.stat-tile:hover {
 
 @media (max-width: 960px) {
   .admin-shell {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 16px;
     padding-top: 12px;
   }

@@ -34,7 +34,7 @@
   --r-xl: 26px;
 
   --header-h: 68px;
-  --page-max: 1240px;
+  --page-max: 1400px;
   --gutter: clamp(16px, 4vw, 32px);
 }
 
@@ -485,6 +485,7 @@ button:focus-visible {
   flex-wrap: wrap;
   gap: 6px;
   margin-top: -6px;
+  margin-bottom: 10px;
 }
 
 .password-rule {

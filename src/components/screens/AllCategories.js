@@ -130,7 +130,10 @@ const AllCategories = () => {
       notify(t("all_categories_page.status_updated"));
       fetchCategories();
     } else {
-      notify(res.message || t("all_categories_page.status_update_error"), "error");
+      notify(
+        res.message || t("all_categories_page.status_update_error"),
+        "error",
+      );
     }
   };
 
@@ -154,7 +157,11 @@ const AllCategories = () => {
       title={t("all_categories_page.title")}
       subtitle={t("all_categories_page.subtitle")}
       actions={
-        <Button variant="contained" startIcon={<AddRounded />} onClick={() => setAddOpen(true)}>
+        <Button
+          variant="contained"
+          startIcon={<AddRounded />}
+          onClick={() => setAddOpen(true)}
+        >
           {t("all_categories_page.add_new")}
         </Button>
       }
@@ -183,69 +190,83 @@ const AllCategories = () => {
 
         {loading && <LinearProgress />}
 
-        <Table className="data-table">
-          <TableHead>
-            <TableRow>
-              <TableCell>{t("all_categories_page.name")}</TableCell>
-              <TableCell>{t("all_categories_page.status")}</TableCell>
-              <TableCell>{t("all_categories_page.created")}</TableCell>
-              <TableCell align="right">{t("all_categories_page.actions")}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {!loading && categories.length === 0 && (
-              <TableRow className="data-empty">
-                <TableCell colSpan={4}>
-                  <EmptyState compact icon={<CategoryOutlined />} title={t("all_categories_page.empty")} />
+        <div className="data-scroll">
+          <Table className="data-table">
+            <TableHead>
+              <TableRow>
+                <TableCell>{t("all_categories_page.name")}</TableCell>
+                <TableCell>{t("all_categories_page.status")}</TableCell>
+                <TableCell>{t("all_categories_page.created")}</TableCell>
+                <TableCell align="right">
+                  {t("all_categories_page.actions")}
                 </TableCell>
               </TableRow>
-            )}
+            </TableHead>
+            <TableBody>
+              {!loading && categories.length === 0 && (
+                <TableRow className="data-empty">
+                  <TableCell colSpan={4}>
+                    <EmptyState
+                      compact
+                      icon={<CategoryOutlined />}
+                      title={t("all_categories_page.empty")}
+                    />
+                  </TableCell>
+                </TableRow>
+              )}
 
-            {categories.map((c) => (
-              <TableRow key={c.id}>
-                <TableCell className="cell-main">
-                  <strong>{c.name}</strong>
-                </TableCell>
-                <TableCell data-label={t("all_categories_page.status")}>
-                  <StatusChip status={c.status} />
-                </TableCell>
-                <TableCell data-label={t("all_categories_page.created")}>
-                  {formatDate(c.created_at, i18n.language)}
-                </TableCell>
-                <TableCell>
-                  <div className="cell-actions">
-                    <Tooltip
-                      title={
-                        c.status === "active"
-                          ? t("all_categories_page.tooltip_deactivate")
-                          : t("all_categories_page.tooltip_activate")
-                      }
-                    >
-                      <span>
+              {categories.map((c) => (
+                <TableRow key={c.id}>
+                  <TableCell className="cell-main">
+                    <strong>{c.name}</strong>
+                  </TableCell>
+                  <TableCell data-label={t("all_categories_page.status")}>
+                    <StatusChip status={c.status} />
+                  </TableCell>
+                  <TableCell data-label={t("all_categories_page.created")}>
+                    {formatDate(c.created_at, i18n.language)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="cell-actions">
+                      <Tooltip
+                        title={
+                          c.status === "active"
+                            ? t("all_categories_page.tooltip_deactivate")
+                            : t("all_categories_page.tooltip_activate")
+                        }
+                      >
+                        <span>
+                          <IconButton
+                            className={`icon-btn ${c.status === "active" ? "" : "success"}`}
+                            disabled={busy}
+                            onClick={() => toggleStatus(c)}
+                          >
+                            {c.status === "active" ? (
+                              <ToggleOnOutlined
+                                fontSize="small"
+                                color="success"
+                              />
+                            ) : (
+                              <ToggleOffOutlined fontSize="small" />
+                            )}
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                      <Tooltip title={t("all_categories_page.tooltip_delete")}>
                         <IconButton
-                          className={`icon-btn ${c.status === "active" ? "" : "success"}`}
-                          disabled={busy}
-                          onClick={() => toggleStatus(c)}
+                          className="icon-btn danger"
+                          onClick={() => setDeleteId(c.id)}
                         >
-                          {c.status === "active" ? (
-                            <ToggleOnOutlined fontSize="small" color="success" />
-                          ) : (
-                            <ToggleOffOutlined fontSize="small" />
-                          )}
+                          <DeleteOutline fontSize="small" />
                         </IconButton>
-                      </span>
-                    </Tooltip>
-                    <Tooltip title={t("all_categories_page.tooltip_delete")}>
-                      <IconButton className="icon-btn danger" onClick={() => setDeleteId(c.id)}>
-                        <DeleteOutline fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                      </Tooltip>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
 
         <TablePagination
           component="div"
@@ -254,7 +275,9 @@ const AllCategories = () => {
           rowsPerPage={rowsPerPage}
           rowsPerPageOptions={[10, 25, 50]}
           onPageChange={(_e, p) => setPage(p)}
-          onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+          onRowsPerPageChange={(e) =>
+            setRowsPerPage(parseInt(e.target.value, 10))
+          }
           labelRowsPerPage={t("common.rows_per_page")}
         />
       </div>

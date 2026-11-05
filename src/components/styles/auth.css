@@ -43,12 +43,15 @@
   top: -120px;
   right: -140px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(47, 134, 246, 0.55), transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(47, 134, 246, 0.55),
+    transparent 70%
+  );
 }
 
 .auth-brand-logo {
   position: relative;
-  width: 120px;
   background: #fff;
   border-radius: 22px;
   padding: 12px;

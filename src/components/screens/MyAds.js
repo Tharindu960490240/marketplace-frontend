@@ -63,7 +63,12 @@ const MyAds = () => {
     setLoading(true);
     const token = await get_token();
     const res = await getMyAds(
-      { page: page + 1, limit: rowsPerPage, search: debouncedSearch, status: STATUS_TABS[tab] },
+      {
+        page: page + 1,
+        limit: rowsPerPage,
+        search: debouncedSearch,
+        status: STATUS_TABS[tab],
+      },
       token,
     );
     if (res.success) {
@@ -106,7 +111,12 @@ const MyAds = () => {
           <h1 className="page-title">{t("my_ads_page.title")}</h1>
           <p className="page-subtitle">{t("my_ads_page.subtitle")}</p>
         </div>
-        <Button component={Link} to="/post-ad" variant="contained" startIcon={<AddRounded />}>
+        <Button
+          component={Link}
+          to="/post-ad"
+          variant="contained"
+          startIcon={<AddRounded />}
+        >
           {t("header.postAd")}
         </Button>
       </div>
@@ -140,132 +150,151 @@ const MyAds = () => {
 
         {loading && <LinearProgress />}
 
-        <Table className="data-table">
-          <TableHead>
-            <TableRow>
-              <TableCell>{t("my_ads_page.table_title")}</TableCell>
-              <TableCell>{t("my_ads_page.table_status")}</TableCell>
-              <TableCell>{t("my_ads_page.table_price")}</TableCell>
-              <TableCell>{t("my_ads_page.table_views")}</TableCell>
-              <TableCell align="right">{t("my_ads_page.table_actions")}</TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {!loading && ads.length === 0 && (
-              <TableRow className="data-empty">
-                <TableCell colSpan={5}>
-                  <EmptyState
-                    compact
-                    icon={<CampaignOutlined />}
-                    title={t("my_ads_page.empty")}
-                    text={t("my_ads_page.empty_hint")}
-                  />
+        <div className="data-scroll">
+          <Table className="data-table">
+            <TableHead>
+              <TableRow>
+                <TableCell>{t("my_ads_page.table_title")}</TableCell>
+                <TableCell>{t("my_ads_page.table_status")}</TableCell>
+                <TableCell>{t("my_ads_page.table_price")}</TableCell>
+                <TableCell>{t("my_ads_page.table_views")}</TableCell>
+                <TableCell align="right">
+                  {t("my_ads_page.table_actions")}
                 </TableCell>
               </TableRow>
-            )}
+            </TableHead>
 
-            {ads.map((ad) => (
-              <TableRow key={ad.id}>
-                <TableCell className="cell-main">
-                  <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                    <img
-                      className="cell-thumb"
-                      src={ad.primary_image || AppConst.ADS_PLACEHOLDER_IMAGE}
-                      alt=""
-                      loading="lazy"
+            <TableBody>
+              {!loading && ads.length === 0 && (
+                <TableRow className="data-empty">
+                  <TableCell colSpan={5}>
+                    <EmptyState
+                      compact
+                      icon={<CampaignOutlined />}
+                      title={t("my_ads_page.empty")}
+                      text={t("my_ads_page.empty_hint")}
                     />
-                    <div className="cell-title">
-                      <Link to={`/ad/${ad.id}`}>{ad.title}</Link>
-                      <span className="cell-sub">
-                        {ad.category?.name}
-                        {ad.sub_category ? ` / ${ad.sub_category}` : ""}
-                      </span>
-                      {ad.status === "rejected" && (ad.reason || ad.reject_reason) && (
-                        <span className="cell-note">
-                          {t("my_ads_page.rejected_reason", {
-                            reason: ad.reason || ad.reject_reason,
-                          })}
+                  </TableCell>
+                </TableRow>
+              )}
+
+              {ads.map((ad) => (
+                <TableRow key={ad.id}>
+                  <TableCell className="cell-main">
+                    <div
+                      style={{ display: "flex", gap: 12, alignItems: "center" }}
+                    >
+                      <img
+                        className="cell-thumb"
+                        src={ad.primary_image || AppConst.ADS_PLACEHOLDER_IMAGE}
+                        alt=""
+                        loading="lazy"
+                      />
+                      <div className="cell-title">
+                        <Link to={`/ad/${ad.id}`}>{ad.title}</Link>
+                        <span className="cell-sub">
+                          {ad.category?.name}
+                          {ad.sub_category ? ` / ${ad.sub_category}` : ""}
                         </span>
+                        {ad.status === "rejected" &&
+                          (ad.reason || ad.reject_reason) && (
+                            <span className="cell-note">
+                              {t("my_ads_page.rejected_reason", {
+                                reason: ad.reason || ad.reject_reason,
+                              })}
+                            </span>
+                          )}
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell data-label={t("my_ads_page.table_status")}>
+                    <StatusChip status={ad.status} />
+                  </TableCell>
+                  <TableCell data-label={t("my_ads_page.table_price")}>
+                    <strong>{formatPrice(ad.price)}</strong>
+                  </TableCell>
+                  <TableCell data-label={t("my_ads_page.table_views")}>
+                    {formatNumber(ad.views_count)}
+                  </TableCell>
+                  <TableCell>
+                    <div className="cell-actions">
+                      <Tooltip title={t("my_ads_page.tooltip_view")}>
+                        <IconButton
+                          component={Link}
+                          to={`/ad/${ad.id}`}
+                          className="icon-btn"
+                        >
+                          <VisibilityOutlined fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+
+                      {ad.status === "active" && (
+                        <Tooltip title={t("my_ads_page.tooltip_mark_sold")}>
+                          <span>
+                            <IconButton
+                              className="icon-btn success"
+                              disabled={busyId === ad.id}
+                              onClick={() =>
+                                changeStatus(
+                                  ad.id,
+                                  "sold",
+                                  t("my_ads_page.marked_sold"),
+                                )
+                              }
+                            >
+                              <CheckCircleOutline fontSize="small" />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      )}
+
+                      {ad.status === "sold" && (
+                        <Tooltip title={t("my_ads_page.tooltip_mark_active")}>
+                          <span>
+                            <IconButton
+                              className="icon-btn"
+                              disabled={busyId === ad.id}
+                              onClick={() =>
+                                changeStatus(
+                                  ad.id,
+                                  "active",
+                                  t("my_ads_page.marked_active"),
+                                )
+                              }
+                            >
+                              <ReplayRounded fontSize="small" />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      )}
+
+                      {ad.status === "active" && (
+                        <ShareButton
+                          url={`${AppConst.FRONTEND_BASE_URL}ad/${ad.id}`}
+                          title={ad.title}
+                        />
+                      )}
+
+                      {["pending", "active", "sold"].includes(ad.status) && (
+                        <Tooltip title={t("my_ads_page.tooltip_delete")}>
+                          <span>
+                            <IconButton
+                              className="icon-btn danger"
+                              disabled={busyId === ad.id}
+                              onClick={() => setDeleteId(ad.id)}
+                            >
+                              <DeleteOutline fontSize="small" />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
                       )}
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell data-label={t("my_ads_page.table_status")}>
-                  <StatusChip status={ad.status} />
-                </TableCell>
-                <TableCell data-label={t("my_ads_page.table_price")}>
-                  <strong>{formatPrice(ad.price)}</strong>
-                </TableCell>
-                <TableCell data-label={t("my_ads_page.table_views")}>
-                  {formatNumber(ad.views_count)}
-                </TableCell>
-                <TableCell>
-                  <div className="cell-actions">
-                    <Tooltip title={t("my_ads_page.tooltip_view")}>
-                      <IconButton component={Link} to={`/ad/${ad.id}`} className="icon-btn">
-                        <VisibilityOutlined fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-
-                    {ad.status === "active" && (
-                      <Tooltip title={t("my_ads_page.tooltip_mark_sold")}>
-                        <span>
-                          <IconButton
-                            className="icon-btn success"
-                            disabled={busyId === ad.id}
-                            onClick={() =>
-                              changeStatus(ad.id, "sold", t("my_ads_page.marked_sold"))
-                            }
-                          >
-                            <CheckCircleOutline fontSize="small" />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                    )}
-
-                    {ad.status === "sold" && (
-                      <Tooltip title={t("my_ads_page.tooltip_mark_active")}>
-                        <span>
-                          <IconButton
-                            className="icon-btn"
-                            disabled={busyId === ad.id}
-                            onClick={() =>
-                              changeStatus(ad.id, "active", t("my_ads_page.marked_active"))
-                            }
-                          >
-                            <ReplayRounded fontSize="small" />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                    )}
-
-                    {ad.status === "active" && (
-                      <ShareButton
-                        url={`${AppConst.FRONTEND_BASE_URL}ad/${ad.id}`}
-                        title={ad.title}
-                      />
-                    )}
-
-                    {["pending", "active", "sold"].includes(ad.status) && (
-                      <Tooltip title={t("my_ads_page.tooltip_delete")}>
-                        <span>
-                          <IconButton
-                            className="icon-btn danger"
-                            disabled={busyId === ad.id}
-                            onClick={() => setDeleteId(ad.id)}
-                          >
-                            <DeleteOutline fontSize="small" />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
 
         <TablePagination
           component="div"
@@ -274,7 +303,9 @@ const MyAds = () => {
           rowsPerPage={rowsPerPage}
           rowsPerPageOptions={[10, 25, 50]}
           onPageChange={(_e, p) => setPage(p)}
-          onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+          onRowsPerPageChange={(e) =>
+            setRowsPerPage(parseInt(e.target.value, 10))
+          }
           labelRowsPerPage={t("common.rows_per_page")}
         />
       </div>

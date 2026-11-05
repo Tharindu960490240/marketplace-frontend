@@ -1,21 +1,62 @@
 import * as React from "react";
-import CircularProgress from "@mui/material/CircularProgress";
-import Backdrop from "@mui/material/Backdrop";
-import { useTranslation } from "react-i18next";
+import Box from "@mui/material/Box";
+import Modal from "@mui/material/Modal";
+import Fade from "@mui/material/Fade";
 
 import "../styles/loadingSpinner.css";
 
-/* Full-screen loader — only for app start-up and blocking actions. */
+import { useTranslation } from "react-i18next";
+
+// Brand mark shown inside the ring (same logos the header uses)
+const ICON = `${process.env.PUBLIC_URL || ""}/assets/navbar_logo.png`;
+const ICON_DARK = `${process.env.PUBLIC_URL || ""}/assets/navbar_logo_d.png`;
+
+// Same props as before: <LoadingSpinner open={loading} />
 const LoadingSpinner = ({ open }) => {
   const { t } = useTranslation();
 
   return (
-    <Backdrop open={!!open} className="loading-backdrop">
-      <div className="loading-box" role="status" aria-live="polite">
-        <CircularProgress size={36} thickness={4.5} />
-        <span className="loading-text">{t("loading")}</span>
-      </div>
-    </Backdrop>
+    <Modal
+      open={!!open}
+      closeAfterTransition
+      disableAutoFocus
+      disableEnforceFocus
+      disableRestoreFocus
+      slotProps={{
+        backdrop: {
+          className: "loading-modal-backdrop",
+        },
+      }}
+    >
+      <Fade in={!!open}>
+        <Box className="loading-spinner-box" role="status" aria-live="polite">
+          <div className="afc-loader">
+            <span className="afc-loader-glow" />
+            <span className="afc-loader-ring" />
+            <span className="afc-loader-ring afc-loader-ring-slow" />
+            <img
+              className="afc-loader-icon afc-loader-icon-light"
+              src={ICON}
+              alt=""
+            />
+            <img
+              className="afc-loader-icon afc-loader-icon-dark"
+              src={ICON_DARK}
+              alt=""
+            />
+          </div>
+
+          <p className="loading-text">
+            {t("loading", { defaultValue: "Loading" })}
+            <span className="loading-dots" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+          </p>
+        </Box>
+      </Fade>
+    </Modal>
   );
 };
 

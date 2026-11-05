@@ -39,6 +39,8 @@ import StatusChip from "../common/StatusChip";
 import EmptyState from "../common/EmptyState";
 import PageLoader from "../common/PageLoader";
 import ConfirmDialog from "../common/ConfirmDialog";
+import AdminNav from "../common/AdminNav";
+import "../styles/admin.css";
 
 const TICKETS_POLL_MS = 30000;
 const MESSAGES_POLL_MS = 10000;
@@ -227,7 +229,11 @@ const SupportPage = () => {
   const isClosed = selected?.status === "closed";
 
   return (
-    <div className={`support-page ${selected ? "chat-open" : ""}`}>
+    <div className="support-screen">
+      {/* Admins get the section nav here, same as the other admin pages */}
+      {isAdmin && <AdminNav className="admin-nav-bar support-admin-bar" />}
+
+      <div className={`support-page ${selected ? "chat-open" : ""}`}>
       {/* ================= TICKET LIST ================= */}
       <aside className="support-list">
         <div className="support-list-head">
@@ -439,6 +445,7 @@ const SupportPage = () => {
         onConfirm={handleCloseTicket}
         onClose={() => setCloseOpen(false)}
       />
+      </div>
     </div>
   );
 };

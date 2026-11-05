@@ -42,7 +42,9 @@ const ProtectedRoute = ({ roles = [], children }) => {
   const location = useLocation();
 
   if (!isSignedIn) {
-    return <Navigate to="/signin" replace state={{ from: location.pathname }} />;
+    return (
+      <Navigate to="/signin" replace state={{ from: location.pathname }} />
+    );
   }
   if (roles.length > 0 && !roles.includes(user?.role)) {
     return <Navigate to="/home" replace />;
@@ -67,12 +69,8 @@ const ScrollToTop = () => {
 
 const AppShell = () => {
   const { ready } = useAuth();
-  const { pathname } = useLocation();
 
   if (!ready) return <LoadingSpinner open />;
-
-  // Chat screen fills the viewport, so it has no footer
-  const hideFooter = pathname.startsWith("/support");
 
   return (
     <div className="app-root">
@@ -85,56 +83,106 @@ const AppShell = () => {
           <Route path="/home" element={<Home />} />
           <Route path="/ad/:id" element={<AdDetails />} />
 
-          <Route path="/signin" element={<GuestRoute><SignIn /></GuestRoute>} />
-          <Route path="/signup" element={<GuestRoute><SignUp /></GuestRoute>} />
+          <Route
+            path="/signin"
+            element={
+              <GuestRoute>
+                <SignIn />
+              </GuestRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <GuestRoute>
+                <SignUp />
+              </GuestRoute>
+            }
+          />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify/:token" element={<VerifyAccount />} />
 
           <Route
             path="/profile"
-            element={<ProtectedRoute roles={["user", "admin"]}><Profile /></ProtectedRoute>}
+            element={
+              <ProtectedRoute roles={["user", "admin"]}>
+                <Profile />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/support"
-            element={<ProtectedRoute roles={["user", "admin"]}><SupportPage /></ProtectedRoute>}
+            element={
+              <ProtectedRoute roles={["user", "admin"]}>
+                <SupportPage />
+              </ProtectedRoute>
+            }
           />
 
           <Route
             path="/post-ad"
-            element={<ProtectedRoute roles={["user"]}><PostAd /></ProtectedRoute>}
+            element={
+              <ProtectedRoute roles={["user"]}>
+                <PostAd />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/saved-ads"
-            element={<ProtectedRoute roles={["user"]}><SavedAds /></ProtectedRoute>}
+            element={
+              <ProtectedRoute roles={["user"]}>
+                <SavedAds />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/my-ads"
-            element={<ProtectedRoute roles={["user"]}><MyAds /></ProtectedRoute>}
+            element={
+              <ProtectedRoute roles={["user"]}>
+                <MyAds />
+              </ProtectedRoute>
+            }
           />
 
           <Route
             path="/dashboard"
-            element={<ProtectedRoute roles={["admin"]}><AdminDashboard /></ProtectedRoute>}
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/ads"
-            element={<ProtectedRoute roles={["admin"]}><AllAds /></ProtectedRoute>}
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AllAds />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/users"
-            element={<ProtectedRoute roles={["admin"]}><AllUsers /></ProtectedRoute>}
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AllUsers />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/categories"
-            element={<ProtectedRoute roles={["admin"]}><AllCategories /></ProtectedRoute>}
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AllCategories />
+              </ProtectedRoute>
+            }
           />
 
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </main>
 
-      {!hideFooter && <Footer />}
+      <Footer />
     </div>
   );
 };

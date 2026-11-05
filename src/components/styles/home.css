@@ -73,7 +73,6 @@ body.lang-si .hero h1 {
   border-radius: 18px;
   padding: 6px;
   box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.6);
-  max-width: 980px;
 }
 
 [data-theme="dark"] .search-bar {

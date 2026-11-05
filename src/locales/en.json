@@ -681,5 +681,11 @@
     },
     "admin": {
         "nav_label": "Admin sections"
+    },
+    "snackbar": {
+        "success": "Success",
+        "error": "Something went wrong",
+        "warning": "Please note",
+        "info": "Information"
     }
 }

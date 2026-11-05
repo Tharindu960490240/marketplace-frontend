@@ -10,12 +10,25 @@
   overflow: hidden;
 }
 
+/* Let the pagination controls wrap instead of forcing the card wider
+   than the screen on narrow viewports */
+.data-card .MuiTablePagination-toolbar {
+  flex-wrap: wrap;
+  row-gap: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.data-card .MuiTablePagination-spacer {
+  flex: 1 0 0;
+}
+
 .data-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px 16px;
-  padding: 6px 16px 0;
+  padding: 6px 16px 10px;
   border-bottom: 1px solid var(--c-border);
   flex-wrap: wrap;
 }
@@ -29,8 +42,20 @@
   padding-bottom: 8px;
 }
 
+/* Horizontal scroll fallback so a wide table never clips its last column */
+.data-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .data-table {
   width: 100%;
+  min-width: 720px;
+}
+
+/* long emails / titles wrap instead of forcing the table wider than the card */
+.cell-sub {
+  overflow-wrap: anywhere;
 }
 
 .data-table .MuiTableRow-root:hover .MuiTableCell-body {
@@ -118,11 +143,15 @@
 /* ---------- Stacked cards on small screens ---------- */
 @media (max-width: 760px) {
   .data-toolbar {
-    padding: 4px 12px 0;
+    padding: 4px 12px 8px;
   }
 
   .data-search {
     width: 100%;
+  }
+
+  .data-scroll {
+    overflow-x: visible;
   }
 
   .data-table thead {
@@ -135,6 +164,7 @@
   .data-table td {
     display: block;
     width: 100%;
+    min-width: 0;
   }
 
   .data-table tr {
