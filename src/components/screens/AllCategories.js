@@ -1,575 +1,296 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-  Tabs,
+  Button,
+  IconButton,
+  InputAdornment,
+  LinearProgress,
   Tab,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
-  TableRow,
-  Paper,
   TablePagination,
-  Box,
+  TableRow,
+  Tabs,
   TextField,
-  InputAdornment,
-  IconButton,
-  Chip,
-  Modal,
   Tooltip,
-  Dialog,
-  DialogActions,
-  DialogContentText,
-  DialogContent,
-  DialogTitle,
 } from "@mui/material";
-
 import {
-  Search,
-  ToggleOn,
-  ToggleOff,
-  Add,
-  Category,
-  Close,
-  Delete,
+  AddRounded,
+  CategoryOutlined,
+  DeleteOutline,
+  SearchRounded,
+  ToggleOffOutlined,
+  ToggleOnOutlined,
 } from "@mui/icons-material";
-
-import {
-  getAllCategoriesAdmin,
-  createCategory,
-  updateCategoryStatus,
-  deleteCategory,
-} from "../../services/categoryService";
-
-import { get_token } from "../../services/authService";
-
-import LoadingSpinner from "./LoadingSpinner";
-import CustomSnackbar from "./CustomSnackbar";
-
-import "../styles/allCategories.css";
-
 import { useTranslation } from "react-i18next";
 
-// ================= TABS =================
-const statusTabs = ["active", "inactive"];
+import "../styles/dataTable.css";
 
-// ================= DEBOUNCE =================
-const useDebounce = (value, delay) => {
-  const [debounced, setDebounced] = useState(value);
+import {
+  createCategory,
+  deleteCategory,
+  getAllCategoriesAdmin,
+  updateCategoryStatus,
+} from "../../services/categoryService";
+import { get_token } from "../../services/authService";
+import { useNotify } from "../../context/NotifyContext";
+import useDebounce from "../../hooks/useDebounce";
+import { formatDate } from "../../utils/format";
+import { isText } from "../../utils/validation";
+import AdminLayout from "../common/AdminLayout";
+import StatusChip from "../common/StatusChip";
+import EmptyState from "../common/EmptyState";
+import ConfirmDialog from "../common/ConfirmDialog";
 
-  useEffect(() => {
-    const handler = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-
-  return debounced;
-};
+const STATUS_TABS = ["active", "inactive"];
 
 const AllCategories = () => {
-  const { t } = useTranslation();
-  const [tabIndex, setTabIndex] = useState(0);
+  const { t, i18n } = useTranslation();
+  const notify = useNotify();
 
+  const [tab, setTab] = useState(0);
   const [categories, setCategories] = useState([]);
   const [total, setTotal] = useState(0);
-
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
   const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounce(search, 500);
+  const debouncedSearch = useDebounce(search.trim(), 450);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
 
-  const [loading, setLoading] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [addSubmitted, setAddSubmitted] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deletCategoryId, setDeleteCategoryId] = useState(null);
+  useEffect(() => setPage(0), [debouncedSearch, tab, rowsPerPage]);
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-
-  const handleClose = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
-  // ================= FETCH =================
   const fetchCategories = useCallback(async () => {
-    try {
-      const token = await get_token();
-
-      if (!token) {
-        setSnackbar({
-          open: true,
-          message: t("all_categories_page.session_expired"),
-          severity: "error",
-        });
-        return;
-      }
-      setLoading(true);
-
-      const res = await getAllCategoriesAdmin(token, {
-        page: page + 1,
-        limit: rowsPerPage,
-        search: debouncedSearch,
-        status: statusTabs[tabIndex],
-      });
-
-      if (res.success) {
-        setCategories(res.data);
-        setTotal(res.total);
-      } else {
-        setSnackbar({
-          open: true,
-          message: t("all_categories_page.load_error"),
-          severity: "error",
-        });
-      }
-    } catch (err) {
-      setSnackbar({
-        open: true,
-        message: t("all_categories_page.load_error"),
-        severity: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [page, rowsPerPage, debouncedSearch, tabIndex, t]);
-
-  // ================= ADD =================
-  const handleAddCategory = async () => {
-    const token = await get_token();
-
-    if (!token) {
-      setSnackbar({
-        open: true,
-        message: t("all_categories_page.session_expired"),
-        severity: "error",
-      });
-      return;
-    }
-
-    const isValidCategory = /^[A-Za-z\u0D80-\u0DFF\p{L}\s\-()]+$/u.test(
-      categoryData.category,
-    );
-
-    setCategoryData({
-      ...categoryData,
-      isValidCategory,
-    });
-
-    if (!isValidCategory) {
-      setSnackbar({
-        open: true,
-        message: t("all_categories_page.invalid_name"),
-        severity: "error",
-      });
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const res = await createCategory(token, {
-        name: categoryData.category,
-      });
-
-      if (res.success) {
-        setSnackbar({
-          open: true,
-          message: t("all_categories_page.add_success"),
-          severity: "success",
-        });
-
-        setCategoryData({
-          category: "",
-          isValidCategory: true,
-        });
-
-        fetchCategories();
-      } else {
-        setSnackbar({
-          open: true,
-          message: t("all_categories_page.add_error"),
-          severity: "error",
-        });
-      }
-    } catch (err) {
-      setSnackbar({
-        open: true,
-        message: t("all_categories_page.add_error"),
-        severity: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ================= STATUS TOGGLE =================
-  const handleToggleStatus = async (id, current) => {
-    const token = await get_token();
-
-    if (!token) {
-      setSnackbar({
-        open: true,
-        message: t("all_categories_page.session_expired"),
-        severity: "error",
-      });
-      return;
-    }
-
     setLoading(true);
-    const newStatus = current === "active" ? "inactive" : "active";
-
-    try {
-      const res = await updateCategoryStatus(token, id, newStatus);
-      if (res.success) {
-        setSnackbar({
-          open: true,
-          message: t("all_categories_page.status_updated"),
-          severity: "success",
-        });
-        fetchCategories();
-      } else {
-        setLoading(false);
-        setSnackbar({
-          open: true,
-          message: t("all_categories_page.status_update_error"),
-          severity: "error",
-        });
-      }
-    } catch (err) {
-      setLoading(false);
-      setSnackbar({
-        open: true,
-        message: t("all_categories_page.status_update_error"),
-        severity: "error",
-      });
-    }
-  };
-
-  const [showModal, setShowModal] = useState(false);
-
-  const [categoryData, setCategoryData] = useState({
-    category: "",
-    isValidCategory: true,
-  });
-
-  // Reset Password Modal Logic
-  const handleModalOpen = () => {
-    setCategoryData({
-      category: "",
-      isValidCategory: true,
-    });
-    setShowModal(true);
-  };
-
-  const handleCategoryChange = (val) => {
-    const isValidCategory = /^[A-Za-z\u0D80-\u0DFF\p{L}\s\-()]+$/u.test(val);
-    setCategoryData({ ...categoryData, category: val, isValidCategory });
-  };
-
-  const handleDelete = async () => {
     const token = await get_token();
-
-    if (!token) {
-      setSnackbar({
-        open: true,
-        message: t("all_categories_page.session_expired"),
-        severity: "error",
-      });
-      return;
+    const res = await getAllCategoriesAdmin(token, {
+      page: page + 1,
+      limit: rowsPerPage,
+      search: debouncedSearch,
+      status: STATUS_TABS[tab],
+    });
+    if (res.success) {
+      setCategories(res.data);
+      setTotal(res.total);
+    } else {
+      notify(t("all_categories_page.load_error"), "error");
     }
-
-    setLoading(true);
-
-    try {
-      const res = await deleteCategory(token, deletCategoryId);
-
-      if (res.success) {
-        setSnackbar({
-          open: true,
-          message: t("all_categories_page.delete_success"),
-          severity: "success",
-        });
-
-        // close dialog
-        setDeleteDialogOpen(false);
-        fetchCategories();
-      } else {
-        setLoading(false);
-        setSnackbar({
-          open: true,
-          message: t("all_categories_page.delete_error"),
-          severity: "error",
-        });
-      }
-    } catch (error) {
-      setLoading(false);
-      setSnackbar({
-        open: true,
-        message: t("all_categories_page.delete_error"),
-        severity: "error",
-      });
-    } finally {
-    }
-  };
-
-  const deleteDialogOpenCategory = (id) => {
-    setDeleteCategoryId(id);
-    setDeleteDialogOpen(true);
-  };
-
-  const statusChip = (status) => {
-    const map = {
-      active: "success",
-      inactive: "error",
-    };
-
-    const label =
-      status === "active"
-        ? t("all_categories_page.status_active")
-        : t("all_categories_page.status_inactive");
-
-    return <Chip label={label} color={map[status]} size="small" />;
-  };
+    setLoading(false);
+  }, [page, rowsPerPage, debouncedSearch, tab, notify, t]);
 
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
 
+  /* ================= ADD ================= */
+  const nameError = addSubmitted && !isText(newName, 2);
+
+  const closeAdd = () => {
+    setAddOpen(false);
+    setNewName("");
+    setAddSubmitted(false);
+  };
+
+  const handleAdd = async () => {
+    setAddSubmitted(true);
+    if (!isText(newName, 2)) return;
+
+    setBusy(true);
+    const token = await get_token();
+    const res = await createCategory(token, { name: newName.trim() });
+    setBusy(false);
+
+    if (res.success) {
+      notify(t("all_categories_page.add_success"));
+      closeAdd(); // the dialog used to stay open after saving
+      fetchCategories();
+    } else {
+      notify(res.message || t("all_categories_page.add_error"), "error");
+    }
+  };
+
+  /* ================= STATUS / DELETE ================= */
+  const toggleStatus = async (cat) => {
+    setBusy(true);
+    const token = await get_token();
+    const res = await updateCategoryStatus(
+      token,
+      cat.id,
+      cat.status === "active" ? "inactive" : "active",
+    );
+    setBusy(false);
+
+    if (res.success) {
+      notify(t("all_categories_page.status_updated"));
+      fetchCategories();
+    } else {
+      notify(res.message || t("all_categories_page.status_update_error"), "error");
+    }
+  };
+
+  const handleDelete = async () => {
+    setBusy(true);
+    const token = await get_token();
+    const res = await deleteCategory(token, deleteId);
+    setBusy(false);
+
+    if (res.success) {
+      notify(t("all_categories_page.delete_success"));
+      setDeleteId(null);
+      fetchCategories();
+    } else {
+      notify(res.message || t("all_categories_page.delete_error"), "error");
+    }
+  };
+
   return (
-    <>
-      <Box className="allCategories-container" p={2}>
-        <h2>{t("all_categories_page.title")}</h2>
-
-        <div className="button-group">
-          <button onClick={handleModalOpen} className="button-success">
-            <Add style={{ marginRight: 5 }} />
-            {t("all_categories_page.add_new")}
-          </button>
-        </div>
-        {/*  TABS (NEW) */}
-        <Tabs
-          value={tabIndex}
-          onChange={(e, v) => {
-            setTabIndex(v);
-            setPage(0);
-          }}
-          variant="scrollable"
-          scrollButtons
-          allowScrollButtonsMobile
-        >
-          <Tab label={t("all_categories_page.tab_active")} />
-          <Tab label={t("all_categories_page.tab_inactive")} />
-        </Tabs>
-
-        {/* ACTION BAR */}
-        <Box className="allCategories-actions">
+    <AdminLayout
+      title={t("all_categories_page.title")}
+      subtitle={t("all_categories_page.subtitle")}
+      actions={
+        <Button variant="contained" startIcon={<AddRounded />} onClick={() => setAddOpen(true)}>
+          {t("all_categories_page.add_new")}
+        </Button>
+      }
+    >
+      <div className="data-card">
+        <div className="data-toolbar">
+          <Tabs value={tab} onChange={(_e, v) => setTab(v)}>
+            {STATUS_TABS.map((s) => (
+              <Tab key={s} label={t(`status.${s}`)} />
+            ))}
+          </Tabs>
           <TextField
-            className="custom-textfield"
-            size="small"
-            label={t("all_categories_page.search_label")}
+            className="data-search"
+            placeholder={t("all_categories_page.search_label")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Search />
+                  <SearchRounded fontSize="small" />
                 </InputAdornment>
               ),
             }}
           />
-        </Box>
-
-        {/* TABLE */}
-        <Paper sx={{ mt: 2 }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t("all_categories_page.name")}</TableCell>
-                  <TableCell>{t("all_categories_page.status")}</TableCell>
-                  <TableCell>{t("all_categories_page.created")}</TableCell>
-                  <TableCell>{t("all_categories_page.actions")}</TableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {categories.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} align="center">
-                      {t("all_categories_page.empty")}
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  categories.map((c) => (
-                    <TableRow key={c.id}>
-                      <TableCell>{c.name}</TableCell>
-                      <TableCell>{statusChip(c.status)}</TableCell>
-                      <TableCell>
-                        {new Date(c.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        {c.status !== "active" ? (
-                          <Tooltip
-                            title={t("all_categories_page.tooltip_activate")}
-                          >
-                            <IconButton
-                              color="secondary"
-                              onClick={() => handleToggleStatus(c.id, c.status)}
-                            >
-                              <ToggleOn color="success" />
-                            </IconButton>
-                          </Tooltip>
-                        ) : (
-                          <Tooltip
-                            title={t("all_categories_page.tooltip_deactivate")}
-                          >
-                            <IconButton
-                              onClick={() => handleToggleStatus(c.id, c.status)}
-                            >
-                              <ToggleOff color="error" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                        <Tooltip
-                          title={t("all_categories_page.tooltip_delete")}
-                        >
-                          <IconButton
-                            color="secondary"
-                            onClick={() => deleteDialogOpenCategory(c.id)}
-                          >
-                            <Delete color="error" />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          {/* PAGINATION */}
-          <TablePagination
-            component="div"
-            count={total}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(e, p) => setPage(p)}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setPage(0);
-            }}
-          />
-        </Paper>
-      </Box>
-
-      <Modal open={showModal}>
-        <div className="add-category-modal">
-          <IconButton
-            onClick={() => setShowModal(false)}
-            style={{
-              position: "absolute",
-              right: 10,
-              top: 10,
-              color: "var(--muted-color)",
-            }}
-          >
-            <Close />
-          </IconButton>
-          <h2 className="modal-title">
-            {t("all_categories_page.modal_title")}
-          </h2>
-
-          <TextField
-            className="custom-textfield"
-            size="small"
-            label={t("all_categories_page.modal_input")}
-            type="text"
-            fullWidth
-            margin="normal"
-            variant="outlined"
-            onChange={(e) => handleCategoryChange(e.target.value)}
-            required
-            error={!categoryData.isValidCategory}
-            helperText={
-              !categoryData.isValidCategory
-                ? t("all_categories_page.modal_error")
-                : ""
-            }
-            value={categoryData.category}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Category />
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          <div className="button-group">
-            <button onClick={handleAddCategory} className="button-success">
-              {t("all_categories_page.save")}
-            </button>
-
-            <button
-              onClick={() => setShowModal(false)}
-              className="button-error"
-            >
-              {t("all_categories_page.cancel")}
-            </button>
-          </div>
         </div>
-      </Modal>
 
-      <LoadingSpinner open={loading} />
-      <CustomSnackbar {...snackbar} onClose={handleClose} />
+        {loading && <LinearProgress />}
 
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        aria-labelledby="delete-category-dialog-title"
-        fullWidth
-        maxWidth="xs"
+        <Table className="data-table">
+          <TableHead>
+            <TableRow>
+              <TableCell>{t("all_categories_page.name")}</TableCell>
+              <TableCell>{t("all_categories_page.status")}</TableCell>
+              <TableCell>{t("all_categories_page.created")}</TableCell>
+              <TableCell align="right">{t("all_categories_page.actions")}</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {!loading && categories.length === 0 && (
+              <TableRow className="data-empty">
+                <TableCell colSpan={4}>
+                  <EmptyState compact icon={<CategoryOutlined />} title={t("all_categories_page.empty")} />
+                </TableCell>
+              </TableRow>
+            )}
+
+            {categories.map((c) => (
+              <TableRow key={c.id}>
+                <TableCell className="cell-main">
+                  <strong>{c.name}</strong>
+                </TableCell>
+                <TableCell data-label={t("all_categories_page.status")}>
+                  <StatusChip status={c.status} />
+                </TableCell>
+                <TableCell data-label={t("all_categories_page.created")}>
+                  {formatDate(c.created_at, i18n.language)}
+                </TableCell>
+                <TableCell>
+                  <div className="cell-actions">
+                    <Tooltip
+                      title={
+                        c.status === "active"
+                          ? t("all_categories_page.tooltip_deactivate")
+                          : t("all_categories_page.tooltip_activate")
+                      }
+                    >
+                      <span>
+                        <IconButton
+                          className={`icon-btn ${c.status === "active" ? "" : "success"}`}
+                          disabled={busy}
+                          onClick={() => toggleStatus(c)}
+                        >
+                          {c.status === "active" ? (
+                            <ToggleOnOutlined fontSize="small" color="success" />
+                          ) : (
+                            <ToggleOffOutlined fontSize="small" />
+                          )}
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+                    <Tooltip title={t("all_categories_page.tooltip_delete")}>
+                      <IconButton className="icon-btn danger" onClick={() => setDeleteId(c.id)}>
+                        <DeleteOutline fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        <TablePagination
+          component="div"
+          count={total}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          rowsPerPageOptions={[10, 25, 50]}
+          onPageChange={(_e, p) => setPage(p)}
+          onRowsPerPageChange={(e) => setRowsPerPage(parseInt(e.target.value, 10))}
+          labelRowsPerPage={t("common.rows_per_page")}
+        />
+      </div>
+
+      <ConfirmDialog
+        open={addOpen}
+        title={t("all_categories_page.modal_title")}
+        confirmLabel={t("all_categories_page.save")}
+        onConfirm={handleAdd}
+        onClose={closeAdd}
+        busy={busy}
+        danger={false}
       >
-        <DialogTitle id="delete-category-dialog-title">
-          {t("all_categories_page.dialog_title")}
-          <IconButton
-            aria-label="close"
-            onClick={() => setDeleteDialogOpen(false)}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: "var(--muted-color)",
-            }}
-          >
-            <Close />
-          </IconButton>
-        </DialogTitle>
+        <TextField
+          sx={{ mt: 1 }}
+          label={t("all_categories_page.modal_input")}
+          autoFocus
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+          error={nameError}
+          helperText={nameError ? t("all_categories_page.modal_error") : ""}
+          inputProps={{ maxLength: 60 }}
+        />
+      </ConfirmDialog>
 
-        <DialogContent dividers>
-          <DialogContentText>
-            {t("all_categories_page.dialog_message")}
-          </DialogContentText>
-        </DialogContent>
-
-        <DialogActions sx={{ p: 2 }}>
-          <button
-            className="button-success"
-            onClick={() => setDeleteDialogOpen(false)}
-          >
-            {t("all_categories_page.cancel")}
-          </button>
-
-          <button className="button-error" onClick={handleDelete}>
-            {t("all_categories_page.delete")}
-          </button>
-        </DialogActions>
-      </Dialog>
-    </>
+      <ConfirmDialog
+        open={!!deleteId}
+        title={t("all_categories_page.dialog_title")}
+        message={t("all_categories_page.dialog_message")}
+        confirmLabel={t("all_categories_page.delete")}
+        onConfirm={handleDelete}
+        onClose={() => setDeleteId(null)}
+        busy={busy}
+      />
+    </AdminLayout>
   );
 };
 

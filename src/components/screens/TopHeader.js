@@ -1,530 +1,357 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import { Switch, Avatar, Badge } from "@mui/material";
-
+import React, { useCallback, useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
-  Home,
-  Dashboard,
-  AddCircle,
-  Login,
-  PersonAdd,
-  Logout,
-  AccountCircle,
+  Avatar,
+  Badge,
+  Button,
+  Divider,
+  Drawer,
+  IconButton,
+  ListItemIcon,
   Menu,
+  MenuItem,
+  Tooltip,
+} from "@mui/material";
+import {
+  AddRounded,
+  AccountCircleOutlined,
+  BookmarkBorder,
+  CampaignOutlined,
+  CategoryOutlined,
+  ChatBubbleOutline,
   Close,
-  BorderColor,
-  LightMode,
-  DarkMode,
-  People,
-  Category,
-  Bookmark,
-  Notifications,
-  ChatBubble,
-  Language,
+  DarkModeOutlined,
+  DashboardOutlined,
+  LightModeOutlined,
+  Logout,
+  Menu as MenuIcon,
+  NotificationsNoneRounded,
+  PeopleOutline,
+  StorefrontOutlined,
+  TranslateRounded,
 } from "@mui/icons-material";
-
-import "../styles/topHeader.css";
-import "../styles/modal.css";
-
-import LoadingSpinner from "./LoadingSpinner";
-import CustomSnackbar from "./CustomSnackbar";
-
-import * as AppConst from "../../const/const";
-
-import { get_token, getProfile } from "../../services/authService";
-import { getSavedAds } from "../../services/savedAdService";
-import { getNotificationsCount } from "../../services/notificationService";
-
 import { useTranslation } from "react-i18next";
 
-const TopHeader = ({ onSignOut, isSignedIn }) => {
-  const { t, i18n } = useTranslation();
+import "../styles/topHeader.css";
 
+import * as AppConst from "../../const/const";
+import { get_token } from "../../services/authService";
+import { getSavedAds } from "../../services/savedAdService";
+import { getNotificationsCount } from "../../services/notificationService";
+import { useAuth } from "../../context/AuthContext";
+import { usePreferences } from "../../context/PreferencesContext";
+import { useNotify } from "../../context/NotifyContext";
+
+const POLL_MS = 60000;
+
+const TopHeader = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  const notify = useNotify();
+  const { user, isSignedIn, signOut } = useAuth();
+  const { mode, toggleMode, language, toggleLanguage } = usePreferences();
 
-  const [loading, setLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-
-  const [openMenu, setOpenMenu] = useState(false);
-  const [mobileMenu, setMobileMenu] = useState(false);
-  const profileRef = useRef();
-
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
-
   const [savedCount, setSavedCount] = useState(0);
 
-  const [user, setUser] = useState(null);
+  const isUser = user?.role === "user";
+  const isAdmin = user?.role === "admin";
 
-  const [darkMode, setDarkMode] = useState(
-    document.documentElement.getAttribute("data-theme") === "dark",
-  );
+  /* ================= COUNTS ================= */
+  const fetchSavedCount = useCallback(async () => {
+    const token = await get_token();
+    if (!token) return setSavedCount(0);
+    // Only the total is needed, so ask for a single item
+    const res = await getSavedAds(token, { page: 1, limit: 1 });
+    setSavedCount(res.success ? res.total : 0);
+  }, []);
 
-  const [language, setLanguage] = useState(
-    document.documentElement.getAttribute("language") || "en",
-  );
-
-  const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    document.documentElement.setAttribute(
-      "data-theme",
-      newMode ? "dark" : "light",
-    );
-  };
-
-  const toggleLanguage = () => {
-    const newLang = language === "en" ? "si" : "en";
-    setLanguage(newLang);
-    document.documentElement.setAttribute("language", newLang);
-  };
+  const fetchNotificationCount = useCallback(async () => {
+    const token = await get_token();
+    if (!token) return setNotificationCount(0);
+    const res = await getNotificationsCount(token);
+    if (res.success) setNotificationCount(Number(res.data) || 0);
+  }, []);
 
   useEffect(() => {
-    i18n.changeLanguage(language);
-  }, [language, i18n]);
+    if (!isSignedIn) {
+      setSavedCount(0);
+      setNotificationCount(0);
+      return undefined;
+    }
 
+    fetchNotificationCount();
+    if (isUser) fetchSavedCount();
+
+    const timer = setInterval(fetchNotificationCount, POLL_MS);
+    window.addEventListener("savedChanged", fetchSavedCount);
+    window.addEventListener("notificationUpdated", fetchNotificationCount);
+
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("savedChanged", fetchSavedCount);
+      window.removeEventListener("notificationUpdated", fetchNotificationCount);
+    };
+  }, [isSignedIn, isUser, fetchSavedCount, fetchNotificationCount]);
+
+  /* ================= ACTIONS ================= */
   const goTo = (path) => {
+    setMenuAnchor(null);
+    setDrawerOpen(false);
     navigate(path);
-    setMobileMenu(false);
-    setOpenMenu(false);
-  };
-
-  const handleClose = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   const handleLogout = () => {
-    localStorage.clear();
-
-    setLoading(true);
-    setSnackbar({
-      open: true,
-      message: t("header.logoutSuccess"),
-      severity: "success",
-    });
-
-    setTimeout(() => {
-      setLoading(false);
-      setMobileMenu(false);
-      setOpenMenu(false);
-      setUser(null);
-      onSignOut();
-      navigate("/home");
-    }, 2500);
+    setMenuAnchor(null);
+    setDrawerOpen(false);
+    signOut();
+    notify(t("header.logoutSuccess"));
+    navigate("/home");
   };
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (profileRef.current && !profileRef.current.contains(e.target)) {
-        setOpenMenu(false);
-      }
-    };
+  /* One list of account links, shared by the menu and the drawer */
+  const accountLinks = [
+    { show: true, to: "/profile", icon: <AccountCircleOutlined />, label: t("header.profile") },
+    { show: isAdmin, to: "/dashboard", icon: <DashboardOutlined />, label: t("header.dashboard") },
+    { show: isAdmin, to: "/ads", icon: <CampaignOutlined />, label: t("header.manageAds") },
+    { show: isAdmin, to: "/users", icon: <PeopleOutline />, label: t("header.manageUsers") },
+    { show: isAdmin, to: "/categories", icon: <CategoryOutlined />, label: t("header.manageCategories") },
+    { show: isUser, to: "/my-ads", icon: <CampaignOutlined />, label: t("header.myAds") },
+    {
+      show: isUser,
+      to: "/saved-ads",
+      icon: <BookmarkBorder />,
+      label: t("header.mySavedAds"),
+      count: savedCount,
+    },
+    {
+      show: true,
+      to: "/support",
+      icon: <ChatBubbleOutline />,
+      label: isUser ? t("header.contactUs") : t("header.giveSupport"),
+      count: notificationCount,
+    },
+  ].filter((l) => l.show);
 
-    const handleResize = () => {
-      if (window.innerWidth > 800) {
-        setMobileMenu(false);
-        setOpenMenu(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const saved_token = await get_token();
-      if (!saved_token) return;
-
-      try {
-        const res = await getProfile(saved_token);
-
-        if (res.success) {
-          const user = res.user;
-          setUser(user);
-        } else {
-          setUser(null);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchUserData();
-
-    window.addEventListener("profileUpdated", fetchUserData);
-
-    return () => window.removeEventListener("profileUpdated", fetchUserData);
-  }, [isSignedIn]);
-
-  const fetchSavedAds = useCallback(async () => {
-    try {
-      const token = await get_token();
-      if (!token) return;
-
-      const res = await getSavedAds(token);
-
-      if (res?.success) {
-        setSavedCount(res.total || res.data?.length || 0);
-      } else {
-        setSavedCount(0);
-      }
-    } catch (err) {
-      console.error(err);
-      setSavedCount(0);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isSignedIn) {
-      fetchSavedAds();
-      window.addEventListener("savedChanged", fetchSavedAds);
-
-      return () => window.removeEventListener("savedChanged", fetchSavedAds);
-    }
-  }, [fetchSavedAds, isSignedIn]);
-
-  const fetchNotificationsCount = useCallback(async () => {
-    try {
-      const token = await get_token();
-      if (!token) return;
-
-      const res = await getNotificationsCount(token);
-
-      if (res?.success) {
-        setNotificationCount(res.data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isSignedIn) {
-      fetchNotificationsCount();
-
-      // refresh when new notification comes
-      window.addEventListener("notificationUpdated", fetchNotificationsCount);
-
-      return () =>
-        window.removeEventListener(
-          "notificationUpdated",
-          fetchNotificationsCount,
-        );
-    }
-  }, [fetchNotificationsCount, isSignedIn]);
+  const avatarSrc = user?.profile_image || AppConst.PROFILE_PLACEHOLDER_IMAGE;
 
   return (
     <>
-      {/* ================= HEADER ================= */}
-      <header className="header">
-        {/* LEFT LOGO */}
-        <div className="header-left" onClick={() => goTo("/")}>
-          <img
-            src={
-              darkMode
-                ? "/assets/navbar_logo_d.png"
-                : "/assets/navbar_logo.png"
-            }
-            alt="logo"
-            className="logo-img"
-          />
-        </div>
-
-        {/* CENTER NAV */}
-        <div className="header-center">
-          <div className="nav-item" onClick={() => goTo("/")}>
-            <Home /> {t("header.home")}
-          </div>
-
-          {isSignedIn && user?.role === "user" && (
-            <div
-              className="nav-item highlight"
-              onClick={() => goTo("/post-ad")}
-            >
-              <AddCircle />{" "}
-              <span style={{ marginBottom: "2px" }}>{t("header.postAd")}</span>
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT SIDE */}
-        <div className="header-right">
-          {/* NOTIFICATION */}
-          {isSignedIn && (
-            <div
-              className="nav-item notification"
-              onClick={() => goTo("/support")}
-            >
-              <Badge color="error" badgeContent={notificationCount} max={99}>
-                <Notifications />
-              </Badge>
-            </div>
-          )}
-
-          {/* MOBILE ICON */}
-          <div className="mobile-menu-icon" onClick={() => setMobileMenu(true)}>
-            <Menu />
-          </div>
-
-          {/* NOT LOGGED IN */}
-          {!isSignedIn && (
-            <>
-              <button
-                className="hide-in-mobile"
-                onClick={() => goTo("/signin")}
-              >
-                <Login /> <span>{t("header.signIn")}</span>
-              </button>
-
-              <button
-                className="primary hide-in-mobile"
-                onClick={() => goTo("/signup")}
-              >
-                <PersonAdd /> <span>{t("header.signUp")}</span>
-              </button>
-            </>
-          )}
-          {/* DARK MODE INSIDE DROPDOWN */}
-          <div className="nav-item toggle-theme hide-in-mobile">
-            <LightMode />
-            <Switch
-              checked={darkMode}
-              onChange={toggleDarkMode}
-              color="primary"
+      <header className="site-header">
+        <div className="site-header-inner">
+          <button className="brand" onClick={() => goTo("/home")} aria-label={t("header.home")}>
+            <img
+              src={mode === "dark" ? "/assets/navbar_logo_d.png" : "/assets/navbar_logo.png"}
+              alt="Agri Link Services"
+              className="brand-logo"
             />
-            <DarkMode />
-          </div>
+          </button>
 
-          <div className="nav-item hide-in-mobile" onClick={toggleLanguage}>
-            <Language />
-            {language === "en" ? "සිංහල" : "English"}
-          </div>
+          <nav className="header-nav" aria-label={t("header.menu")}>
+            <NavLink to="/home" className="header-link">
+              <StorefrontOutlined fontSize="small" />
+              {t("header.browse")}
+            </NavLink>
+            {isUser && (
+              <NavLink to="/my-ads" className="header-link">
+                <CampaignOutlined fontSize="small" />
+                {t("header.myAds")}
+              </NavLink>
+            )}
+            {isAdmin && (
+              <NavLink to="/dashboard" className="header-link">
+                <DashboardOutlined fontSize="small" />
+                {t("header.dashboard")}
+              </NavLink>
+            )}
+          </nav>
 
-          {/* PROFILE DROPDOWN */}
-          {isSignedIn && (
-            <div
-              className="profile-section"
-              ref={profileRef}
-              onClick={() => setOpenMenu(!openMenu)}
+          <div className="header-actions">
+            <Tooltip title={t("header.language")}>
+              <Button
+                className="header-lang hide-sm"
+                color="inherit"
+                size="small"
+                startIcon={<TranslateRounded fontSize="small" />}
+                onClick={toggleLanguage}
+              >
+                {language === "en" ? "සිංහල" : "English"}
+              </Button>
+            </Tooltip>
+
+            <Tooltip title={mode === "dark" ? t("header.light_mode") : t("header.dark_mode")}>
+              <IconButton className="header-icon hide-sm" onClick={toggleMode}>
+                {mode === "dark" ? <LightModeOutlined /> : <DarkModeOutlined />}
+              </IconButton>
+            </Tooltip>
+
+            {isSignedIn && (
+              <Tooltip title={t("header.notifications")}>
+                <IconButton className="header-icon" onClick={() => goTo("/support")}>
+                  <Badge color="error" badgeContent={notificationCount} max={99}>
+                    <NotificationsNoneRounded />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {isUser && (
+              <Button
+                variant="contained"
+                startIcon={<AddRounded />}
+                className="hide-sm"
+                onClick={() => goTo("/post-ad")}
+              >
+                {t("header.postAd")}
+              </Button>
+            )}
+
+            {!isSignedIn && (
+              <div className="hide-sm header-auth">
+                <Button color="inherit" onClick={() => goTo("/signin")}>
+                  {t("header.signIn")}
+                </Button>
+                <Button variant="contained" onClick={() => goTo("/signup")}>
+                  {t("header.signUp")}
+                </Button>
+              </div>
+            )}
+
+            {isSignedIn && (
+              <button
+                className="avatar-button hide-sm"
+                onClick={(e) => setMenuAnchor(e.currentTarget)}
+                aria-haspopup="menu"
+                aria-expanded={!!menuAnchor}
+              >
+                <Avatar src={avatarSrc} sx={{ width: 34, height: 34 }} />
+                <span className="avatar-name">{user?.first_name}</span>
+              </button>
+            )}
+
+            <IconButton
+              className="header-icon show-sm"
+              onClick={() => setDrawerOpen(true)}
+              aria-label={t("header.menu")}
             >
-              <Avatar
-                src={
-                  user && user.profile_image
-                    ? user.profile_image
-                    : AppConst.PROFILE_PLACEHOLDER_IMAGE
-                }
-                className="profile-avatar"
-              />
-              <span className="header-name">
-                {t("header.welcome")}, {user?.first_name}
-              </span>
-
-              {openMenu && (
-                <div className="dropdown-menu">
-                  <div
-                    className="dropdown-item"
-                    onClick={() => goTo("/profile")}
-                  >
-                    <AccountCircle /> {t("header.profile")}
-                  </div>
-
-                  {user?.role === "admin" && (
-                    <div
-                      className="dropdown-item"
-                      onClick={() => goTo("/dashboard")}
-                    >
-                      <Dashboard /> {t("header.dashboard")}
-                    </div>
-                  )}
-
-                  {user?.role === "admin" && (
-                    <div className="dropdown-item" onClick={() => goTo("/ads")}>
-                      <BorderColor /> {t("header.manageAds")}
-                    </div>
-                  )}
-
-                  {user?.role === "user" && (
-                    <div
-                      onClick={() => goTo("/saved-ads")}
-                      className="dropdown-item saved-item"
-                    >
-                      <Bookmark /> {t("header.mySavedAds")}
-                      <span className="badge-count">{savedCount}</span>
-                    </div>
-                  )}
-
-                  {user?.role === "user" && (
-                    <div
-                      className="dropdown-item"
-                      onClick={() => goTo("/my-ads")}
-                    >
-                      <BorderColor /> {t("header.myAds")}
-                    </div>
-                  )}
-
-                  {user?.role === "admin" && (
-                    <div
-                      className="dropdown-item"
-                      onClick={() => goTo("/users")}
-                    >
-                      <People />
-                      {t("header.manageUsers")}
-                    </div>
-                  )}
-
-                  {user?.role === "admin" && (
-                    <div
-                      className="dropdown-item"
-                      onClick={() => goTo("/categories")}
-                    >
-                      <Category />
-                      {t("header.manageCategories")}
-                    </div>
-                  )}
-
-                  <div
-                    className="dropdown-item saved-item"
-                    onClick={() => goTo("/support")}
-                  >
-                    <ChatBubble />
-                    {user?.role === "user"
-                      ? t("header.contactUs")
-                      : t("header.giveSupport")}
-                    <span className="badge-count">{notificationCount}</span>
-                  </div>
-
-                  <div className="dropdown-item" onClick={handleLogout}>
-                    <Logout /> {t("header.logout")}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+              <MenuIcon />
+            </IconButton>
+          </div>
         </div>
       </header>
 
+      {/* ================= DESKTOP ACCOUNT MENU ================= */}
+      <Menu
+        anchorEl={menuAnchor}
+        open={!!menuAnchor}
+        onClose={() => setMenuAnchor(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        PaperProps={{ className: "account-menu" }}
+      >
+        <div className="account-menu-head">
+          <strong>
+            {user?.first_name} {user?.last_name}
+          </strong>
+          <span>{user?.email}</span>
+        </div>
+        <Divider />
+        {accountLinks.map((link) => (
+          <MenuItem key={link.to} onClick={() => goTo(link.to)}>
+            <ListItemIcon>{link.icon}</ListItemIcon>
+            <span className="menu-label">{link.label}</span>
+            {link.count > 0 && <span className="menu-count">{link.count}</span>}
+          </MenuItem>
+        ))}
+        <Divider />
+        <MenuItem onClick={handleLogout}>
+          <ListItemIcon>
+            <Logout />
+          </ListItemIcon>
+          {t("header.logout")}
+        </MenuItem>
+      </Menu>
+
       {/* ================= MOBILE DRAWER ================= */}
-      <div className={`mobile-drawer ${mobileMenu ? "open" : ""}`}>
-        <div className="drawer-header">
-          <span>{t("header.menu")}</span>
-          <Close onClick={() => setMobileMenu(false)} />
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        PaperProps={{ className: "mobile-drawer" }}
+      >
+        <div className="drawer-head">
+          {isSignedIn ? (
+            <div className="drawer-user">
+              <Avatar src={avatarSrc} />
+              <div>
+                <strong>{user?.first_name}</strong>
+                <span>{user?.email}</span>
+              </div>
+            </div>
+          ) : (
+            <strong>{t("header.menu")}</strong>
+          )}
+          <IconButton onClick={() => setDrawerOpen(false)} aria-label={t("common.close")}>
+            <Close />
+          </IconButton>
         </div>
 
-        <div className="drawer-content">
-          <div onClick={() => goTo("/")}>
-            <Home /> {t("header.home")}
-          </div>
-
-          {isSignedIn && (
-            <>
-              <div onClick={() => goTo("/profile")}>
-                <AccountCircle /> {t("header.profile")}
-              </div>
-
-              {user?.role === "admin" && (
-                <div onClick={() => goTo("/dashboard")}>
-                  <Dashboard /> {t("header.dashboard")}
-                </div>
-              )}
-
-              {user?.role === "admin" && (
-                <div onClick={() => goTo("/ads")}>
-                  <BorderColor /> {t("header.manageAds")}
-                </div>
-              )}
-
-              {user?.role === "user" && (
-                <div onClick={() => goTo("/post-ad")}>
-                  <AddCircle /> {t("header.postAd")}
-                </div>
-              )}
-
-              {user?.role === "user" && (
-                <div onClick={() => goTo("/saved-ads")} className="saved-item">
-                  <Bookmark /> {t("header.mySavedAds")}
-                  <span className="badge-count">{savedCount}</span>
-                </div>
-              )}
-
-              {user?.role === "user" && (
-                <div onClick={() => goTo("/my-ads")}>
-                  <BorderColor /> {t("header.myAds")}
-                </div>
-              )}
-
-              {user?.role === "admin" && (
-                <div onClick={() => goTo("/users")}>
-                  <People />
-                  {t("header.manageUsers")}
-                </div>
-              )}
-
-              {user?.role === "admin" && (
-                <div onClick={() => goTo("/categories")}>
-                  <Category />
-                  {t("header.manageCategories")}
-                </div>
-              )}
-
-              <div onClick={() => goTo("/support")} className="saved-item">
-                <ChatBubble />
-                {user?.role === "user"
-                  ? t("header.contactUs")
-                  : t("header.giveSupport")}
-                <span className="badge-count">{notificationCount}</span>
-              </div>
-
-              <div onClick={handleLogout}>
-                <Logout /> {t("header.logout")}
-              </div>
-            </>
+        <div className="drawer-body">
+          {isUser && (
+            <Button
+              variant="contained"
+              fullWidth
+              startIcon={<AddRounded />}
+              onClick={() => goTo("/post-ad")}
+            >
+              {t("header.postAd")}
+            </Button>
           )}
+
+          <button className="drawer-link" onClick={() => goTo("/home")}>
+            <StorefrontOutlined /> {t("header.browse")}
+          </button>
+
+          {isSignedIn &&
+            accountLinks.map((link) => (
+              <button key={link.to} className="drawer-link" onClick={() => goTo(link.to)}>
+                {link.icon}
+                <span className="menu-label">{link.label}</span>
+                {link.count > 0 && <span className="menu-count">{link.count}</span>}
+              </button>
+            ))}
 
           {!isSignedIn && (
-            <>
-              <div onClick={() => goTo("/signin")}>
-                <Login /> {t("header.signIn")}
-              </div>
-
-              <div onClick={() => goTo("/signup")}>
-                <PersonAdd /> {t("header.signUp")}
-              </div>
-            </>
+            <div className="drawer-auth">
+              <Button variant="outlined" fullWidth onClick={() => goTo("/signin")}>
+                {t("header.signIn")}
+              </Button>
+              <Button variant="contained" fullWidth onClick={() => goTo("/signup")}>
+                {t("header.signUp")}
+              </Button>
+            </div>
           )}
 
-          <div className="toggle-theme">
-            <LightMode />
-            <Switch
-              checked={darkMode}
-              onChange={toggleDarkMode}
-              color="primary"
-            />
-            <DarkMode />
-          </div>
+          <Divider sx={{ my: 1 }} />
 
-          <div onClick={toggleLanguage}>
-            <Language />
-            <span>{language === "en" ? "සිංහල" : "English"}</span>
-          </div>
+          <button className="drawer-link" onClick={toggleMode}>
+            {mode === "dark" ? <LightModeOutlined /> : <DarkModeOutlined />}
+            {mode === "dark" ? t("header.light_mode") : t("header.dark_mode")}
+          </button>
+          <button className="drawer-link" onClick={toggleLanguage}>
+            <TranslateRounded />
+            {language === "en" ? "සිංහල" : "English"}
+          </button>
+
+          {isSignedIn && (
+            <button className="drawer-link danger" onClick={handleLogout}>
+              <Logout /> {t("header.logout")}
+            </button>
+          )}
         </div>
-      </div>
-
-      {/* OVERLAY */}
-      {mobileMenu && (
-        <div className="drawer-overlay" onClick={() => setMobileMenu(false)} />
-      )}
-
-      <CustomSnackbar {...snackbar} onClose={handleClose} />
-      <LoadingSpinner open={loading} />
+      </Drawer>
     </>
   );
 };

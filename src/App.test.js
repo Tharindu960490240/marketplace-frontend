@@ -1,8 +1,24 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen } from "@testing-library/react";
+import "./i18n";
+import App from "./App";
 
-test('renders learn react link', () => {
+beforeEach(() => {
+  localStorage.clear();
+  window.matchMedia =
+    window.matchMedia ||
+    (() => ({ matches: false, addListener() {}, removeListener() {} }));
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      ok: true,
+      status: 200,
+      text: () => Promise.resolve(JSON.stringify({ data: [], total: 0 })),
+    }),
+  );
+});
+
+test("renders the marketplace home page", async () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(
+    await screen.findByText(/Marketplace for Animals, Pets & Farm Supplies/i),
+  ).toBeInTheDocument();
 });

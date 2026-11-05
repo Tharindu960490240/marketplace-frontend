@@ -1,470 +1,280 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
 import {
-  Person,
-  Lock,
-  Phone,
-  Visibility,
-  VisibilityOff,
-  Email,
-  Close,
-} from "@mui/icons-material";
-
-import {
-  IconButton,
-  TextField,
-  InputAdornment,
+  Button,
   Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
   DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  InputAdornment,
+  TextField,
 } from "@mui/material";
-import "../styles/signUp.css";
-
-import LoadingSpinner from "./LoadingSpinner";
-import CustomSnackbar from "./CustomSnackbar";
-
-import { registerUser } from "../../services/authService";
-
+import {
+  Close,
+  EmailOutlined,
+  MarkEmailReadOutlined,
+  PersonOutline,
+  PhoneOutlined,
+} from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 
-const SignUp = () => {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
+import AuthLayout from "../common/AuthLayout";
+import PasswordField from "../common/PasswordField";
+import { registerUser } from "../../services/authService";
+import { useNotify } from "../../context/NotifyContext";
+import {
+  isEmail,
+  isName,
+  isPhone,
+  isStrongPassword,
+} from "../../utils/validation";
 
-  const initialUserData = {
-    first_name: "",
-    last_name: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: "",
-    showPassword: false,
-    isValidFirstName: true,
-    isValidLastName: true,
-    isValidEmail: true,
-    isValidPhone: true,
-    isValidPassword: true,
-    passwordMatch: true,
+const emptyForm = {
+  first_name: "",
+  last_name: "",
+  email: "",
+  phone: "",
+  password: "",
+  confirmPassword: "",
+};
+
+/* Live checklist so people see which password rule is missing */
+export const PasswordRules = ({ value }) => {
+  const { t } = useTranslation();
+  const rules = [
+    { ok: value.length >= 8, label: t("password_rules.length") },
+    { ok: /[A-Z]/.test(value), label: t("password_rules.upper") },
+    { ok: /[a-z]/.test(value), label: t("password_rules.lower") },
+    { ok: /\d/.test(value), label: t("password_rules.number") },
+    { ok: /[@$!%*?&]/.test(value), label: t("password_rules.special") },
+  ];
+  return (
+    <div className="password-rules" aria-live="polite">
+      {rules.map((r) => (
+        <span key={r.label} className={`password-rule ${r.ok ? "ok" : ""}`}>
+          {r.label}
+        </span>
+      ))}
+    </div>
+  );
+};
+
+const SignUp = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const notify = useNotify();
+
+  const [form, setForm] = useState(emptyForm);
+  const [touched, setTouched] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [doneOpen, setDoneOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+
+  const errors = {
+    first_name: !isName(form.first_name),
+    last_name: !isName(form.last_name),
+    email: !isEmail(form.email),
+    phone: !isPhone(form.phone),
+    password: !isStrongPassword(form.password),
+    confirmPassword: !form.confirmPassword || form.password !== form.confirmPassword,
   };
 
-  const [userData, setUserData] = useState(initialUserData);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [helpDialogOpen, setHelpDialogOpen] = useState(false);
+  const show = (field) => (submitted || touched[field]) && errors[field];
 
-  const [loading, setLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    severity: "success",
-    message: "",
+  const bind = (field) => ({
+    value: form[field],
+    onChange: (e) => setForm((f) => ({ ...f, [field]: e.target.value })),
+    onBlur: () => setTouched((tch) => ({ ...tch, [field]: true })),
+    error: show(field),
   });
 
-  const handleClose = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitted(true);
 
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-    clearData();
-    setLoading(false);
-    navigate("/home");
-  };
-
-  // ================= VALIDATIONS =================
-
-  const handleEmailChange = (val) => {
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-    setUserData({ ...userData, email: val, isValidEmail });
-  };
-
-  const handleFirstNameChange = (val) => {
-    const isValidFirstName =
-      /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(
-        val,
-      );
-    setUserData({ ...userData, first_name: val, isValidFirstName });
-  };
-
-  const handleLastNameChange = (val) => {
-    const isValidLastName =
-      /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(
-        val,
-      );
-    setUserData({ ...userData, last_name: val, isValidLastName });
-  };
-
-  const handleContactNoChange = (val) => {
-    const isValidPhone = /^\d{10}$/.test(val);
-    setUserData({ ...userData, phone: val, isValidPhone });
-  };
-
-  const handlePasswordChange = (val) => {
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-    const isValidPassword = passwordRegex.test(val);
-    const passwordMatch = val === userData.confirmPassword;
-
-    setUserData({
-      ...userData,
-      password: val,
-      isValidPassword,
-      passwordMatch,
-    });
-  };
-  const handleConfirmPasswordChange = (val) => {
-    const passwordMatch = val === userData.password;
-    setUserData({ ...userData, confirmPassword: val, passwordMatch });
-  };
-
-  const togglePasswordVisibility = () => {
-    setUserData({ ...userData, showPassword: !userData.showPassword });
-  };
-
-  const clearData = () => {
-    setUserData(initialUserData);
-  };
-
-  const handleUserFormSubmit = async () => {
-    const isFirstNameValid =
-      /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(
-        userData.first_name,
-      ) && userData.first_name.length > 0;
-    const isLastNameValid =
-      /^[A-Za-z\u0D80-\u0DFF\p{L}]+(?:\s[A-Za-z\u0D80-\u0DFF\p{L}]+)*$/u.test(
-        userData.last_name,
-      ) && userData.last_name.length > 0;
-
-    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.email);
-    const isContactNoValid = /^\d{10}$/.test(userData.phone);
-
-    const isPasswordValid =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        userData.password,
-      );
-    const matchPassword = userData.password === userData.confirmPassword;
-
-    // Update the state with validation results
-    setUserData({
-      ...userData,
-      isValidFirstName: isFirstNameValid,
-      isValidLastName: isLastNameValid,
-      isValidEmail: isEmailValid,
-      isValidPhone: isContactNoValid,
-      isValidPassword: isPasswordValid,
-      passwordMatch: matchPassword,
-    });
-
-    if (
-      !isFirstNameValid ||
-      !isLastNameValid ||
-      !isEmailValid ||
-      !isContactNoValid ||
-      !isPasswordValid ||
-      !matchPassword
-    ) {
-      setSnackbar({
-        open: true,
-        message: t("signup_page.fillValidFields"),
-        severity: "error",
-      });
+    if (Object.values(errors).some(Boolean)) {
+      notify(t("signup_page.fillValidFields"), "error");
       return;
     }
 
-    setLoading(true);
+    setBusy(true);
+    const res = await registerUser({
+      first_name: form.first_name.trim(),
+      last_name: form.last_name.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      password: form.password,
+    });
+    setBusy(false);
 
-    // Proceed with user creation if all validations pass
-    try {
-      const result = await registerUser(userData);
-      if (result.success) {
-        setSnackbar({
-          open: true,
-          message: t("signup_page.accountCreatedSuccess"),
-          severity: "success",
-        });
-        setDialogOpen(true);
-      } else {
-        setLoading(false);
-        setSnackbar({
-          open: true,
-          message: t("signup_page.accountCreateFailed"),
-          severity: "error",
-        });
-      }
-    } catch (error) {
-      setLoading(false);
-      setSnackbar({
-        open: true,
-        message: t("signup_page.accountError"),
-        severity: "error",
-      });
+    if (res.success) {
+      setDoneOpen(true);
+    } else {
+      notify(res.message || t("signup_page.accountCreateFailed"), "error");
     }
   };
 
+  const finish = () => {
+    setDoneOpen(false);
+    navigate("/signin");
+  };
+
   return (
-    <div className="signup-container">
-      <div className="signup-box">
-        <h2>{t("signup_page.signUpTitle")}</h2>
-
-        {/* Name */}
-        <div className="form-row desktop-two mobile-full">
+    <AuthLayout title={t("signup_page.signUpTitle")} subtitle={t("signup_page.subtitle")} wide>
+      <form onSubmit={handleSubmit} noValidate>
+        <div className="form-grid">
           <TextField
-            className="custom-textfield"
-            size="small"
             label={t("signup_page.firstName")}
-            value={userData.first_name}
-            onChange={(e) => handleFirstNameChange(e.target.value)}
-            required
-            error={!userData.isValidFirstName}
-            helperText={
-              !userData.isValidFirstName
-                ? t("signup_page.firstNameError")
-                : t("signup_page.firstNameHint")
-            }
+            autoComplete="given-name"
+            {...bind("first_name")}
+            helperText={show("first_name") ? t("signup_page.firstNameError") : ""}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Person />
+                  <PersonOutline fontSize="small" />
                 </InputAdornment>
               ),
             }}
           />
-
           <TextField
-            className="custom-textfield"
-            size="small"
             label={t("signup_page.lastName")}
-            value={userData.last_name}
-            onChange={(e) => handleLastNameChange(e.target.value)}
-            required
-            error={!userData.isValidLastName}
-            helperText={
-              !userData.isValidLastName
-                ? t("signup_page.lastNameError")
-                : t("signup_page.lastNameHint")
-            }
+            autoComplete="family-name"
+            {...bind("last_name")}
+            helperText={show("last_name") ? t("signup_page.lastNameError") : ""}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Person />
+                  <PersonOutline fontSize="small" />
                 </InputAdornment>
               ),
             }}
           />
-        </div>
-
-        {/* Email & Contact */}
-        <div className="form-row desktop-two mobile-full">
           <TextField
-            className="custom-textfield"
-            size="small"
             label={t("signup_page.email")}
-            value={userData.email}
-            onChange={(e) => handleEmailChange(e.target.value)}
-            required
-            error={!userData.isValidEmail}
-            helperText={
-              !userData.isValidEmail
-                ? t("signup_page.emailError")
-                : t("signup_page.emailHint")
-            }
+            type="email"
+            autoComplete="email"
+            {...bind("email")}
+            helperText={show("email") ? t("signup_page.emailError") : t("signup_page.emailHint")}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Email />
+                  <EmailOutlined fontSize="small" />
                 </InputAdornment>
               ),
             }}
           />
-
           <TextField
-            className="custom-textfield"
-            size="small"
             label={t("signup_page.contactNo")}
-            value={userData.phone}
+            autoComplete="tel"
+            inputMode="numeric"
+            {...bind("phone")}
             onChange={(e) => {
-              if (/^\d*$/.test(e.target.value)) {
-                handleContactNoChange(e.target.value);
-              }
+              const v = e.target.value.replace(/\D/g, "").slice(0, 10);
+              setForm((f) => ({ ...f, phone: v }));
             }}
-            required
-            error={!userData.isValidPhone}
-            helperText={
-              !userData.isValidPhone
-                ? t("signup_page.contactError")
-                : t("signup_page.contactHint")
-            }
+            helperText={show("phone") ? t("signup_page.contactError") : t("signup_page.contactHint")}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Phone />
+                  <PhoneOutlined fontSize="small" />
                 </InputAdornment>
               ),
             }}
           />
-        </div>
-
-        {/* Password */}
-        <div className="form-row desktop-two mobile-full">
-          <TextField
-            className="custom-textfield"
-            size="small"
+          <PasswordField
             label={t("signup_page.newPassword")}
-            type={userData.showPassword ? "text" : "password"}
-            value={userData.password}
-            onChange={(e) => handlePasswordChange(e.target.value)}
-            required
-            error={!userData.isValidPassword}
-            helperText={
-              !userData.isValidPassword
-                ? t("signup_page.invalidPasswordStrength")
-                : t("signup_page.passwordHintSignup")
-            }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Lock />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={togglePasswordVisibility}>
-                    {userData.showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
+            autoComplete="new-password"
+            {...bind("password")}
+            helperText={show("password") ? t("signup_page.invalidPasswordStrength") : ""}
           />
-
-          <TextField
-            className="custom-textfield"
-            size="small"
+          <PasswordField
             label={t("signup_page.confirmPassword")}
-            type={userData.showPassword ? "text" : "password"}
-            value={userData.confirmPassword}
-            onChange={(e) => handleConfirmPasswordChange(e.target.value)}
-            required
-            error={!userData.passwordMatch}
-            helperText={
-              !userData.passwordMatch ? t("signup_page.passwordMismatch") : ""
-            }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Lock />
-                </InputAdornment>
-              ),
-            }}
+            autoComplete="new-password"
+            showToggle={false}
+            {...bind("confirmPassword")}
+            helperText={show("confirmPassword") ? t("signup_page.passwordMismatch") : ""}
           />
+          <div className="span-2">
+            <PasswordRules value={form.password} />
+          </div>
         </div>
 
-        {/* Buttons */}
-        <div className="button-group">
-          <button onClick={handleUserFormSubmit} className="button-success">
-            {t("signup_page.createAccount")}
-          </button>
+        <Button
+          type="submit"
+          variant="contained"
+          size="large"
+          fullWidth
+          className="auth-submit"
+          disabled={busy}
+        >
+          {busy ? t("signup_page.creating") : t("signup_page.createAccount")}
+        </Button>
+      </form>
 
-          <button onClick={clearData} className="button-error">
-            {t("signup_page.cancel")}
-          </button>
-        </div>
+      <p className="auth-alt">
+        {t("signup_page.alreadyHaveAccount")}
+        <Link to="/signin" className="text-link">
+          {t("signup_page.signInLink")}
+        </Link>
+      </p>
+      <p className="auth-help">
+        <button type="button" className="text-link" onClick={() => setHelpOpen(true)}>
+          {t("signup_page.help_dialog.title")}
+        </button>
+      </p>
 
-        <p className="signin-link">
-          {t("signup_page.alreadyHaveAccount")}{" "}
-          <Link to="/signin">{t("signup_page.signInLink")}</Link>
-        </p>
+      {/* ===== Account created ===== */}
+      <Dialog open={doneOpen} onClose={finish} fullWidth maxWidth="xs">
+        <DialogContent>
+          <div className="auth-result">
+            <div className="auth-result-icon success">
+              <MarkEmailReadOutlined />
+            </div>
+            <h2>{t("signup_page.verifyEmailTitle")}</h2>
+            <p>{t("signup_page.verifyEmailText2")}</p>
+            <p>{t("signup_page.verifyEmailText3")}</p>
+          </div>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button variant="contained" fullWidth onClick={finish}>
+            {t("signup_page.goToSignIn")}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-        <p className="signin-link">
-          <Link onClick={() => setHelpDialogOpen(true)}>
-            {" "}
-            {t("signup_page.help_dialog.title")}
-          </Link>
-        </p>
-      </div>
-
-      <CustomSnackbar {...snackbar} onClose={handleClose} />
-      <LoadingSpinner open={loading} />
-      <Dialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        fullWidth
-        maxWidth="xs"
-      >
+      {/* ===== Help ===== */}
+      <Dialog open={helpOpen} onClose={() => setHelpOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>
-          {t("signup_page.verifyEmailTitle")}
+          {t("signup_page.help_dialog.title")}
           <IconButton
-            onClick={handleDialogClose}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-            }}
+            onClick={() => setHelpOpen(false)}
+            aria-label={t("common.close")}
+            sx={{ position: "absolute", right: 12, top: 12 }}
           >
             <Close />
           </IconButton>
         </DialogTitle>
-
-        <DialogContent dividers>
-          <DialogContentText>
-            {t("signup_page.verifyEmailText1")}
-            <br />
-            <br />
-            {t("signup_page.verifyEmailText2")}
-            <br />
-            <br />
-            {t("signup_page.verifyEmailText3")}
-          </DialogContentText>
+        <DialogContent>
+          <ol className="help-steps">
+            <li>
+              <strong>{t("signup_page.help_dialog.step1_title")}</strong>
+              <p>{t("signup_page.help_dialog.step1_text")}</p>
+            </li>
+            <li>
+              <strong>{t("signup_page.help_dialog.step2_title")}</strong>
+              <p>{t("signup_page.help_dialog.step2_text")}</p>
+              <p>{t("signup_page.help_dialog.password_examples")}</p>
+            </li>
+            <li>
+              <strong>{t("signup_page.help_dialog.step3_title")}</strong>
+              <p>{t("signup_page.help_dialog.step3_text")}</p>
+            </li>
+          </ol>
         </DialogContent>
-        <DialogActions sx={{ p: 2 }}></DialogActions>
       </Dialog>
-
-      <Dialog
-        open={helpDialogOpen}
-        onClose={() => setHelpDialogOpen(false)}
-        fullWidth
-        maxWidth="md"
-      >
-        <DialogTitle>
-          {t("signup_page.help_dialog.title")}{" "}
-          <IconButton
-            onClick={() => setHelpDialogOpen(false)}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-            }}
-          >
-            <Close />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent dividers>
-          <DialogContentText>
-            <DialogContentText style={{ fontWeight: "bold" }}>
-              {t("signup_page.help_dialog.step1_title")}
-            </DialogContentText>
-            {t("signup_page.help_dialog.step1_text")}
-            <br />
-            <br />
-            <DialogContentText style={{ fontWeight: "bold" }}>
-              {" "}
-              {t("signup_page.help_dialog.step2_title")}
-            </DialogContentText>
-            {t("signup_page.help_dialog.step2_text")}
-            {t("signup_page.help_dialog.password_examples")}
-            <br />
-            <br />
-            <DialogContentText style={{ fontWeight: "bold" }}>
-              {" "}
-              {t("signup_page.help_dialog.step3_title")}
-            </DialogContentText>
-            {t("signup_page.help_dialog.step3_text")}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}></DialogActions>
-      </Dialog>
-    </div>
+    </AuthLayout>
   );
 };
 

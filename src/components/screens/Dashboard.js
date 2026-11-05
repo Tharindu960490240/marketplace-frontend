@@ -1,298 +1,208 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, Grid, Chip } from "@mui/material";
-
+import React, { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import {
-  TrendingUp,
-  People,
-  Visibility,
-  HourglassEmpty,
-  Category,
-  AdsClick,
+  CampaignOutlined,
+  CategoryOutlined,
+  ErrorOutlineRounded,
+  HourglassEmptyRounded,
+  PeopleOutline,
+  TrendingUpRounded,
+  VisibilityOutlined,
 } from "@mui/icons-material";
-
-/* ================= CHART IMPORTS ================= */
 import {
-  LineChart,
-  Line,
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-  BarChart,
-  Bar,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 import { getAdminDashboardStats } from "../../services/dashboardService";
 import { get_token } from "../../services/authService";
-
-import LoadingSpinner from "./LoadingSpinner";
-import CustomSnackbar from "./CustomSnackbar";
-
-import { useTranslation } from "react-i18next";
-
-import "../styles/adminDashboard.css";
+import { formatNumber } from "../../utils/format";
+import AdminLayout from "../common/AdminLayout";
+import PageLoader from "../common/PageLoader";
+import EmptyState from "../common/EmptyState";
+import StatusChip from "../common/StatusChip";
 
 const AdminDashboard = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-
+  const theme = useTheme();
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("loading"); // loading | ready | error
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    severity: "success",
-    message: "",
-  });
+  const load = useCallback(async () => {
+    setStatus("loading");
+    const token = await get_token();
+    const res = await getAdminDashboardStats(token);
+    if (res.success && res.data) {
+      setData(res.data);
+      setStatus("ready");
+    } else {
+      setStatus("error");
+    }
+  }, []);
 
-  const showMessage = (message, severity = "success") => {
-    setSnackbar({ open: true, severity, message });
-  };
-
-  const handleClose = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
-  /* ================= FETCH DATA ================= */
   useEffect(() => {
-    const fetchData = async () => {
-      const token = await get_token();
+    load();
+  }, [load]);
 
-      if (!token) {
-        showMessage(t("admin_dashboard.session_expired"), "error");
-        return;
-      }
+  const chartColor = theme.palette.primary.main;
+  const gridColor = theme.palette.divider;
+  const axisColor = theme.palette.text.secondary;
 
-      setLoading(true);
+  const growth = (data?.growth || []).map((g) => ({ ...g, ads: Number(g.ads) || 0 }));
+  const categories = (data?.categories || []).map((c) => ({ ...c, count: Number(c.count) || 0 }));
 
-      try {
-        const res = await getAdminDashboardStats(token);
-
-        if (res.success) {
-          setData(res.data);
-        } else {
-          showMessage(t("admin_dashboard.failed_load_dashboard"), "error");
-        }
-      } catch (err) {
-        showMessage(t("admin_dashboard.server_error"), "error");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [t]);
-
-  const goTo = (path) => {
-    navigate(path);
-  };
-
-  if (!data) return <LoadingSpinner open={!data} />;
-
-  /* ================= FIX DATA ================= */
-  const growthData = data.growth.map((g) => ({
-    ...g,
-    ads: Number(g.ads),
-  }));
-
-  /* ================= UPDATE statusChip ================= */
-
-  const statusChip = (status) => {
-    const map = {
-      pending: "warning",
-      active: "success",
-      sold: "info",
-      rejected: "warning",
-      deleted: "error",
-    };
-
-    const labelMap = {
-      pending: t("admin_dashboard.pending"),
-      active: t("admin_dashboard.active"),
-      sold: t("admin_dashboard.sold"),
-      rejected: t("admin_dashboard.rejected"),
-      deleted: t("admin_dashboard.deleted"),
-    };
-
-    return (
-      <Chip
-        label={labelMap[status] || status}
-        color={map[status]}
-        size="small"
-      />
-    );
-  };
+  const stats = data
+    ? [
+        { to: "/ads", icon: <TrendingUpRounded />, value: data.activeAds, label: t("admin_dashboard.active_ads") },
+        {
+          to: "/ads",
+          icon: <HourglassEmptyRounded />,
+          value: data.pendingAds,
+          label: t("admin_dashboard.pending_ads"),
+          attention: Number(data.pendingAds) > 0,
+        },
+        { to: "/ads", icon: <CampaignOutlined />, value: data.totalAds, label: t("admin_dashboard.total_ads") },
+        { to: "/users", icon: <PeopleOutline />, value: data.users, label: t("admin_dashboard.users") },
+        { icon: <VisibilityOutlined />, value: data.views, label: t("admin_dashboard.views") },
+        { to: "/categories", icon: <CategoryOutlined />, value: categories.length, label: t("admin_dashboard.categories") },
+      ]
+    : [];
 
   return (
-    <Box className="admin-dashboard">
-      {/* ================= STATS ================= */}
-      <Grid container spacing={2} className="stats-grid">
-        <Grid item xs={12} sm={6} md={3}>
-          <div className="stat-card green">
-            <TrendingUp />
-            <div>
-              <h2>{data.activeAds}</h2>
-              <p>{t("admin_dashboard.active_ads")}</p>
-            </div>
+    <AdminLayout title={t("header.dashboard")} subtitle={t("admin_dashboard.subtitle")}>
+      {status === "loading" && <PageLoader />}
+
+      {status === "error" && (
+        <EmptyState
+          icon={<ErrorOutlineRounded />}
+          title={t("admin_dashboard.failed_load_dashboard")}
+          action={
+            <Button variant="contained" onClick={load}>
+              {t("common.try_again")}
+            </Button>
+          }
+        />
+      )}
+
+      {status === "ready" && (
+        <>
+          <div className="stat-grid">
+            {stats.map((s) => {
+              const Tag = s.to ? Link : "div";
+              return (
+                <Tag
+                  key={s.label}
+                  to={s.to}
+                  className={`stat-tile ${s.attention ? "attention" : ""}`}
+                >
+                  <span className="stat-icon">{s.icon}</span>
+                  <span>
+                    <span className="stat-value">{formatNumber(s.value)}</span>
+                    <span className="stat-label" style={{ display: "block" }}>
+                      {s.label}
+                    </span>
+                  </span>
+                </Tag>
+              );
+            })}
           </div>
-        </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <div className="stat-card orange">
-            <HourglassEmpty />
-            <div>
-              <h2>{data.pendingAds}</h2>
-              <p>{t("admin_dashboard.pending_ads")}</p>
-            </div>
+          <div className="dash-grid">
+            <section className="dash-card">
+              <h2>{t("admin_dashboard.growth_overview")}</h2>
+              <p>{t("admin_dashboard.ads_created_per_month")}</p>
+              <ResponsiveContainer width="100%" height={240}>
+                <AreaChart data={growth} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="growthFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={chartColor} stopOpacity={0.28} />
+                      <stop offset="100%" stopColor={chartColor} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid stroke={gridColor} vertical={false} />
+                  <XAxis dataKey="month" tick={{ fill: axisColor, fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis allowDecimals={false} tick={{ fill: axisColor, fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <Tooltip />
+                  <Area
+                    type="monotone"
+                    dataKey="ads"
+                    name={t("admin_dashboard.ads")}
+                    stroke={chartColor}
+                    strokeWidth={2.5}
+                    fill="url(#growthFill)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </section>
+
+            <section className="dash-card">
+              <h2>{t("admin_dashboard.category_distribution")}</h2>
+              <p>{t("admin_dashboard.ads_by_category")}</p>
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={categories} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
+                  <CartesianGrid stroke={gridColor} vertical={false} />
+                  <XAxis dataKey="name" tick={{ fill: axisColor, fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis allowDecimals={false} tick={{ fill: axisColor, fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <Tooltip cursor={{ fill: theme.palette.action.hover }} />
+                  <Bar
+                    dataKey="count"
+                    name={t("admin_dashboard.ads")}
+                    fill={chartColor}
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={44}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </section>
           </div>
-        </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <div className="stat-card blue">
-            <People />
-            <div>
-              <h2>{data.users}</h2>
-              <p>{t("admin_dashboard.users")}</p>
-            </div>
+          <div className="dash-grid three">
+            <section className="dash-card">
+              <h2>{t("admin_dashboard.recent_ads")}</h2>
+              <ul className="dash-list">
+                {(data.recentAds || []).map((ad) => (
+                  <li key={ad.id}>
+                    <Link to={`/ad/${ad.id}`}>{ad.title}</Link>
+                    <StatusChip status={ad.status} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="dash-card">
+              <h2>{t("admin_dashboard.top_users")}</h2>
+              <ul className="dash-list">
+                {(data.topUsers || []).map((u) => (
+                  <li key={u.id}>
+                    <span>{u.name}</span>
+                    <span className="muted">{t("admin_dashboard.ads_count", { count: u.ads })}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="dash-card">
+              <h2>{t("admin_dashboard.activity")}</h2>
+              <ul className="dash-list activity">
+                {(data.activity || []).map((a, i) => (
+                  <li key={i}>{a.message}</li>
+                ))}
+              </ul>
+            </section>
           </div>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <div className="stat-card purple">
-            <Visibility />
-            <div>
-              <h2>{data.views}</h2>
-              <p>{t("admin_dashboard.views")}</p>
-            </div>
-          </div>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <div className="stat-card teal">
-            <AdsClick />
-            <div>
-              <h2>{data.totalAds}</h2>
-              <p>{t("admin_dashboard.total_ads")}</p>
-            </div>
-          </div>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <div className="stat-card indigo">
-            <Category />
-            <div>
-              <h2>{data.categories.length}</h2>
-              <p>{t("admin_dashboard.categories")}</p>
-            </div>
-          </div>
-        </Grid>
-      </Grid>
-
-      {/* ================= CHARTS ================= */}
-      <Grid container spacing={2} className="section">
-        {/* GROWTH */}
-        <Grid item xs={12} md={6}>
-          <div className="card-box">
-            <h3>{t("admin_dashboard.growth_overview")}</h3>
-
-            <p>{t("admin_dashboard.ads_created_per_month")}</p>
-
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={growthData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="ads"
-                  stroke="#4caf50"
-                  strokeWidth={3}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </Grid>
-
-        {/* CATEGORY */}
-        <Grid item xs={12} md={6}>
-          <div className="card-box">
-            <h3>{t("admin_dashboard.category_distribution")}</h3>
-
-            <p>{t("admin_dashboard.ads_by_category")}</p>
-
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={data.categories}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill="#2196f3" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Grid>
-      </Grid>
-
-      {/* ================= TABLE SECTION ================= */}
-      <Grid container spacing={2} className="section">
-        <Grid item xs={12} md={4}>
-          <div className="card-box">
-            <h3>{t("admin_dashboard.recent_ads")}</h3>
-
-            {data.recentAds.map((ad) => (
-              <div className="list-item" key={ad.id}>
-                <span>{ad.title}</span>
-                <span className="badge">{statusChip(ad.status)}</span>
-              </div>
-            ))}
-          </div>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <div className="card-box">
-            <h3>{t("admin_dashboard.top_users")}</h3>
-
-            {data.topUsers.map((u) => (
-              <div className="list-item" key={u.id}>
-                <span>{u.name}</span>
-                <span>{t("admin_dashboard.ads_count", { count: u.ads })}</span>
-              </div>
-            ))}
-          </div>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <div className="card-box">
-            <h3>{t("admin_dashboard.activity")}</h3>
-
-            {data.activity.map((a, i) => (
-              <div className="activity" key={i}>
-                {a.message}
-              </div>
-            ))}
-          </div>
-        </Grid>
-      </Grid>
-
-      {/* ================= ACTIONS ================= */}
-      <div className="button-group">
-        <button className="button-success" onClick={() => goTo("/ads")}>
-          {t("admin_dashboard.manage_ads")}
-        </button>
-        <button className="button-success" onClick={() => goTo("/categories")}>
-          {t("admin_dashboard.manage_categories")}
-        </button>
-        <button className="button-success" onClick={() => goTo("/users")}>
-          {t("admin_dashboard.manage_users")}
-        </button>
-      </div>
-
-      <CustomSnackbar {...snackbar} onClose={handleClose} />
-      <LoadingSpinner open={loading} />
-    </Box>
+        </>
+      )}
+    </AdminLayout>
   );
 };
 

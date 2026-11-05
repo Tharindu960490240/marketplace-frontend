@@ -1,399 +1,148 @@
+import { jwtDecode } from "jwt-decode";
 import { API_ENDPOINTS } from "../const/const";
-const { jwtDecode } = require("jwt-decode");
+import { apiRequest, buildQuery } from "./apiClient";
 
-/* ===========================
-    REGISTER USER
-=========================== */
-export const registerUser = async (userData) => {
+const TOKEN_KEY = "Token";
+const TIMESTAMP_KEY = "sessionTimestamp";
+const SESSION_HOURS = 24;
+
+/* ================= SESSION HELPERS ================= */
+
+export const saveSession = (token) => {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(TIMESTAMP_KEY, Date.now().toString());
+};
+
+/* Only removes auth keys — keeps theme/language preferences. */
+export const clearSession = () => {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(TIMESTAMP_KEY);
+};
+
+const isTokenExpired = (token) => {
   try {
-    const res = await fetch(API_ENDPOINTS.AUTH.REGISTER, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Registration failed");
-    }
-
-    return {
-      success: true,
-      data,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: error.message,
-    };
+    const { exp } = jwtDecode(token);
+    return exp ? exp * 1000 < Date.now() : false;
+  } catch {
+    return true;
   }
 };
 
-/* ===========================
-    LOGIN USER
-=========================== */
-export const loginUser = async (credentials) => {
-  try {
-    const res = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(credentials),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Login failed");
-    }
-
-    return {
-      success: true,
-      data,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
-};
-
-/* ===========================
-    VERIFY EMAIL
-=========================== */
-export const verifyEmail = async (token) => {
-  try {
-    const res = await fetch(`${API_ENDPOINTS.AUTH.VERIFY}/${token}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.message || "Verification failed");
-    }
-
-    return {
-      success: true,
-      data,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
-};
-
-/* ===========================
-    GET PROFILE (ME)
-=========================== */
-export const getProfile = async (token) => {
-  try {
-    const res = await fetch(API_ENDPOINTS.AUTH.ME, {
-      method: "GET",
-      headers: {
-        
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to fetch profile");
-    }
-
-    return { success: true, user: data };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
-};
-
-/* ===========================
-    UPDATE PROFILE
-=========================== */
-export const updateProfile = async (token, userData) => {
-  try {
-    const res = await fetch(API_ENDPOINTS.AUTH.UPDATE_PROFILE, {
-      method: "PUT",
-      headers: {
-        
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Profile update failed");
-    }
-
-    return { success: true, data };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
-};
-
-/* ===========================
-    UPDATE PROFILE IMAGE
-=========================== */
-export const updateProfileImage = async (token, imageFile) => {
-  try {
-    const formData = new FormData();
-    formData.append("image", imageFile);
-
-    const res = await fetch(API_ENDPOINTS.AUTH.ME_IMAGE, {
-      method: "PUT",
-      headers: {
-        
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Image upload failed");
-    }
-
-    return { success: true, data };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
-};
-
-/* ===========================
-    CHANGE PASSWORD
-=========================== */
-export const changePassword = async (token, passwordData) => {
-  try {
-    const res = await fetch(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, {
-      method: "PUT",
-      headers: {
-        
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(passwordData),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Password change failed");
-    }
-
-    return { success: true, data };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
-};
-
-/* ===========================
-    RESEND VERIFICATION
-=========================== */
-export const resendVerification = async (email) => {
-  try {
-    const res = await fetch(API_ENDPOINTS.AUTH.RESEND, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Resend failed");
-    }
-
-    return { success: true, data };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
-};
-
-/* ===========================
-    ADMIN - UPDATE USER STATUS
-=========================== */
-export const updateUserStatus = async (token, userId, email, status) => {
-  try {
-    const res = await fetch(API_ENDPOINTS.AUTH.UPDATE_STATUS(userId), {
-      method: "PATCH",
-      headers: {
-        
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, status }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Status update failed");
-    }
-
-    return { success: true, data };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
-};
-
+/* Returns a valid token, or null (clearing stale sessions). */
 export async function get_token() {
-  try {
-    const userToken = await localStorage.getItem("Token");
-    return userToken;
-  } catch (error) {
-    console.error("Error fetching token:", error);
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) return null;
+
+  const ts = parseInt(localStorage.getItem(TIMESTAMP_KEY) || "0", 10);
+  const tooOld = Date.now() - ts > SESSION_HOURS * 60 * 60 * 1000;
+
+  if (tooOld || isTokenExpired(token)) {
+    clearSession();
     return null;
   }
+  return token;
 }
-
-export const sendPasswordResetLink = async (email) => {
-  try {
-    const res = await fetch(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to send reset link");
-    }
-
-    return {
-      success: true,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
-};
-
-export const resetPassword = async (token, password) => {
-  try {
-    const res = await fetch(API_ENDPOINTS.AUTH.RESET_PASSWORD, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token,
-        password,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Password reset failed");
-    }
-
-    return {
-      success: true,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
-};
-
-export const getAllUsers = async (token, params = {}) => {
-  try {
-    const query = new URLSearchParams();
-
-    if (params.page) query.append("page", params.page);
-    if (params.limit) query.append("limit", params.limit);
-    if (params.status) query.append("status", params.status);
-    if (params.search) query.append("search", params.search);
-    if (params.role) query.append("role", params.role);
-
-    const res = await fetch(`${API_ENDPOINTS.AUTH.BASE}?${query.toString()}`, {
-      method: "GET",
-      headers: {
-        
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to fetch users");
-    }
-
-    return {
-      success: true,
-      data: data.data,
-      total: data.total,
-      page: data.page,
-      limit: data.limit,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
-};
 
 export async function getMyData() {
+  const token = await get_token();
+  if (!token) return null;
   try {
-    const userToken = await localStorage.getItem("Token");
-    if (userToken) {
-      const user = jwtDecode(userToken);
-      return user;
-    }
-    return null;
-  } catch (error) {
-    console.error("Error fetching email:", error);
+    return jwtDecode(token);
+  } catch {
     return null;
   }
 }
 
-export const deleteProfile = async (token) => {
-  try {
-    const res = await fetch(API_ENDPOINTS.AUTH.DELETE_PROFILE, {
-      method: "DELETE",
-      headers: {
-        
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+/* ================= AUTH ================= */
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Account deletion failed");
-    }
-
-    return { success: true, data };
-  } catch (error) {
-    return { success: false, message: error.message };
-  }
+export const registerUser = async (userData) => {
+  // Send only the fields the API needs (no UI flags)
+  const { first_name, last_name, email, phone, password, role } = userData;
+  const payload = { first_name, last_name, email, phone, password };
+  if (role) payload.role = role;
+  return apiRequest(API_ENDPOINTS.AUTH.REGISTER, {
+    method: "POST",
+    body: payload,
+  });
 };
+
+export const loginUser = (credentials) =>
+  apiRequest(API_ENDPOINTS.AUTH.LOGIN, { method: "POST", body: credentials });
+
+export const verifyEmail = (token) =>
+  apiRequest(`${API_ENDPOINTS.AUTH.VERIFY}/${token}`);
+
+export const getProfile = async (token) => {
+  const res = await apiRequest(API_ENDPOINTS.AUTH.ME, { token });
+  return res.success ? { success: true, user: res.data } : res;
+};
+
+export const updateProfile = (token, userData) =>
+  apiRequest(API_ENDPOINTS.AUTH.UPDATE_PROFILE, {
+    method: "PUT",
+    token,
+    body: userData,
+  });
+
+export const updateProfileImage = (token, imageFile) => {
+  const formData = new FormData();
+  formData.append("image", imageFile);
+  return apiRequest(API_ENDPOINTS.AUTH.ME_IMAGE, {
+    method: "PUT",
+    token,
+    formData,
+  });
+};
+
+export const changePassword = (token, passwordData) =>
+  apiRequest(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, {
+    method: "PUT",
+    token,
+    body: passwordData,
+  });
+
+export const resendVerification = (email) =>
+  apiRequest(API_ENDPOINTS.AUTH.RESEND, { method: "POST", body: { email } });
+
+export const updateUserStatus = (token, userId, email, status) =>
+  apiRequest(API_ENDPOINTS.AUTH.UPDATE_STATUS(userId), {
+    method: "PATCH",
+    token,
+    body: { email, status },
+  });
+
+export const sendPasswordResetLink = (email) =>
+  apiRequest(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, {
+    method: "POST",
+    body: { email },
+  });
+
+export const resetPassword = (token, password) =>
+  apiRequest(API_ENDPOINTS.AUTH.RESET_PASSWORD, {
+    method: "POST",
+    body: { token, password },
+  });
+
+export const getAllUsers = async (token, params = {}) => {
+  const res = await apiRequest(
+    `${API_ENDPOINTS.AUTH.BASE}${buildQuery({
+      page: params.page,
+      limit: params.limit,
+      status: params.status,
+      search: params.search,
+      role: params.role,
+      sortField: params.sortField,
+      sortOrder: params.sortOrder,
+    })}`,
+    { token },
+  );
+  if (!res.success) return res;
+  return {
+    success: true,
+    data: res.data?.data || [],
+    total: res.data?.total || 0,
+  };
+};
+
+export const deleteProfile = (token) =>
+  apiRequest(API_ENDPOINTS.AUTH.DELETE_PROFILE, { method: "DELETE", token });

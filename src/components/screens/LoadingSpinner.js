@@ -1,38 +1,22 @@
 import * as React from "react";
 import CircularProgress from "@mui/material/CircularProgress";
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
-import Typography from "@mui/material/Typography";
-import Fade from "@mui/material/Fade";
+import Backdrop from "@mui/material/Backdrop";
+import { useTranslation } from "react-i18next";
 
 import "../styles/loadingSpinner.css";
 
-import { useTranslation } from "react-i18next";
-
+/* Full-screen loader — only for app start-up and blocking actions
+   (sign out, account deletion). Page data uses <PageLoader/> instead. */
 const LoadingSpinner = ({ open }) => {
   const { t } = useTranslation();
 
   return (
-    <Modal
-      open={open}
-      closeAfterTransition
-      disableAutoFocus
-      disableEnforceFocus
-      disableRestoreFocus
-      slotProps={{
-        backdrop: {
-          className: "loading-modal-backdrop",
-        },
-      }}
-    >
-      <Fade in={open}>
-        <Box className="loading-spinner-box">
-          <CircularProgress size={42} thickness={4} />
-
-          <Typography className="loading-text">{t("loading")}</Typography>
-        </Box>
-      </Fade>
-    </Modal>
+    <Backdrop open={!!open} className="loading-backdrop">
+      <div className="loading-box" role="status" aria-live="polite">
+        <CircularProgress size={36} thickness={4.5} />
+        <span className="loading-text">{t("loading")}</span>
+      </div>
+    </Backdrop>
   );
 };
 

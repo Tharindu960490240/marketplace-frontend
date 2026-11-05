@@ -1,64 +1,11 @@
 import { API_ENDPOINTS } from "../const/const";
+import { apiRequest } from "./apiClient";
 
-/* ===========================
-    GET DASHBOARD STATS
-=========================== */
-export const getDashboardStats = async () => {
-  try {
-    const res = await fetch(API_ENDPOINTS.DASHBOARD.HOME, {
-      method: "GET",
-      headers: {
-        
-        "Content-Type": "application/json",
-      },
-    });
+const unwrap = (res) =>
+  res.success ? { success: true, data: res.data?.data } : res;
 
-    const data = await res.json();
+export const getDashboardStats = async () =>
+  unwrap(await apiRequest(API_ENDPOINTS.DASHBOARD.HOME));
 
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to fetch dashboard stats");
-    }
-
-    return {
-      success: true,
-      data: data.data,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
-};
-
-/* ===========================
-    GET DASHBOARD STATS (ADMIN)
-=========================== */
-export const getAdminDashboardStats = async (token) => {
-  try {
-    const res = await fetch(API_ENDPOINTS.DASHBOARD.ADMIN, {
-      method: "GET",
-      headers: {
-        
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.message || "Failed to fetch dashboard stats");
-    }
-
-    return {
-      success: true,
-      data: data.data,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      message: error.message,
-    };
-  }
-};
+export const getAdminDashboardStats = async (token) =>
+  unwrap(await apiRequest(API_ENDPOINTS.DASHBOARD.ADMIN, { token }));

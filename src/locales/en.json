@@ -20,22 +20,29 @@
         "notifications": "Notifications",
         "welcome": "Hi",
         "savedAds": "Saved Ads",
-        "logoutSuccess": "You have signed out successfully."
+        "logoutSuccess": "You have signed out successfully.",
+        "browse": "Browse ads",
+        "dark_mode": "Dark mode",
+        "light_mode": "Light mode"
     },
     "signin_page": {
         "signIn": "Sign In",
-        "signUp": "Sign Up",
+        "signUp": "Create an account",
         "email": "Email Address",
         "password": "Password",
         "forgotPassword": "Forgot your password?",
         "resetIt": "Reset it here",
-        "dontHaveAccount": "Don't have an account? Sign up here.",
+        "dontHaveAccount": "New to Agri Link?",
         "emailError": "Please enter a correct email address.",
         "invalidPassword": "Password must be at least 8 characters long and include an uppercase letter, lowercase letter, a number, and a special character.",
         "loginSuccess": "Welcome back! You signed in successfully.",
         "loginFailed": "Wrong email or password. Please try again.",
         "unexpectedError": "Something went wrong. Please try to sign in again in a few minutes.",
-        "validEmailPassword": "Please enter a valid email address and password."
+        "validEmailPassword": "Please enter a valid email address and password.",
+        "title": "Welcome back",
+        "subtitle": "Sign in to save ads, post your own and message support.",
+        "passwordRequired": "Enter your password.",
+        "signingIn": "Signing in…"
     },
     "reset_password_page": {
         "title": "Reset Your Password",
@@ -55,14 +62,21 @@
         "resetSuccess": "Password changed successfully. Taking you to the sign-in page...",
         "resetFailed": "Could not reset password. Please try again.",
         "somethingWrong": "Something went wrong on our side. Please try again later.",
-        "fillValidFields": "Please fill in all details correctly before saving."
+        "fillValidFields": "Please fill in all details correctly before saving.",
+        "subtitle": "Choose a new password for your account.",
+        "linkProblem": "This link can't be used",
+        "requestNewLink": "Request a new link",
+        "resetDone": "Password changed. Sign in with your new password."
     },
     "verify_account_page": {
         "verifyingAccount": "Verifying your account...",
         "verifySubtext": "Please wait while we check your email address.",
         "verifySuccess": "Your account is now verified and active!",
         "verifyFailed": "We could not verify your account. The link may have expired.",
-        "verifyError": "Something went wrong while checking your account. Please try again."
+        "verifyError": "Something went wrong while checking your account. Please try again.",
+        "title": "Email verification",
+        "successText": "You can now sign in and start posting ads.",
+        "goHome": "Go to the marketplace"
     },
     "frorgotPassword_page": {
         "forgotPasswordTitle": "Forgot Password",
@@ -74,7 +88,12 @@
         "signIn": "Sign In",
         "email": "Email Address",
         "emailError": "Please enter a valid email address.",
-        "rememberedPassword": "Remembered your password?"
+        "rememberedPassword": "Remembered your password?",
+        "subtitle": "Enter the email you signed up with and we will send you a reset link.",
+        "checkInbox": "Check your inbox",
+        "sentTo": "We sent a password reset link to {{email}}. The link expires soon, so use it today.",
+        "backToSignIn": "Back to sign in",
+        "useAnotherEmail": "Use a different email"
     },
     "profile_page": {
         "title": "My Profile",
@@ -114,7 +133,14 @@
         "invalidPasswordStrength": "Password must be at least 8 characters long and include an uppercase letter, lowercase letter, a number, and a special character.",
         "passwordHint": "e.g., MyPass2026!",
         "resetPassword": "Change Password",
-        "fillValidFields": "Please fill in all fields correctly before saving."
+        "fillValidFields": "Please fill in all fields correctly before saving.",
+        "changePhoto": "Change profile photo",
+        "oldPasswordRequired": "Enter your current password.",
+        "passwordChangedSignIn": "Password changed. Sign in with your new password.",
+        "passwordMismatch": "The passwords do not match.",
+        "security": "Password",
+        "securityText": "You will be signed out after changing it.",
+        "updatePassword": "Update password"
     },
     "support_page": {
         "title": "Help & Support",
@@ -140,12 +166,21 @@
         "tickets_load_failed": "Could not load tickets at this time.",
         "messages_load_failed": "Could not load chat history.",
         "ticket_create_failed": "Could not create support ticket. Please try again.",
-        "ticket_created": "Support ticket created successfully. We will reply soon.",
+        "ticket_created": "Ticket created. We will reply here soon.",
         "message_send_failed": "Could not send message. Please check your internet connection.",
         "message_send_error": "Something went wrong while sending your message.",
         "ticket_close_success": "Ticket closed successfully.",
         "ticket_close_failed": "Could not close the ticket. Please try again.",
-        "user_profile_load_failed": "Could not load user profile details."
+        "user_profile_load_failed": "Could not load user profile details.",
+        "new_ticket": "New ticket",
+        "filter_all": "All",
+        "filter_open": "Open",
+        "filter_closed": "Closed",
+        "no_tickets": "No tickets here",
+        "no_tickets_hint": "Questions about an ad or your account? Open a ticket and we will reply here.",
+        "select_ticket_hint": "Choose a conversation from the list.",
+        "send": "Send",
+        "close_ticket_confirm": "The member won't be able to reply to a closed ticket."
     },
     "footer": {
         "companyName": "Agri Link Services",
@@ -156,7 +191,8 @@
         "youtube": "YouTube",
         "facebook": "Facebook",
         "linkedin": "LinkedIn",
-        "copyright": "© 2026 T&S Private Limited. All rights reserved."
+        "copyright": "© 2026 T&S Private Limited. All rights reserved.",
+        "marketplace": "Marketplace"
     },
     "signup_page": {
         "signUpTitle": "Create an Account",
@@ -166,7 +202,7 @@
         "contactNo": "Phone Number",
         "createAccount": "Create Account",
         "cancel": "Cancel",
-        "alreadyHaveAccount": "Already have an account? Sign in.",
+        "alreadyHaveAccount": "Already have an account?",
         "signInLink": "Sign In",
         "firstNameError": "First name can only contain letters.",
         "lastNameError": "Last name can only contain letters.",
@@ -198,7 +234,10 @@
             "password_examples": "Password Examples: MyPass2025!, Agri@Link99, SafeFarm@1",
             "step3_title": "3. Email Verification (Final Step)",
             "step3_text": "After submitting, a verification link will be sent to your email. Check your Inbox or Spam folder and click the link to activate your account."
-        }
+        },
+        "subtitle": "It takes a minute. We will email you a link to confirm your address.",
+        "creating": "Creating account…",
+        "goToSignIn": "Go to sign in"
     },
     "home_page": {
         "hero_title": "Marketplace for Animals, Pets & Farm Supplies",
@@ -229,7 +268,14 @@
         "deleted": "Deleted",
         "negotiable": "Price Negotiable",
         "fixed": "Fixed Price",
-        "views": "views"
+        "views": "views",
+        "all_categories": "All",
+        "clear_filters": "Clear filters",
+        "no_listings_hint": "Try another district or category, or search with fewer words.",
+        "rating": "Average rating",
+        "results_count": "Ads found: {{count}}",
+        "searching": "Searching…",
+        "sign_in_to_save": "Sign in to save ads."
     },
     "saved_ads_page": {
         "no_saved_ads": "No saved ads found.",
@@ -249,7 +295,9 @@
         "rejected": "Rejected",
         "deleted": "Deleted",
         "negotiable": "Negotiable",
-        "fixed": "Fixed"
+        "fixed": "Fixed",
+        "subtitle": "Saved: {{count}}",
+        "empty_hint": "Tap the bookmark on any ad to keep it here."
     },
     "ad_details_page": {
         "failed_load_ad": "Could not load ad details.",
@@ -295,7 +343,20 @@
         "status_error_pending": "This advertisement is currently pending activation.",
         "status_error_sold": "This item has already been sold.",
         "status_error_rejected": "This advertisement has been rejected.",
-        "status_error_deleted": "This advertisement has been deleted."
+        "status_error_deleted": "This advertisement has been deleted.",
+        "call_seller": "Call seller",
+        "comment_required": "Write a few words about your experience.",
+        "delete_review_confirm": "This review will be removed for everyone.",
+        "next_photo": "Next photo",
+        "previous_photo": "Previous photo",
+        "photo": "Photo",
+        "photos": "Photos",
+        "not_found_hint": "The ad may have been removed or the link is wrong.",
+        "posted_on": "Posted {{date}}",
+        "review_count": "Reviews: {{count}}",
+        "sign_in_to_review": "to leave a review.",
+        "views_count": "Views: {{count}}",
+        "your_rating": "Your rating"
     },
     "admin_dashboard": {
         "session_expired": "Your session has ended. Please sign in again.",
@@ -322,7 +383,9 @@
         "active": "Active",
         "sold": "Sold",
         "rejected": "Rejected",
-        "deleted": "Deleted"
+        "deleted": "Deleted",
+        "ads": "Ads",
+        "subtitle": "What's happening on the marketplace."
     },
     "post_ad": {
         "title_page": "Post a New Ad",
@@ -336,17 +399,17 @@
         "negotiable": "Price is negotiable",
         "upload_images": "Upload Images",
         "publish_ad": "Publish Ad",
-        "title_error": "Title can only contain letters.",
+        "title_error": "Enter at least 3 characters (letters, numbers and basic punctuation).",
         "category_error": "Please choose a category.",
-        "sub_category_error": "Sub category can only contain letters.",
-        "price_error": "Invalid price format. (e.g., 5000 or 5000.50)",
-        "city_error": "City name can only contain letters.",
+        "sub_category_error": "Enter a sub category (letters and numbers).",
+        "price_error": "Enter a price, e.g. 15000 or 15,000.50",
+        "city_error": "Enter your city (letters and numbers).",
         "district_error": "Please choose a district.",
-        "description_error": "Please enter a description.",
-        "title_hint": "e.g., Cow for sale",
+        "description_error": "Describe the item in at least 10 characters.",
+        "title_hint": "e.g., Jersey cow, 3 years old",
         "category_hint": "e.g., Animals",
         "sub_category_hint": "e.g., Jersey Cow",
-        "price_hint": "e.g., 15000.00",
+        "price_hint": "Price in rupees",
         "district_hint": "e.g., Colombo",
         "city_hint": "e.g., Dehiwala",
         "description_hint": "e.g., Healthy animal, well-trained and vaccinated.",
@@ -355,12 +418,24 @@
         "max_images": "You can upload a maximum of 5 images.",
         "image_required": "Please upload at least one image.",
         "fill_all_fields": "Please fill in all fields with valid information.",
-        "ad_success": "Your ad was published successfully!",
+        "ad_success": "Ad submitted. It will go live after an admin approves it.",
         "ad_error": "Could not publish your ad. Please try again.",
         "something_went_wrong": "Something went wrong. Please try again later.",
         "search_location": "Search Map Location",
         "search_location_placeholder": "Type to pinpoint address...",
-        "search_location_helper": "e.g., 54 Galle Road, Colombo 03"
+        "search_location_helper": "e.g., 54 Galle Road, Colombo 03",
+        "subtitle": "Good photos and a clear description help your ad sell faster.",
+        "photos": "Photos",
+        "details": "Details",
+        "price_location": "Price and location",
+        "cover": "Cover",
+        "make_cover": "Make cover",
+        "remove_photo": "Remove photo",
+        "upload_hint": "JPG, PNG or WEBP, up to 5",
+        "unsupported_images": "Some files were skipped. Use JPG, PNG or WEBP photos.",
+        "upload_failed": "Photos could not be uploaded, so the ad was not published. Please try again.",
+        "publishing": "Publishing…",
+        "review_note": "Your ad will be visible after an admin approves it."
     },
     "all_categories_page": {
         "title": "Category Management",
@@ -378,7 +453,7 @@
         "empty": "No categories found.",
         "modal_title": "Add New Category",
         "modal_input": "Category Name",
-        "modal_error": "Category name is required and can only contain letters.",
+        "modal_error": "Enter a category name (at least 2 characters).",
         "dialog_title": "Delete Category",
         "dialog_message": "Are you sure you want to delete this category? This action cannot be undone.",
         "session_expired": "Your session has ended. Please sign in again.",
@@ -395,7 +470,8 @@
         "status_inactive": "Inactive",
         "tooltip_activate": "Activate",
         "tooltip_deactivate": "Deactivate",
-        "tooltip_delete": "Delete"
+        "tooltip_delete": "Delete",
+        "subtitle": "Categories shown to buyers and sellers."
     },
     "my_ads_page": {
         "title": "My Ads",
@@ -434,7 +510,12 @@
         "status_active": "Active",
         "status_sold": "Sold",
         "status_rejected": "Rejected",
-        "status_deleted": "Deleted"
+        "status_deleted": "Deleted",
+        "subtitle": "Manage the ads you have posted.",
+        "empty_hint": "Ads with this status will appear here.",
+        "marked_sold": "Marked as sold.",
+        "marked_active": "Ad is active again.",
+        "rejected_reason": "Reason: {{reason}}"
     },
     "all_ads_page": {
         "title": "Ads Management",
@@ -483,7 +564,9 @@
         "status_active": "Active",
         "status_sold": "Sold",
         "status_rejected": "Rejected",
-        "status_deleted": "Deleted"
+        "status_deleted": "Deleted",
+        "subtitle": "Approve, reject or remove ads.",
+        "reject_modal_text": "The seller will see this reason."
     },
     "all_users_page": {
         "title": "User Management",
@@ -530,12 +613,73 @@
         "save": "Save",
         "cancel": "Cancel",
         "tooltip_send_reminder": "Send activation reminder",
-        "share_email_title": "Action Required: Please verify your account"
+        "share_email_title": "Action Required: Please verify your account",
+        "subtitle": "Members and admins of the marketplace.",
+        "create_admin": "Create admin",
+        "reminder_copied": "Reminder message copied. Paste it into an email or chat.",
+        "reminder_message": "Hi {{name}},\n\nYour Agri Link Services Marketplace account is not active yet. Open the link below to verify your email.\nAgri Link Services Marketplace හි ඔබගේ ගිණුම තවමත් සක්‍රිය කර නැත. ඔබගේ ඊමේල් තහවුරු කිරීමට පහත සබැඳිය විවෘත කරන්න.\n\nThank you / ස්තුතියි,\nThe Agri Link Team",
+        "suspend_title": "Suspend user",
+        "suspend_message": "{{name}} won't be able to sign in until you activate the account again."
     },
     "share_component": {
         "share_tooltip": "Share Link",
         "copied": "Link successfully copied to clipboard!",
         "failed_copy": "Failed to copy link automatically.",
         "error": "An error occurred while attempting to share."
+    },
+    "common": {
+        "back": "Back",
+        "cancel": "Cancel",
+        "close": "Close",
+        "delete": "Delete",
+        "show_password": "Show password",
+        "hide_password": "Hide password",
+        "rows_per_page": "Rows per page",
+        "session_expired": "Your session has ended. Please sign in again.",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "try_again": "Try again"
+    },
+    "status": {
+        "active": "Active",
+        "pending": "Pending",
+        "sold": "Sold",
+        "rejected": "Rejected",
+        "deleted": "Deleted",
+        "inactive": "Inactive",
+        "suspended": "Suspended",
+        "open": "Open",
+        "closed": "Closed"
+    },
+    "roles": {
+        "user": "Member",
+        "admin": "Admin"
+    },
+    "rating_labels": {
+        "none": "No reviews yet",
+        "r05": "Very poor",
+        "r10": "Very poor",
+        "r15": "Poor",
+        "r20": "Poor",
+        "r25": "Fair",
+        "r30": "Fair",
+        "r35": "Good",
+        "r40": "Very good",
+        "r45": "Excellent",
+        "r50": "Excellent"
+    },
+    "password_rules": {
+        "length": "8+ characters",
+        "upper": "Uppercase letter",
+        "lower": "Lowercase letter",
+        "number": "Number",
+        "special": "Symbol (@$!%*?&)"
+    },
+    "auth": {
+        "brand_title": "Buy and sell animals and farm supplies across Sri Lanka",
+        "brand_text": "Livestock, pets, feed and farm medicine from sellers near you."
+    },
+    "admin": {
+        "nav_label": "Admin sections"
     }
 }

@@ -6,7 +6,9 @@
 
 // export const API_BASE_URL = "/api";
 
-export const API_BASE_URL = "https://api.agrilinkservices.com/api";
+// Can be overridden at build time with REACT_APP_API_BASE_URL
+export const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL || "https://api.agrilinkservices.com/api";
 
 export const FRONTEND_BASE_URL = "https://marketplace.agrilinkservices.com/";
 
@@ -102,12 +104,6 @@ export const ROUTES = {
   FORGOT_PASSWORD: "/forgot-password",
   RESET_PASSWORD: "/reset-password",
 };
-
-// export const googleMapsConfig = {
-//   id: "google-map-script",
-//   googleMapsApiKey: "AIzaSyBVnhyhy6TFKpERbsN4d_GKJir9wQgrGeg",
-//   libraries: ["places", "maps"],
-// };
 
 export const DISTRICTS = [
   { value: "Ampara", label: "Ampara", si: "අම්පාර", lat: 7.3018, lng: 81.6747 },
@@ -239,6 +235,7 @@ export const DISTRICTS = [
   },
 ];
 
+// Deprecated: use getRatingLabel() from utils/format.js (translated)
 export const RATING_LABLES = {
   0.5: "Useless",
   1: "Useless+",

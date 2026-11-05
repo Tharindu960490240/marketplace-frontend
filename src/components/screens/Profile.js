@@ -1,725 +1,368 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  get_token,
-  getProfile,
-  updateProfile,
-  updateProfileImage,
-  changePassword,
-  deleteProfile,
-} from "../../services/authService";
-
-import "../styles/profile.css";
-import LoadingSpinner from "./LoadingSpinner";
-import CustomSnackbar from "./CustomSnackbar";
-import * as AppConst from "../../const/const";
-
-import {
-  Lock,
-  Phone,
-  Visibility,
-  VisibilityOff,
-  PhotoCamera,
-  Close,
-} from "@mui/icons-material";
-
-import {
-  Modal,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
   Avatar,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  InputAdornment,
+  TextField,
 } from "@mui/material";
-
+import {
+  Close,
+  LockOutlined,
+  PhoneOutlined,
+  PhotoCameraOutlined,
+} from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 
-const Profile = ({ onSignOut, isSignedIn }) => {
+import "../styles/profile.css";
+
+import * as AppConst from "../../const/const";
+import {
+  changePassword,
+  deleteProfile,
+  get_token,
+  updateProfile,
+  updateProfileImage,
+} from "../../services/authService";
+import { useAuth } from "../../context/AuthContext";
+import { useNotify } from "../../context/NotifyContext";
+import { isPhone, isStrongPassword } from "../../utils/validation";
+import PasswordField from "../common/PasswordField";
+import ConfirmDialog from "../common/ConfirmDialog";
+import StatusChip from "../common/StatusChip";
+import { PasswordRules } from "./SignUp";
+
+const emptyPasswords = { oldPassword: "", newPassword: "", confirmPassword: "" };
+
+const Profile = () => {
   const { t } = useTranslation();
-
   const navigate = useNavigate();
-
-  const [user, setUser] = useState(null);
-  const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [phone, setPhone] = useState(null);
-  const [isValidContactNo, setIsValidContactNo] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null);
+  const notify = useNotify();
+  const { user, refreshUser, signOut } = useAuth();
 
   const fileInputRef = useRef(null);
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [busy, setBusy] = useState(false);
 
-  // ================= SNACKBAR =================
-  const showMessage = (msg, type = "success") => {
-    setSnackbar({
-      open: true,
-      message: msg,
-      severity: type,
-    });
-  };
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [passwords, setPasswords] = useState(emptyPasswords);
+  const [passwordSubmitted, setPasswordSubmitted] = useState(false);
 
-  const handleClose = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
-  // ================= FETCH USER =================
-  const fetchUser = useCallback(async () => {
-    try {
-      const token = await get_token();
-
-      if (!token) {
-        showMessage(t("profile_page.sessionExpired"), "error");
-        setLoading(false);
-        return;
-      }
-
-      const res = await getProfile(token);
-
-      if (res.success) {
-        setUser(res.user);
-        setPhone(res.user.phone);
-        setIsValidContactNo(/^\d{10}$/.test(res.user.phone || ""));
-      } else {
-        showMessage(res.message || "Failed to load profile", "error");
-      }
-    } catch (err) {
-      showMessage(
-        err?.response?.data?.message || "Failed to load profile",
-        "error",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   useEffect(() => {
-    fetchUser();
-  }, [fetchUser]);
+    setPhone(user?.phone || "");
+  }, [user?.phone]);
 
-  useEffect(() => {
-    return () => {
-      if (imagePreview) {
-        URL.revokeObjectURL(imagePreview);
-      }
-    };
-  }, [imagePreview]);
+  useEffect(
+    () => () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    },
+    [imagePreview],
+  );
 
-  // ================= UPDATE PROFILE =================
-  const handleUpdateProfile = async () => {
-    try {
-      const token = await get_token();
-
-      if (!token) {
-        showMessage(t("profile_page.sessionExpired"), "error");
-        return;
-      }
-
-      const isValidContactNo = /^\d{10}$/.test(phone);
-      setIsValidContactNo(isValidContactNo);
-
-      if (!isValidContactNo) {
-        setSnackbar({
-          open: true,
-          message: t("profile_page.fillValidFields"),
-          severity: "error",
-        });
-        return;
-      }
-
-      setLoading(true);
-
-      const res = await updateProfile(token, { phone });
-
-      if (res.success) {
-        showMessage(t("profile_page.profileUpdated"), "success");
-        await fetchUser();
-      } else {
-        showMessage(t("profile_page.profileUpdateFailed"), "error");
-      }
-    } catch (err) {
-      showMessage(t("profile_page.profileUpdateFailed"), "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleContactNoChange = (val) => {
-    const isValidContactNo = /^\d{10}$/.test(val);
-    setPhone(val);
-    setIsValidContactNo(isValidContactNo);
-  };
-
-  // ================= IMAGE VALIDATION =================
+  /* ================= PHOTO ================= */
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-
+    const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file) return;
 
-    const allowedTypes = ["image/jpeg", "image/png"];
-
-    if (!allowedTypes.includes(file.type)) {
-      showMessage(t("profile_page.onlyImagesAllowed"), "error");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      notify(t("profile_page.onlyImagesAllowed"), "error");
       return;
     }
-
     setImage(file);
-
-    //  create preview URL
-    const previewUrl = URL.createObjectURL(file);
-    setImagePreview(previewUrl);
+    setImagePreview(URL.createObjectURL(file));
   };
 
-  // ================= UPLOAD IMAGE =================
+  const cancelImage = () => {
+    setImage(null);
+    setImagePreview(null);
+  };
+
   const handleUpload = async () => {
-    if (!image) {
-      showMessage(t("profile_page.selectImageFirst"), "error");
-      return;
-    }
-
-    try {
-      const token = await get_token();
-
-      if (!token) {
-        showMessage(t("profile_page.sessionExpired"), "error");
-        return;
-      }
-
-      setLoading(true);
-
-      const res = await updateProfileImage(token, image);
-
-      if (res.success) {
-        showMessage(t("profile_page.imageUpdated"), "success");
-        setImage(null);
-        await fetchUser();
-        window.dispatchEvent(new Event("profileUpdated"));
-      } else {
-        showMessage(t("profile_page.imageUploadFailed"), "error");
-      }
-    } catch (err) {
-      showMessage(t("profile_page.imageUploadFailed"), "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ================= OPEN FILE DIALOG =================
-  const openFilePicker = () => {
-    fileInputRef.current.click();
-  };
-
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [resetData, setResetData] = useState({
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-    showPassword: false,
-    isValidOldPassword: true,
-    isValidPassword: true,
-    passwordMatch: true,
-  });
-
-  // Reset Password Modal Logic
-  const handlePasswordModalOpen = () => {
-    setResetData({
-      oldPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-      showPassword: false,
-      isValidOldPassword: true,
-      isValidPassword: true,
-      passwordMatch: true,
-    });
-    setShowPasswordModal(true);
-  };
-
-  const handleOldPasswordChange = (event) => {
-    const oldPassword = event.target.value;
-    setResetData({
-      ...resetData,
-      oldPassword,
-      isValidOldPassword:
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-          oldPassword,
-        ),
-    });
-  };
-
-  const handlePasswordChange = (event) => {
-    const newPassword = event.target.value;
-    setResetData({
-      ...resetData,
-      newPassword,
-      isValidPassword:
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-          newPassword,
-        ),
-      passwordMatch: newPassword === resetData.confirmPassword,
-    });
-  };
-
-  const handleConfirmPasswordChange = (event) => {
-    const confirmPassword = event.target.value;
-    setResetData({
-      ...resetData,
-      confirmPassword,
-      passwordMatch: confirmPassword === resetData.newPassword,
-    });
-  };
-
-  const toggleShowPassword = () => {
-    setResetData({ ...resetData, showPassword: !resetData.showPassword });
-  };
-
-  const handlePasswordReset = async () => {
+    setBusy(true);
     const token = await get_token();
+    const res = await updateProfileImage(token, image);
+    setBusy(false);
 
-    if (!token) {
-      showMessage(t("profile_page.sessionExpired"), "error");
-      return;
-    }
-
-    const isOldPasswordValid =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        resetData.oldPassword,
-      );
-    const isPasswordValid =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        resetData.newPassword,
-      );
-    const matchPassword = resetData.newPassword === resetData.confirmPassword;
-
-    // Update the state with the latest validation results
-    setResetData({
-      ...resetData,
-      isValidOldPassword: isOldPasswordValid,
-      isValidPassword: isPasswordValid,
-      passwordMatch: matchPassword,
-    });
-
-    if (!isOldPasswordValid || !isPasswordValid || !matchPassword) {
-      setSnackbar({
-        open: true,
-        message: t("profile_page.fillValidFields"),
-        severity: "error",
-      });
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const result = await changePassword(token, {
-        newPassword: resetData.newPassword,
-        oldPassword: resetData.oldPassword,
-      });
-      if (result.success) {
-        setSnackbar({
-          open: true,
-          message: t("profile_page.passwordResetSuccess"),
-          severity: "success",
-        });
-        // Log out the user after password reset
-        setTimeout(() => {
-          setShowPasswordModal(false);
-          setLoading(false);
-          handleLogout();
-        }, 2500);
-      } else {
-        setLoading(false);
-        setSnackbar({
-          open: true,
-          message: result.message || t("profile_page.passwordResetFailed"),
-          severity: "error",
-        });
-      }
-    } catch (error) {
-      // Handle any errors during the password reset process
-      setLoading(false);
-      setSnackbar({
-        open: true,
-        message: t("profile_page.passwordResetFailed"),
-        severity: "error",
-      });
-      console.error("Password reset error:", error);
+    if (res.success) {
+      notify(t("profile_page.imageUpdated"));
+      cancelImage();
+      refreshUser();
+    } else {
+      notify(res.message || t("profile_page.imageUploadFailed"), "error");
     }
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
+  /* ================= PHONE ================= */
+  const phoneChanged = phone !== (user?.phone || "");
+  const phoneError = phoneChanged && !isPhone(phone);
 
-    setLoading(true);
-    setSnackbar({
-      open: true,
-      message: t("profile_page.loggedOut"),
-      severity: "success",
-    });
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    if (!isPhone(phone)) {
+      notify(t("profile_page.invalidContactNo"), "error");
+      return;
+    }
+    setBusy(true);
+    const token = await get_token();
+    const res = await updateProfile(token, { phone });
+    setBusy(false);
 
-    setTimeout(() => {
-      setLoading(false);
-      onSignOut();
-      navigate("/home");
-    }, 2500);
+    if (res.success) {
+      notify(t("profile_page.profileUpdated"));
+      refreshUser();
+    } else {
+      notify(res.message || t("profile_page.profileUpdateFailed"), "error");
+    }
   };
 
+  /* ================= PASSWORD ================= */
+  const pwErrors = {
+    // Current password only needs to be entered — older accounts
+    // may have passwords that predate the strength rule
+    oldPassword: !passwords.oldPassword,
+    newPassword: !isStrongPassword(passwords.newPassword),
+    confirmPassword: passwords.newPassword !== passwords.confirmPassword,
+  };
+
+  const closePasswordDialog = () => {
+    setPasswordOpen(false);
+    setPasswords(emptyPasswords);
+    setPasswordSubmitted(false);
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setPasswordSubmitted(true);
+    if (Object.values(pwErrors).some(Boolean)) return;
+
+    setBusy(true);
+    const token = await get_token();
+    const res = await changePassword(token, {
+      oldPassword: passwords.oldPassword,
+      newPassword: passwords.newPassword,
+    });
+    setBusy(false);
+
+    if (res.success) {
+      closePasswordDialog();
+      signOut();
+      notify(t("profile_page.passwordChangedSignIn"));
+      navigate("/signin");
+    } else {
+      notify(res.message || t("profile_page.passwordResetFailed"), "error");
+    }
+  };
+
+  /* ================= DELETE ================= */
   const handleDelete = async () => {
+    setBusy(true);
     const token = await get_token();
+    const res = await deleteProfile(token);
+    setBusy(false);
 
-    if (!token) {
-      showMessage(t("profile_page.sessionExpired"), "error");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const res = await deleteProfile(token);
-
-      if (res.success) {
-        setSnackbar({
-          open: true,
-          message: t("profile_page.accountDeleted"),
-          severity: "success",
-        });
-
-        // close dialog
-        setDeleteDialogOpen(false);
-        setTimeout(() => {
-          setLoading(false);
-          handleLogout();
-        }, 2500);
-      } else {
-        setLoading(false);
-        setSnackbar({
-          open: true,
-          message: res.message || t("profile_page.accountDeleteFailed"),
-          severity: "error",
-        });
-      }
-    } catch (error) {
-      setLoading(false);
-      setSnackbar({
-        open: true,
-        message: t("profile_page.accountDeleteFailed"),
-        severity: "error",
-      });
+    if (res.success) {
+      setDeleteOpen(false);
+      signOut();
+      notify(t("profile_page.accountDeleted"));
+      navigate("/home");
+    } else {
+      notify(res.message || t("profile_page.accountDeleteFailed"), "error");
     }
   };
 
-  if (!user) return <LoadingSpinner open={!user} />;
+  if (!user) return null;
+
+  const avatarSrc = imagePreview || user.profile_image || AppConst.PROFILE_PLACEHOLDER_IMAGE;
 
   return (
-    <div className="profile-container">
-      <div className="profile-card">
-        {/* ================= COVER ================= */}
-        <div className="profile-header">
-          <div className="profile-image-box" onClick={openFilePicker}>
-            <Avatar
-              className="profile_img"
-              src={
-                imagePreview
-                  ? imagePreview
-                  : user.profile_image
-                    ? user.profile_image
-                    : AppConst.PROFILE_PLACEHOLDER_IMAGE
-              }
-              alt="profile"
-            />
-            <div className="edit-icon">
-              <PhotoCamera />
-            </div>
-          </div>
-        </div>
+    <div className="page narrow profile-page">
+      {/* ================= IDENTITY ================= */}
+      <section className="panel profile-hero">
+        <button
+          type="button"
+          className="profile-avatar"
+          onClick={() => fileInputRef.current?.click()}
+          aria-label={t("profile_page.changePhoto")}
+        >
+          <Avatar src={avatarSrc} alt="" sx={{ width: 96, height: 96 }} />
+          <span className="profile-avatar-edit">
+            <PhotoCameraOutlined fontSize="small" />
+          </span>
+        </button>
+        <input
+          type="file"
+          hidden
+          accept="image/jpeg,image/png,image/webp"
+          ref={fileInputRef}
+          onChange={handleImageChange}
+        />
 
-        {/* ================= BASIC INFO ================= */}
-        <div className="profile-basic-info">
-          <h2>
+        <div className="profile-identity">
+          <h1>
             {user.first_name} {user.last_name}
-          </h2>
+          </h1>
           <p>{user.email}</p>
-
-          <div className="button-group">
-            <input
-              type="file"
-              hidden
-              ref={fileInputRef}
-              onChange={handleImageChange}
-            />
-
-            <button
-              disabled={!image}
-              className={image ? "button-success" : "button-disable"}
-              onClick={handleUpload}
-            >
-              {t("profile_page.upload")}
-            </button>
-
-            <button
-              className="button-success"
-              onClick={handlePasswordModalOpen}
-            >
-              {t("profile_page.changePassword")}
-            </button>
+          <div className="profile-chips">
+            <span className="role-chip">{t(`roles.${user.role}`, { defaultValue: user.role })}</span>
+            <StatusChip status={user.status} />
           </div>
         </div>
 
-        {/* ================= STATS ================= */}
-        <div className="profile-stats">
-          <div className="stat-item">
-            <h3>{t("profile_page.role")}</h3>
-            <span>{user.role}</span>
+        {image && (
+          <div className="profile-photo-actions">
+            <Button variant="contained" onClick={handleUpload} disabled={busy}>
+              {t("profile_page.saveProfilePicture")}
+            </Button>
+            <Button color="inherit" onClick={cancelImage} disabled={busy}>
+              {t("common.cancel")}
+            </Button>
           </div>
-          <div className="stat-item">
-            <h3>{t("profile_page.status")}</h3>
-            <span>{user.status}</span>
+        )}
+      </section>
+
+      {/* ================= CONTACT ================= */}
+      <section className="panel">
+        <h2 className="panel-title">{t("profile_page.personalInfo")}</h2>
+        <form className="profile-row" onSubmit={handleUpdateProfile} noValidate>
+          <TextField
+            label={t("profile_page.phone")}
+            value={phone}
+            inputMode="numeric"
+            onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+            error={phoneError}
+            helperText={phoneError ? t("profile_page.invalidContactNo") : ""}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PhoneOutlined fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <Button type="submit" variant="contained" disabled={busy || !phoneChanged}>
+            {t("profile_page.saveChanges")}
+          </Button>
+        </form>
+      </section>
+
+      {/* ================= SECURITY ================= */}
+      <section className="panel">
+        <div className="profile-row">
+          <div>
+            <h2 className="panel-title">{t("profile_page.security")}</h2>
+            <p className="muted">{t("profile_page.securityText")}</p>
           </div>
+          <Button
+            variant="outlined"
+            startIcon={<LockOutlined />}
+            onClick={() => setPasswordOpen(true)}
+          >
+            {t("profile_page.changePassword")}
+          </Button>
         </div>
+      </section>
 
-        {/* ================= SECTIONS ================= */}
-        <div className="profile-sections">
-          {/* PERSONAL INFO */}
-          <div className="section-card">
-            <h3 className="profile-sections-title">
-              {t("profile_page.personalInfo")}
-            </h3>
+      {/* ================= DANGER ZONE ================= */}
+      {user.role !== "admin" && (
+        <section className="panel danger-zone">
+          <div className="profile-row">
+            <div>
+              <h2 className="panel-title">{t("profile_page.dangerZone")}</h2>
+              <p className="muted">{t("profile_page.permanentlyDeleteAccount")}</p>
+            </div>
+            <Button variant="outlined" color="error" onClick={() => setDeleteOpen(true)}>
+              {t("profile_page.deleteAccount")}
+            </Button>
+          </div>
+        </section>
+      )}
 
-            <div className="info-row">
-              <span className="info-label">{t("profile_page.phone")}</span>
-              <TextField
-                className="custom-textfield"
-                size="small"
-                value={phone}
-                onChange={(e) => {
-                  if (/^\d*$/.test(e.target.value)) {
-                    handleContactNoChange(e.target.value);
-                  }
-                }}
-                error={!isValidContactNo}
+      {/* ================= PASSWORD DIALOG ================= */}
+      <Dialog open={passwordOpen} onClose={busy ? undefined : closePasswordDialog} fullWidth maxWidth="xs">
+        <form onSubmit={handlePasswordChange} noValidate>
+          <DialogTitle>
+            {t("profile_page.resetPassword")}
+            <IconButton
+              onClick={closePasswordDialog}
+              aria-label={t("common.close")}
+              sx={{ position: "absolute", right: 12, top: 12 }}
+            >
+              <Close />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            <div className="dialog-fields">
+              <PasswordField
+                label={t("profile_page.oldPassword")}
+                autoComplete="current-password"
+                value={passwords.oldPassword}
+                onChange={(e) => setPasswords((p) => ({ ...p, oldPassword: e.target.value }))}
+                error={passwordSubmitted && pwErrors.oldPassword}
                 helperText={
-                  !isValidContactNo ? t("profile_page.invalidContactNo") : ""
+                  passwordSubmitted && pwErrors.oldPassword ? t("profile_page.oldPasswordRequired") : ""
                 }
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Phone />
-                    </InputAdornment>
-                  ),
-                }}
+              />
+              <PasswordField
+                label={t("profile_page.newPassword")}
+                autoComplete="new-password"
+                value={passwords.newPassword}
+                onChange={(e) => setPasswords((p) => ({ ...p, newPassword: e.target.value }))}
+                error={passwordSubmitted && pwErrors.newPassword}
+                helperText={
+                  passwordSubmitted && pwErrors.newPassword
+                    ? t("profile_page.invalidPasswordStrength")
+                    : ""
+                }
+              />
+              <PasswordRules value={passwords.newPassword} />
+              <PasswordField
+                label={t("profile_page.confirmPassword")}
+                autoComplete="new-password"
+                showToggle={false}
+                value={passwords.confirmPassword}
+                onChange={(e) =>
+                  setPasswords((p) => ({ ...p, confirmPassword: e.target.value }))
+                }
+                error={passwordSubmitted && pwErrors.confirmPassword}
+                helperText={
+                  passwordSubmitted && pwErrors.confirmPassword
+                    ? t("profile_page.passwordMismatch")
+                    : ""
+                }
               />
             </div>
-
-            <button className="button-success" onClick={handleUpdateProfile}>
-              {t("profile_page.saveChanges")}
-            </button>
-          </div>
-
-          {/* DANGER ZONE */}
-          <div hidden={user?.role === "admin"} className="danger-zone">
-            <h3>{t("profile_page.dangerZone")}</h3>
-            <p>{t("profile_page.permanentlyDeleteAccount")}</p>
-
-            <button
-              className="button-error"
-              onClick={() => setDeleteDialogOpen(true)}
-            >
-              {t("profile_page.deleteAccount")}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Password Reset Modal */}
-      <Modal open={showPasswordModal}>
-        <div className="reset-password-modal">
-          <IconButton
-            onClick={() => setShowPasswordModal(false)}
-            style={{
-              position: "absolute",
-              right: 10,
-              top: 10,
-              color: "var(--muted-color)",
-            }}
-          >
-            <Close />
-          </IconButton>
-          <h2 className="modal-title">{t("profile_page.resetPassword")}</h2>
-
-          <div className="input-container">
-            <TextField
-              className="custom-textfield"
-              size="small"
-              label={t("profile_page.oldPassword")}
-              type={resetData.showPassword ? "text" : "password"}
-              value={resetData.oldPassword}
-              onChange={handleOldPasswordChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              error={!resetData.isValidOldPassword}
-              helperText={
-                !resetData.isValidOldPassword
-                  ? t("profile_page.invalidPasswordStrength")
-                  : ""
-              }
-              required
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={toggleShowPassword}>
-                      {resetData.showPassword ? (
-                        <Visibility />
-                      ) : (
-                        <VisibilityOff />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </div>
-
-          <div className="input-container">
-            <TextField
-              className="custom-textfield"
-              size="small"
-              label={t("profile_page.newPassword")}
-              type={resetData.showPassword ? "text" : "password"}
-              value={resetData.newPassword}
-              onChange={handlePasswordChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              error={!resetData.isValidPassword}
-              helperText={
-                !resetData.isValidPassword
-                  ? t("profile_page.invalidPasswordStrength")
-                  : ""
-              }
-              required
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={toggleShowPassword}>
-                      {resetData.showPassword ? (
-                        <Visibility />
-                      ) : (
-                        <VisibilityOff />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </div>
-
-          <div className="input-container">
-            <TextField
-              className="custom-textfield"
-              size="small"
-              label={t("profile_page.confirmPassword")}
-              type={resetData.showPassword ? "text" : "password"}
-              value={resetData.confirmPassword}
-              onChange={handleConfirmPasswordChange}
-              fullWidth
-              margin="normal"
-              variant="outlined"
-              error={!resetData.passwordMatch}
-              required
-              helperText={
-                !resetData.passwordMatch
-                  ? t("profile_page.passwordMismatch")
-                  : ""
-              }
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Lock />
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </div>
-
-          <div className="button-group">
-            <button onClick={handlePasswordReset} className="button-success">
-              {t("profile_page.save")}
-            </button>
-
-            <button
-              onClick={() => setShowPasswordModal(false)}
-              className="button-error"
-            >
-              {t("profile_page.cancel")}
-            </button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* ================= SNACKBAR ================= */}
-      <CustomSnackbar {...snackbar} onClose={handleClose} />
-
-      {/* ================= LOADING ================= */}
-      <LoadingSpinner open={loading} />
-
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        aria-labelledby="delete-dialog-title"
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogTitle id="delete-dialog-title">
-          {t("profile_page.confirmAccountDeletion")}
-          <IconButton
-            aria-label="close"
-            onClick={() => setDeleteDialogOpen(false)}
-            sx={{
-              position: "absolute",
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <Close />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent dividers>
-          <DialogContentText>
-            {t("profile_page.confirmAccountDeletionMessage")}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <button
-            className="button-success"
-            onClick={() => setDeleteDialogOpen(false)}
-          >
-            {t("profile_page.cancel")}
-          </button>
-          <button className="button-error" onClick={handleDelete}>
-            {t("profile_page.deleteAccount")}
-          </button>
-        </DialogActions>
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2.5 }}>
+            <Button color="inherit" onClick={closePasswordDialog} disabled={busy}>
+              {t("common.cancel")}
+            </Button>
+            <Button type="submit" variant="contained" disabled={busy}>
+              {t("profile_page.updatePassword")}
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
+
+      <ConfirmDialog
+        open={deleteOpen}
+        title={t("profile_page.confirmAccountDeletion")}
+        message={t("profile_page.confirmAccountDeletionMessage")}
+        confirmLabel={t("profile_page.deleteAccount")}
+        onConfirm={handleDelete}
+        onClose={() => setDeleteOpen(false)}
+        busy={busy}
+      />
     </div>
   );
 };

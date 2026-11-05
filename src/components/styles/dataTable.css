@@ -1,0 +1,188 @@
+/* =========================================================
+   Shared table frame — My Ads and all admin lists.
+   Replaces allAds.css / allUsers.css / allCategories.css.
+========================================================= */
+
+.data-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.data-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  padding: 6px 16px 0;
+  border-bottom: 1px solid var(--c-border);
+  flex-wrap: wrap;
+}
+
+.data-toolbar .MuiTabs-root {
+  min-height: 48px;
+}
+
+.data-search {
+  width: min(320px, 100%);
+  padding-bottom: 8px;
+}
+
+.data-table {
+  width: 100%;
+}
+
+.data-table .MuiTableRow-root:hover .MuiTableCell-body {
+  background: var(--c-surface-2);
+}
+
+.data-table .MuiTableCell-body {
+  vertical-align: middle;
+}
+
+.cell-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--c-surface-2);
+}
+
+.cell-title {
+  display: grid;
+  gap: 2px;
+  min-width: 180px;
+}
+
+.cell-title a,
+.cell-title strong {
+  color: var(--c-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cell-title a:hover {
+  color: var(--c-primary);
+}
+
+.cell-sub {
+  color: var(--c-muted);
+  font-size: 0.82rem;
+}
+
+.cell-note {
+  color: var(--c-danger);
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.cell-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.cell-actions .MuiIconButton-root.danger:hover {
+  color: var(--c-danger);
+  background: var(--c-danger-soft);
+}
+
+.cell-actions .MuiIconButton-root.success:hover {
+  color: var(--c-success);
+  background: var(--c-success-soft);
+}
+
+.data-empty td {
+  border-bottom: 0;
+}
+
+.sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sort-button svg {
+  font-size: 16px;
+}
+
+/* ---------- Stacked cards on small screens ---------- */
+@media (max-width: 760px) {
+  .data-toolbar {
+    padding: 4px 12px 0;
+  }
+
+  .data-search {
+    width: 100%;
+  }
+
+  .data-table thead {
+    display: none;
+  }
+
+  .data-table,
+  .data-table tbody,
+  .data-table tr,
+  .data-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .data-table tr {
+    position: relative;
+    padding: 14px 14px 10px;
+    border-bottom: 1px solid var(--c-border);
+  }
+
+  .data-table .MuiTableCell-body {
+    border: 0;
+    padding: 4px 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: right;
+  }
+
+  .data-table .MuiTableCell-body[data-label]::before {
+    content: attr(data-label);
+    color: var(--c-muted);
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .data-table .cell-hide-sm {
+    display: none !important;
+  }
+
+  .data-table .cell-main {
+    justify-content: flex-start;
+    text-align: left;
+    gap: 12px;
+  }
+
+  .data-table .cell-actions {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--c-border);
+  }
+
+  .data-table .MuiTableRow-root:hover .MuiTableCell-body {
+    background: none;
+  }
+
+  .data-empty td {
+    text-align: center;
+    justify-content: center;
+  }
+}

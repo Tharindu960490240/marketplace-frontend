@@ -1,156 +1,162 @@
-/* ===============================
-   POST AD CONTAINER
-=============================== */
-.ads-container {
-  position: relative;
-  width: 100%;
-  max-width: 700px;
-  margin: 30px auto 30px auto;
-
-  background: var(--card-color);
-  border-radius: 15px;
-  box-shadow: 0 4px 12px var(--border-color);
-
-  padding: 30px;
-  box-sizing: border-box;
-
-  color: var(--text-color);
+.post-ad .panel {
+  margin-top: 16px;
 }
 
-/* Title */
-.ads-subcontainer h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 28px;
-  font-weight: bold;
-  color: var(--text-color);
+.panel-count {
+  color: var(--c-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
-/* ===============================
-   UPLOAD BOX
-=============================== */
-.upload-row {
-  margin-top: 10px;
-}
+/* ================= PHOTO UPLOAD ================= */
 
-.upload-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  padding: 12px;
-
-  border: 2px dashed var(--border-color);
-  border-radius: 12px;
-
-  cursor: pointer;
-  color: var(--muted-color);
-  transition: all 0.3s ease;
-}
-
-.upload-box:hover {
-  border-color: var(--link-color);
-  color: var(--link-color);
-  transform: translateY(-2px);
-}
-
-.required {
-  border-color: #ff6b6b;
-}
-/* ===============================
-   IMAGE PREVIEW
-=============================== */
-.image-preview {
-  display: flex;
-  flex-wrap: wrap;
+.upload-zone {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 12px;
-
-  padding: 15px;
-  overflow-x: auto;
-  padding-bottom: 5px;
+  padding: 12px;
+  border: 2px dashed var(--c-border);
+  border-radius: var(--r-md);
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.image-box {
+.upload-zone.drag {
+  border-color: var(--c-primary);
+  background: var(--c-primary-soft);
+}
+
+.upload-zone.error {
+  border-color: var(--c-danger);
+}
+
+.upload-thumb,
+.upload-add {
   position: relative;
-  width: 110px;
-  height: 110px;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.image-box img {
+.upload-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
 }
 
-/* DELETE BUTTON */
-.image-box button {
+.cover-badge,
+.cover-btn {
   position: absolute;
-  top: -8px;
-  right: -8px;
+  left: 8px;
+  bottom: 8px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
 
-  width: 24px;
-  height: 24px;
+.cover-badge {
+  background: var(--c-primary);
+  color: var(--c-on-primary);
+}
 
-  border: none;
-  border-radius: 50%;
+.cover-btn {
+  border: 0;
+  background: rgba(255, 255, 255, 0.92);
+  color: #14245c;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
 
-  background: #ff4d4d;
-  color: white;
+.upload-thumb:hover .cover-btn,
+.cover-btn:focus-visible {
+  opacity: 1;
+}
 
+@media (hover: none) {
+  .cover-btn {
+    opacity: 1;
+  }
+}
+
+.upload-remove.MuiIconButton-root {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(15, 27, 61, 0.7);
+  color: #fff;
+  padding: 4px;
+}
+
+.upload-remove.MuiIconButton-root:hover {
+  background: var(--c-danger);
+}
+
+.upload-add {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 4px;
+  padding: 10px;
+  text-align: center;
+  border: 0;
+  background: var(--c-surface-2);
+  color: var(--c-primary);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.upload-add:hover {
+  background: var(--c-primary-soft);
+}
+
+.upload-add small {
+  color: var(--c-muted);
+  font-weight: 500;
+  font-size: 0.72rem;
+}
+
+.field-error {
+  color: var(--c-danger);
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+
+/* ================= DETAILS ================= */
+
+.negotiable-toggle.MuiFormControlLabel-root {
+  margin: 0;
+  align-self: start;
+  min-height: 40px;
+}
+
+.negotiable-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.post-ad-submit {
   display: flex;
   align-items: center;
-  justify-content: center;
-
-  cursor: pointer;
-  font-size: 14px;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+  flex-wrap: wrap;
 }
 
-.image-box button:hover {
-  transform: scale(1.1);
+.post-ad-submit p {
+  color: var(--c-muted);
+  font-size: 0.9rem;
+  max-width: 48ch;
 }
 
-.image-box svg {
-  font-size: 1rem;
-}
-
-/* ===============================
-   RESPONSIVE DESIGN
-=============================== */
-
-/* MOBILE (IMPORTANT PART FOR YOUR REQUIREMENT) */
-@media (max-width: 768px) {
-  .ads-container {
-    padding: 20px;
-  }
-
-  .ads-subcontainer h2 {
-    font-size: 22px;
-  }
-
-  .image-box {
-    width: 90px;
-    height: 90px;
-  }
-
-  .form-row {
-    flex-direction: column;
-    gap: 20px !important;
-  }
-}
-
-/* SMALL MOBILE */
-@media (max-width: 480px) {
-  .ads-container {
-    padding: 15px;
-  }
-
-  .upload-box {
-    flex-direction: column;
-    text-align: center;
-    padding: 14px;
+@media (max-width: 640px) {
+  .post-ad-submit .MuiButton-root {
+    width: 100%;
   }
 }

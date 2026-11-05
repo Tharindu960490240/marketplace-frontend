@@ -1,166 +1,100 @@
 import React, { useState } from "react";
-import { Email } from "@mui/icons-material";
-
-import TextField from "@mui/material/TextField";
-import InputAdornment from "@mui/material/InputAdornment";
-import { Link, useNavigate } from "react-router-dom";
-import "../styles/frogotPassword.css";
-import LoadingSpinner from "./LoadingSpinner";
-import CustomSnackbar from "./CustomSnackbar";
-
-import { sendPasswordResetLink } from "../../services/authService";
-
+import { Link } from "react-router-dom";
+import { Button, InputAdornment, TextField } from "@mui/material";
+import { EmailOutlined, MarkEmailReadOutlined } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
+
+import AuthLayout from "../common/AuthLayout";
+import { sendPasswordResetLink } from "../../services/authService";
+import { useNotify } from "../../context/NotifyContext";
+import { isEmail } from "../../utils/validation";
 
 const ForgotPassword = () => {
   const { t } = useTranslation();
+  const notify = useNotify();
 
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({
-    email: "",
-    isValidUser: true,
-    check_email_Change: false,
-  });
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [sentTo, setSentTo] = useState("");
 
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+  const emailError = submitted && !isEmail(email);
 
-  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitted(true);
 
-  // Handle Email Input Change
-  const handleEmailChange = (val) => {
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-    setData({
-      ...data,
-      email: val,
-      isValidUser: isValidEmail,
-      check_email_Change: isValidEmail,
-    });
-  };
-
-  // Handle Password Reset (Only sending email for reset link)
-  const handlePasswordReset = async () => {
-    // 1. Basic validation
-
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email);
-    setData({
-      ...data,
-      isValidUser: isValidEmail,
-      check_email_Change: isValidEmail,
-    });
-
-    if (!isValidEmail) {
-      setSnackbar({
-        open: true,
-        message: t("frorgotPassword_page.enterValidEmail"),
-        severity: "error",
-      });
+    if (!isEmail(email)) {
+      notify(t("frorgotPassword_page.enterValidEmail"), "error");
       return;
     }
 
-    try {
-      setLoading(true);
+    setBusy(true);
+    const res = await sendPasswordResetLink(email.trim());
+    setBusy(false);
 
-      // 2. Call API
-      const response = await sendPasswordResetLink(data.email);
-
-      if (response.success) {
-        setSnackbar({
-          open: true,
-          message: t("frorgotPassword_page.resetLinkSent"),
-          severity: "success",
-        });
-
-        setData((prev) => ({
-          ...prev,
-          email: "",
-          check_email_Change: false,
-        }));
-
-        // optional: redirect after delay
-        setTimeout(() => {
-          navigate("/signin");
-        }, 2500);
-      } else {
-        setSnackbar({
-          open: true,
-          message: t("frorgotPassword_page.resetFailedLink"),
-          severity: "error",
-        });
-      }
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: t("frorgotPassword_page.somethingWrong"),
-        severity: "error",
-      });
-    } finally {
-      setLoading(false);
+    if (res.success) {
+      // Stay on the page and show what happened (no silent redirect)
+      setSentTo(email.trim());
+    } else {
+      notify(res.message || t("frorgotPassword_page.resetFailedLink"), "error");
     }
   };
 
-  // Handle Snackbar Close
-  const handleClose = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  };
-
-  return (
-    <div className="forgot-password-container">
-      <div className="forgot-password-box">
-        <h2>{t("frorgotPassword_page.forgotPasswordTitle")}</h2>
-
-        <div className="input-container">
-          <TextField
-            size="small"
-            label={t("frorgotPassword_page.email")}
-            type="email"
-            fullWidth
-            value={data.email}
-            onChange={(e) => handleEmailChange(e.target.value)}
-            margin="normal"
-            variant="outlined"
-            className="custom-textfield"
-            error={!data.isValidUser}
-            helperText={
-              !data.isValidUser ? t("frorgotPassword_page.emailError") : ""
-            }
-            required
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Email />
-                </InputAdornment>
-              ),
-              endAdornment: data.check_email_Change ? (
-                <InputAdornment position="end">
-                  <span style={{ color: "green" }}>✔</span>
-                </InputAdornment>
-              ) : null,
-            }}
-          />
-        </div>
-
-        {/* Reset Button */}
-        <div className="button-group">
-          <button className="button-success" onClick={handlePasswordReset}>
-            {t("frorgotPassword_page.sendResetLink")}
+  if (sentTo) {
+    return (
+      <AuthLayout title={t("frorgotPassword_page.checkInbox")}>
+        <div className="auth-result">
+          <div className="auth-result-icon success">
+            <MarkEmailReadOutlined />
+          </div>
+          <p>{t("frorgotPassword_page.sentTo", { email: sentTo })}</p>
+          <Button component={Link} to="/signin" variant="contained" fullWidth>
+            {t("frorgotPassword_page.backToSignIn")}
+          </Button>
+          <button type="button" className="text-link" onClick={() => setSentTo("")}>
+            {t("frorgotPassword_page.useAnotherEmail")}
           </button>
         </div>
+      </AuthLayout>
+    );
+  }
 
-        {/* Sign In Link */}
-        <p className="signin-link">
-          {t("frorgotPassword_page.rememberedPassword")}{" "}
-          <Link to="/signin">{t("frorgotPassword_page.signIn")}</Link>
-        </p>
-      </div>
+  return (
+    <AuthLayout
+      title={t("frorgotPassword_page.forgotPasswordTitle")}
+      subtitle={t("frorgotPassword_page.subtitle")}
+    >
+      <form className="auth-fields" onSubmit={handleSubmit} noValidate>
+        <TextField
+          label={t("frorgotPassword_page.email")}
+          type="email"
+          autoComplete="email"
+          autoFocus
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          error={emailError}
+          helperText={emailError ? t("frorgotPassword_page.emailError") : ""}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <EmailOutlined fontSize="small" />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <Button type="submit" variant="contained" size="large" fullWidth disabled={busy}>
+          {t("frorgotPassword_page.sendResetLink")}
+        </Button>
+      </form>
 
-      {/* Snackbar */}
-      <CustomSnackbar {...snackbar} onClose={handleClose} />
-      <LoadingSpinner open={loading} />
-    </div>
+      <p className="auth-alt">
+        {t("frorgotPassword_page.rememberedPassword")}
+        <Link to="/signin" className="text-link">
+          {t("frorgotPassword_page.signIn")}
+        </Link>
+      </p>
+    </AuthLayout>
   );
 };
 

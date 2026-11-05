@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
+  Navigate,
   Route,
   Routes,
-  Navigate,
   useLocation,
 } from "react-router-dom";
 
@@ -25,265 +25,130 @@ import SavedAds from "./components/screens/SavedAds";
 import MyAds from "./components/screens/MyAds";
 import AdminDashboard from "./components/screens/Dashboard";
 import SupportPage from "./components/screens/SupportPage";
+import LoadingSpinner from "./components/screens/LoadingSpinner";
+
+import { PreferencesProvider } from "./context/PreferencesContext";
+import { NotifyProvider } from "./context/NotifyContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import "./App.css";
 
-import LoadingSpinner from "./components/screens/LoadingSpinner";
+/* ================= ROUTE GUARDS =================
+   Defined outside App so React keeps the same component
+   between renders (pages no longer remount and lose state). */
 
-import { get_token, getProfile } from "./services/authService";
-
-// =======================
-// Theme default
-// =======================
-if (!document.documentElement.getAttribute("data-theme")) {
-  document.documentElement.setAttribute("data-theme", "light");
-}
-
-if (!document.documentElement.getAttribute("language")) {
-  document.documentElement.setAttribute("language", "en");
-}
-
-// =======================
-// Layout Wrapper
-// =======================
-const MainBodyWrapper = ({ children, isSignedIn }) => {
+const ProtectedRoute = ({ roles = [], children }) => {
+  const { isSignedIn, user } = useAuth();
   const location = useLocation();
 
-  const isAuthPage =
-    location.pathname.startsWith("/signin") ||
-    location.pathname.startsWith("/signup") ||
-    location.pathname.startsWith("/verify") ||
-    location.pathname.startsWith("/forgot-password") ||
-    location.pathname.startsWith("/reset-password");
-
-  return (
-    <div
-      className={
-        isSignedIn && !isAuthPage ? "mainBody signedIn" : "mainBody signedIn"
-      }
-    >
-      {children}
-    </div>
-  );
+  if (!isSignedIn) {
+    return <Navigate to="/signin" replace state={{ from: location.pathname }} />;
+  }
+  if (roles.length > 0 && !roles.includes(user?.role)) {
+    return <Navigate to="/home" replace />;
+  }
+  return children;
 };
 
-// =======================
-// App
-// =======================
-const App = () => {
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [role, setRole] = useState(null);
-  const [token, setToken] = useState(null);
+const GuestRoute = ({ children }) => {
+  const { isSignedIn } = useAuth();
+  return isSignedIn ? <Navigate to="/home" replace /> : children;
+};
 
-  // =======================
-  // Session check
-  // =======================
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
   useEffect(() => {
-    const restoreSession = async () => {
-      const savedToken = localStorage.getItem("Token");
-      const timestamp = localStorage.getItem("sessionTimestamp");
-      const now = new Date().getTime();
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
 
-      if (!savedToken || !timestamp) {
-        setIsLoading(false);
-        return;
-      }
+/* ================= SHELL ================= */
 
-      const diff = now - parseInt(timestamp, 10);
-      const hours = diff / (1000 * 60 * 60);
+const AppShell = () => {
+  const { ready } = useAuth();
+  const { pathname } = useLocation();
 
-      if (hours >= 24) {
-        handleSignOut();
-        setIsLoading(false);
-        return;
-      }
+  if (!ready) return <LoadingSpinner open />;
 
-      setIsSignedIn(true);
-      setToken(savedToken);
-
-      try {
-        const res = await getProfile(savedToken);
-
-        if (res.success) {
-          setRole(res.user.role);
-        } else {
-          handleSignOut();
-        }
-      } catch (err) {
-        console.error(err);
-        handleSignOut();
-        setIsLoading(false);
-      }
-
-      setIsLoading(false);
-    };
-
-    restoreSession();
-  }, []);
-
-  // =======================
-  // Auth handlers
-  // =======================
-  const handleSignIn = async () => {
-    setIsSignedIn(true);
-    await fetchUserData();
-  };
-
-  const fetchUserData = async () => {
-    const saved_token = await get_token();
-    if (!saved_token) return;
-
-    try {
-      const res = await getProfile(saved_token);
-
-      if (res.success) {
-        const user = res.user;
-        setRole(user.role);
-        setToken(saved_token);
-      } else {
-        setRole(null);
-        setToken(null);
-      }
-    } catch (err) {
-      console.error(err);
-      setRole(null);
-      setToken(null);
-    }
-  };
-
-  const handleSignOut = () => {
-    localStorage.clear();
-    setIsSignedIn(false);
-    setRole(null);
-    setToken(null);
-  };
-
-  const ProtectedRoute = ({ isSignedIn, allowedRoles = [], children }) => {
-    if (!isSignedIn || !token) {
-      return <Navigate to="/signin" replace />;
-    }
-
-    // role restriction
-    if (allowedRoles.length > 0 && !allowedRoles.includes(role || "")) {
-      return <Navigate to="/home" replace />;
-    }
-
-    return children;
-  };
-
-  if (isLoading) return <LoadingSpinner open={isLoading} />;
-
-  if (isSignedIn && token && role === null)
-    return <LoadingSpinner open={isLoading} />;
+  // Chat screen fills the viewport, so it has no footer
+  const hideFooter = pathname.startsWith("/support");
 
   return (
-    <Router>
-      <TopHeader onSignOut={handleSignOut} isSignedIn={isSignedIn} />
+    <div className="app-root">
+      <ScrollToTop />
+      <TopHeader />
 
-      <MainBodyWrapper isSignedIn={isSignedIn}>
+      <main className="app-main">
         <Routes>
-          <Route path="/" element={<Navigate to="/home" />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
-          <Route path="/signup" element={<SignUp />} />
+          <Route path="/ad/:id" element={<AdDetails />} />
+
+          <Route path="/signin" element={<GuestRoute><SignIn /></GuestRoute>} />
+          <Route path="/signup" element={<GuestRoute><SignUp /></GuestRoute>} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify/:token" element={<VerifyAccount />} />
-          <Route path="/ad/:id" element={<AdDetails />} />
+
           <Route
             path="/profile"
-            element={
-              <ProtectedRoute
-                isSignedIn={isSignedIn}
-                allowedRoles={["user", "admin"]}
-              >
-                <Profile onSignOut={handleSignOut} isSignedIn={isSignedIn} />
-              </ProtectedRoute>
-            }
+            element={<ProtectedRoute roles={["user", "admin"]}><Profile /></ProtectedRoute>}
           />
+          <Route
+            path="/support"
+            element={<ProtectedRoute roles={["user", "admin"]}><SupportPage /></ProtectedRoute>}
+          />
+
           <Route
             path="/post-ad"
-            element={
-              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["user"]}>
-                <PostAd />
-              </ProtectedRoute>
-            }
+            element={<ProtectedRoute roles={["user"]}><PostAd /></ProtectedRoute>}
           />
-
-          <Route
-            path="/users"
-            element={
-              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["admin"]}>
-                <AllUsers />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/categories"
-            element={
-              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["admin"]}>
-                <AllCategories />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/ads"
-            element={
-              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["admin"]}>
-                <AllAds />
-              </ProtectedRoute>
-            }
-          />
-
           <Route
             path="/saved-ads"
-            element={
-              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["user"]}>
-                <SavedAds />
-              </ProtectedRoute>
-            }
+            element={<ProtectedRoute roles={["user"]}><SavedAds /></ProtectedRoute>}
           />
-
           <Route
             path="/my-ads"
-            element={
-              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["user"]}>
-                <MyAds />
-              </ProtectedRoute>
-            }
+            element={<ProtectedRoute roles={["user"]}><MyAds /></ProtectedRoute>}
           />
 
           <Route
             path="/dashboard"
-            element={
-              <ProtectedRoute isSignedIn={isSignedIn} allowedRoles={["admin"]}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
+            element={<ProtectedRoute roles={["admin"]}><AdminDashboard /></ProtectedRoute>}
           />
-
           <Route
-            path="/support"
-            element={
-              <ProtectedRoute
-                isSignedIn={isSignedIn}
-                allowedRoles={["user", "admin"]}
-              >
-                <SupportPage />
-              </ProtectedRoute>
-            }
+            path="/ads"
+            element={<ProtectedRoute roles={["admin"]}><AllAds /></ProtectedRoute>}
+          />
+          <Route
+            path="/users"
+            element={<ProtectedRoute roles={["admin"]}><AllUsers /></ProtectedRoute>}
+          />
+          <Route
+            path="/categories"
+            element={<ProtectedRoute roles={["admin"]}><AllCategories /></ProtectedRoute>}
           />
 
-          <Route path="*" element={<Navigate to="/home" />} />
+          <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
-      </MainBodyWrapper>
+      </main>
 
-      <Footer />
-    </Router>
+      {!hideFooter && <Footer />}
+    </div>
   );
 };
+
+const App = () => (
+  <PreferencesProvider>
+    <NotifyProvider>
+      <AuthProvider>
+        <Router>
+          <AppShell />
+        </Router>
+      </AuthProvider>
+    </NotifyProvider>
+  </PreferencesProvider>
+);
 
 export default App;

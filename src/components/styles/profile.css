@@ -1,246 +1,114 @@
-/* ===============================
-   PAGE LAYOUT
-=============================== */
-.profile-container {
-  width: auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  padding: 40px 20px;
-  background: var(--bg-color);
+.profile-page .panel + .panel {
+  margin-top: 16px;
 }
 
-/* ===============================
-   MAIN WRAPPER CARD
-=============================== */
-.profile-card {
-  width: 100%;
-  max-width: 600px;
-  border-radius: 15px;
-  overflow: hidden;
-  background: var(--card-color);
-  box-shadow: 0 4px 12px var(--border-color);
-}
-
-/* ===============================
-   COVER BANNER
-=============================== */
-.profile-header {
-  position: relative;
-  height: 150px;
-  background: linear-gradient(135deg, #2196f3, #6dd5fa);
+.profile-hero {
   display: flex;
-  justify-content: center;
   align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
 }
 
-/* ===============================
-   PROFILE IMAGE (FLOATING)
-=============================== */
-.profile-image-box {
-  position: absolute;
-  bottom: -50px;
-  width: 120px;
-  height: 120px;
+.profile-avatar {
+  position: relative;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
   cursor: pointer;
 }
 
-.profile-image-box .profile_img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid #fff;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-  transition: 0.3s ease;
+.profile-avatar .MuiAvatar-root {
+  border: 3px solid var(--c-surface);
+  box-shadow: 0 0 0 2px var(--c-border);
 }
 
-.profile-image-box:hover .profile_img {
-  transform: scale(1.05);
-}
-
-/* EDIT ICON */
-.edit-icon {
+.profile-avatar-edit {
   position: absolute;
-  bottom: 5px;
-  right: -10px;
+  right: 0;
+  bottom: 2px;
   width: 32px;
   height: 32px;
-  background: #2196f3;
   border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--c-primary);
+  color: var(--c-on-primary);
+  border: 2px solid var(--c-surface);
+}
+
+.profile-identity {
+  flex: 1;
+  min-width: 200px;
+}
+
+.profile-identity h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.profile-identity p {
+  color: var(--c-muted);
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+.profile-chips {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  padding: 2px;
-}
-
-.edit-icon .MuiSvgIcon-root {
-  font-size: 1.25rem;
-}
-
-/* ===============================
-   NAME + ROLE SECTION
-=============================== */
-.profile-basic-info {
-  margin-top: 70px;
-  text-align: center;
-  padding: 10px 20px;
-}
-
-.profile-basic-info h2 {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.profile-basic-info p {
-  color: var(--muted-color);
-  margin-top: 4px;
-}
-
-/* ===============================
-   STATS BAR
-=============================== */
-.profile-stats {
-  display: flex;
-  justify-content: space-around;
-  padding: 20px;
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-  background: rgba(0, 0, 0, 0.02);
-}
-
-.stat-item {
-  text-align: center;
-}
-
-.stat-item h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.stat-item span {
-  font-size: 12px;
-  color: var(--muted-color);
-}
-
-/* ===============================
-   SECTIONS WRAPPER
-=============================== */
-.profile-sections {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* ===============================
-   SECTION CARD
-=============================== */
-.section-card {
-  background: var(--card-color);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: 0.3s ease;
-}
-
-.section-card:hover {
-  transform: translateY(-2px);
-}
-
-.profile-sections-title {
-  font-size: 16px;
-  font-weight: 600;
-  text-align: center;
-  max-width: 1200px;
-  color: var(--text-color);
-}
-
-/* ===============================
-   ROW (FOR INPUTS)
-=============================== */
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.info-row:last-child {
-  border-bottom: none;
-}
-
-.info-label {
-  color: var(--muted-color);
-  font-size: 14px;
-}
-
-.info-value {
-  color: var(--text-color);
-  font-size: 14px;
-}
-
-.profile-card .button-success:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-}
-
-.profile-card .button-success {
-  margin-top: 18px;
-}
-
-.profile-card .button-group button {
+  gap: 8px;
   margin-top: 10px;
 }
 
-/* ===============================
-   DANGER ZONE
-=============================== */
+.profile-photo-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.profile-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.profile-row .panel-title {
+  margin-bottom: 4px;
+}
+
+.profile-row .MuiTextField-root {
+  max-width: 320px;
+}
+
 .danger-zone {
-  border: 1px solid #ff4d4f;
-  background: rgba(255, 77, 79, 0.05);
-  border-radius: 16px;
-  padding: 18px;
+  border-color: color-mix(in srgb, var(--c-danger) 40%, var(--c-border));
 }
 
-.danger-zone h3 {
-  color: #ff4d4f;
-  margin-bottom: 5px;
+.danger-zone .panel-title {
+  color: var(--c-danger);
 }
 
-.danger-zone p {
-  font-size: 13px;
-  color: var(--muted-color);
-}
-
-/* ===============================
-   RESPONSIVE
-=============================== */
-@media (max-width: 500px) {
-  .profile-stats {
+@media (max-width: 560px) {
+  .profile-hero {
     flex-direction: column;
-    gap: 10px;
+    text-align: center;
   }
 
-  .info-row {
+  .profile-chips {
+    justify-content: center;
+  }
+
+  .profile-row {
     flex-direction: column;
-    gap: 10px;
+    align-items: stretch;
   }
 
-  .info-row .custom-textfield {
-    width: 100% !important;
+  .profile-row .MuiTextField-root {
+    max-width: none;
   }
 
-  .profile-container {
-    padding: 0px;
-  }
-
-  .profile-sections{
-    padding: 15px;
+  .profile-photo-actions > * {
+    flex: 1;
   }
 }

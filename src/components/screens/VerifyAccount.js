@@ -1,85 +1,77 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-
-import LoadingSpinner from "./LoadingSpinner";
-import CustomSnackbar from "./CustomSnackbar";
-
-import { verifyEmail } from "../../services/authService";
-import { ROUTES } from "../../const/const";
-
-import "../styles/verifyAccount.css";
-
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { Button, CircularProgress } from "@mui/material";
+import { CheckRounded, ErrorOutlineRounded } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
+
+import AuthLayout from "../common/AuthLayout";
+import { verifyEmail } from "../../services/authService";
 
 const VerifyAccount = () => {
   const { t } = useTranslation();
   const { token } = useParams();
-  const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(true);
-
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: "",
-    severity: "success",
-  });
-
-  const handleClose = () => {
-    setSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  const [status, setStatus] = useState("loading"); // loading | success | error
+  const [message, setMessage] = useState("");
+  const requested = useRef(null);
 
   useEffect(() => {
-    const verifyUser = async () => {
-      setLoading(true);
+    // Verification tokens are single-use: call the API only once per token
+    // (StrictMode and language changes used to trigger a second, failing call)
+    if (requested.current === token) return;
+    requested.current = token;
 
-      try {
-        const result = await verifyEmail(token);
-
-        if (result.success) {
-          setSnackbar({
-            open: true,
-            message: t("verify_account_page.verifySuccess"),
-            severity: "success",
-          });
-        } else {
-          setSnackbar({
-            open: true,
-            message: t("verify_account_page.verifyFailed"),
-            severity: "error",
-          });
-        }
-      } catch (err) {
-        setSnackbar({
-          open: true,
-          message: t("verify_account_page.verifyError"),
-          severity: "error",
-        });
-      } finally {
-        setLoading(false);
-
-        setTimeout(() => {
-          navigate(ROUTES.HOME);
-        }, 2500);
+    verifyEmail(token).then((res) => {
+      if (res.success) {
+        setStatus("success");
+      } else {
+        setStatus("error");
+        setMessage(res.message);
       }
-    };
-
-    verifyUser();
-  }, [token, navigate, t]);
+    });
+  }, [token]);
 
   return (
-    <div className="verify-container">
-      <div className="verify-box">
-        <h2 className="verify-title">{t("verify_account_page.verifyingAccount")}</h2>
+    <AuthLayout title={t("verify_account_page.title")}>
+      <div className="auth-result">
+        {status === "loading" && (
+          <>
+            <CircularProgress />
+            <h2>{t("verify_account_page.verifyingAccount")}</h2>
+            <p>{t("verify_account_page.verifySubtext")}</p>
+          </>
+        )}
 
-        <p className="verify-subtext">{t("verify_account_page.verifySubtext")}</p>
+        {status === "success" && (
+          <>
+            <div className="auth-result-icon success">
+              <CheckRounded />
+            </div>
+            <h2>{t("verify_account_page.verifySuccess")}</h2>
+            <p>{t("verify_account_page.successText")}</p>
+            <Button component={Link} to="/signin" variant="contained" fullWidth>
+              {t("signin_page.signIn")}
+            </Button>
+          </>
+        )}
 
-        {/* Spinner */}
-        <LoadingSpinner open={loading} />
-
-        {/* Snackbar */}
-        <CustomSnackbar {...snackbar} onClose={handleClose} />
+        {status === "error" && (
+          <>
+            <div className="auth-result-icon error">
+              <ErrorOutlineRounded />
+            </div>
+            <h2>{t("verify_account_page.verifyFailed")}</h2>
+            {message && <p>{message}</p>}
+            <Button href="mailto:info@agrilinkservices.com" variant="outlined" fullWidth>
+              {t("header.contactUs")}
+            </Button>
+            <Link to="/home" className="text-link">
+              {t("verify_account_page.goHome")}
+            </Link>
+          </>
+        )}
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 
