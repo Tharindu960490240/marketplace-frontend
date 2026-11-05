@@ -5,8 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import "../styles/loadingSpinner.css";
 
-/* Full-screen loader — only for app start-up and blocking actions
-   (sign out, account deletion). Page data uses <PageLoader/> instead. */
+/* Full-screen loader — only for app start-up and blocking actions. */
 const LoadingSpinner = ({ open }) => {
   const { t } = useTranslation();
 
