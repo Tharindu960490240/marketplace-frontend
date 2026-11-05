@@ -21,7 +21,14 @@
 /* Admin section nav shown above the chat (horizontal bar at every width) */
 .support-admin-bar {
   flex: 0 0 auto;
-  padding: 12px var(--gutter) 0;
+}
+
+/* The three classes beat `.admin-nav.admin-nav-bar` in admin.css so this bar
+   keeps its own spacing: the top padding opens a gap below the sticky header,
+   and the horizontal gutter insets the pills so their left edge lines up with
+   the ticket list (which sits one gutter in from .support-page). */
+.admin-nav.admin-nav-bar.support-admin-bar {
+  padding: 20px var(--gutter) 4px;
 }
 
 .support-admin-bar + .support-page {

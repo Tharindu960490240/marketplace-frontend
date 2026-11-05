@@ -28,15 +28,12 @@ const write = (key, value) => {
   }
 };
 
-const systemPrefersDark = () =>
-  window.matchMedia?.("(prefers-color-scheme: dark)").matches;
-
 export const PreferencesProvider = ({ children }) => {
   const { i18n } = useTranslation();
 
-  const [mode, setMode] = useState(() =>
-    read("pref_theme", systemPrefersDark() ? "dark" : "light"),
-  );
+  // Default to the light theme on first load; a returning visitor keeps
+  // whatever they last chose (persisted under pref_theme).
+  const [mode, setMode] = useState(() => read("pref_theme", "light"));
   const [language, setLanguage] = useState(() => read("pref_lang", "en"));
 
   // Theme → <html data-theme>, persisted
