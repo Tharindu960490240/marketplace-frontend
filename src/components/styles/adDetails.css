@@ -27,6 +27,12 @@
 
 /* ================= GALLERY ================= */
 
+/* Grid item: min-width:0 stops the thumbnail strip's content width from
+   forcing the column wider than the screen (it scrolls instead). */
+.ad-gallery {
+  min-width: 0;
+}
+
 .gallery-main {
   position: relative;
   aspect-ratio: 4 / 3;
@@ -79,6 +85,7 @@
   display: flex;
   gap: 10px;
   margin-top: 12px;
+  min-width: 0;
   overflow-x: auto;
   padding-bottom: 4px;
 }
@@ -114,6 +121,7 @@
   top: calc(var(--header-h) + 16px);
   display: grid;
   gap: 16px;
+  min-width: 0;
 }
 
 .ad-summary .panel + .panel {
@@ -336,7 +344,7 @@
 
 @media (max-width: 960px) {
   .ad-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .ad-summary {
