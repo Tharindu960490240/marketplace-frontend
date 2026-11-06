@@ -139,6 +139,10 @@
   font-weight: 800;
   line-height: 1.25;
   letter-spacing: -0.02em;
+  /* A pasted link or long unbroken word in a title must wrap, or it pushes
+     past the viewport and gets clipped by .app-main (overflow-x: clip). */
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .ad-price-row {
@@ -213,6 +217,13 @@
 
 .seller-row div {
   display: grid;
+  min-width: 0;
+}
+
+.seller-row strong,
+.seller-row a {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .seller-row a {
@@ -231,6 +242,8 @@
   white-space: pre-line;
   line-height: 1.7;
   max-width: 75ch;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .review-form {
@@ -301,6 +314,19 @@
   margin: 4px 0 8px;
   font-size: 0.85rem;
   color: var(--c-muted);
+}
+
+/* The 1fr track in .review-item; min-width:0 lets it shrink so a long word
+   inside wraps instead of widening the row past the screen. */
+.review-content {
+  min-width: 0;
+}
+
+.review-content p,
+.review-top strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .review-content p {
